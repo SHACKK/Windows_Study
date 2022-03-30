@@ -6,6 +6,29 @@ const char choseong[] = { 'r','R','s','e','E','f','a','q','Q','t','T','d','w','W
 const char jungseong[] = { 'k','o','i','O','j,','p','u','P','h','hk','ho','hl','y','n','nj','np','nl','b','m','ml','l' };
 const char jongseong[] = { 'r','R','rt','s','sw','sg','e','f','fr','fa','fq','ft','fx','fv','fg','a','q','qt','t','T','d','w','c','z','x','v','g' };
 
+struct Completed_Eumjeol
+{
+	int type;
+	int choseong;
+	int jungseong;
+	int jongseong;
+};
+
+int FindUnicode(Completed_Eumjeol stsyllable)
+{
+	return 44032 + ((stsyllable.choseong * 21) + stsyllable.jungseong) * 28 + stsyllable.jongseong;
+}
+
+void FindIndex(char c)
+{
+
+}
+
+void InsertChar(Completed_Eumjeol &stsyllable, char c)
+{
+
+}
+
 std::wstring AssembleHangul(std::wstring strCurrentContext, char c)
 {
 	if ('\n' == c)
