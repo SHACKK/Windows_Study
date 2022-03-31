@@ -21,7 +21,10 @@ int FindUnicode(Completed_Eumjeol stsyllable)
 
 void FindIndex(char c)
 {
-
+	for (int i = 0; i < sizeof(choseong); i++)
+	{
+		if(c == choseong[i])
+	}
 }
 
 void InsertChar(Completed_Eumjeol &stsyllable, char c)
