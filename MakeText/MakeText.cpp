@@ -20,15 +20,14 @@ int FindUnicode(Completed_Eumjeol stsyllable)
 
 int FindIndex(const char* chararray[], char* c)
 {
-<<<<<<< HEAD
 	// 인덱스 번호 반환
-	return 1;
-=======
+	
 	for (int i = 0; i < sizeof(choseong); i++)
 	{
-		if(c == choseong[i])
+		if (c == choseong[i])
+			return i;
 	}
->>>>>>> 8839cb275f7a77c9602763bdd57fd9a0d8cbe1ea
+	return 0;
 }
 
 bool SortChar(char* c)
