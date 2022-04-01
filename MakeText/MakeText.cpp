@@ -134,6 +134,7 @@ void InsertChar(CompletedEumjeol &stsyllabel, char* c)
 				stsyllabel.jongseong == 14 ||
 				stsyllabel.jongseong == 17)
 			{
+				char* tmpchar = (char*)charset_jong[stsyllabel.jongseong];
 
 			}
 			else
