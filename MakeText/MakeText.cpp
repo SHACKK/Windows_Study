@@ -2,68 +2,152 @@
 #include <conio.h>
 #include <cstring>
 
-const char* choseong[] = { "r","R","s","e","E","f","a","q","Q","t","T","d","w","W","c","z","x","v","g" };
-const char* jungseong[] = { "k","o","i","O","j,","p","u","P","h","hk","ho","hl","y","n","nj","np","nl","b","m","ml","l" };
-const char* jongseong[] = { "r","R","rt","s","sw","sg","e","f","fr","fa","fq","ft","fx","fv","fg","a","q","qt","t","T","d","w","c","z","x","v","g" };
+const char* charset_cho[] = { "r","R","s","e","E","f","a","q","Q","t","T","d","w","W","c","z","x","v","g" };
+const char* charset_jung[] = { "k","o","i","O","j,","p","u","P","h","hk","ho","hl","y","n","nj","np","nl","b","m","ml","l" };
+const char* charset_jong[] = { "r","R","rt","s","sw","sg","e","f","fr","fa","fq","ft","fx","fv","fg","a","q","qt","t","T","d","w","c","z","x","v","g" };
 
-struct Completed_Eumjeol
+struct CompletedEumjeol
 {
 	int choseong;
 	int jungseong;
 	int jongseong;
 };
 
-int FindUnicode(Completed_Eumjeol stsyllable)
+int FindUnicode(CompletedEumjeol stsyllable)
 {
 	return 44032 + ((stsyllable.choseong * 21) + stsyllable.jungseong) * 28 + stsyllable.jongseong;
 }
 
 int FindIndex(const char* chararray[], char* c)
 {
-	// 인덱스 번호 반환
-	
-	for (int i = 0; i < sizeof(choseong); i++)
+	for (int i = 0; i < sizeof(chararray); i++)
 	{
-		if (c == choseong[i])
+		if (c == chararray[i])
 			return i;
 	}
-	return 0;
+	return -1;
 }
 
-bool SortChar(char* c)
+int SortChar(char* c)
 {
-	for (int i = 0; i < sizeof(choseong); i++)
+	for (int i = 0; i < sizeof(charset_cho); i++)
 	{
-		if (c == choseong[i])
-			return false;
+		if (c == charset_cho[i])
+			return 0; // 있으면 자음
 	}
-	return true;
+	return 1; // 없으면 모음
 }
 
-void InsertChar(Completed_Eumjeol &stsyllabel, char* c)
+int SortEumjeol(CompletedEumjeol stsyllabel)
 {
-	bool flag = SortChar(c); // 1이면 모음, 0이면 자음
-
-	//초성 삽입
-	if (stsyllabel.choseong == NULL)
-		stsyllabel.choseong = FindIndex(choseong, c);
-	// 중성 삽입
-	else if ((stsyllabel.choseong != NULL && stsyllabel.jungseong == NULL))
-		stsyllabel.jungseong = FindIndex(jungseong, c);
-	// 중성이 두개인 경우 재설정 후 삽입
-	else if (stsyllabel.choseong != NULL && stsyllabel.jungseong != NULL && flag == true)
-	{
-		char* tmp_char = (char*)jungseong[stsyllabel.jungseong]; // 액세스 오류
-		strncat_s(tmp_char, 1, c, 1);
-		stsyllabel.jungseong = FindIndex(jungseong, tmp_char);
-	}	
-	// 종성 삽입
-	else if (stsyllabel.choseong !=NULL && stsyllabel.jungseong != NULL && stsyllabel.jongseong == NULL && flag == false)
-		stsyllabel.jongseong = FindIndex(jongseong, c);
-	// 종성이 두개인 경우 재설정 후 삽입
+	if (stsyllabel.choseong == NULL && stsyllabel.jungseong == NULL && stsyllabel.jongseong == NULL)
+		return 0;
+	else if (stsyllabel.choseong == NULL && stsyllabel.jungseong != NULL && stsyllabel.jongseong == NULL)
+		return 1;
+	else if (stsyllabel.choseong != NULL && stsyllabel.jungseong == NULL && stsyllabel.jongseong == NULL)
+		return 2;
+	else if (stsyllabel.choseong != NULL && stsyllabel.jungseong != NULL && stsyllabel.jongseong == NULL)
+		return 3;
+	else if (stsyllabel.choseong != NULL && stsyllabel.jungseong != NULL && stsyllabel.jongseong != NULL)
+		return 4;
 }
 
-std::wstring AssembleHangul(std::wstring strCurrentContext, Completed_Eumjeol &stsyllabel, char* c)
+void ResetEumjeol(CompletedEumjeol& stsyllabel)
+{
+
+}
+
+void InsertChar(CompletedEumjeol &stsyllabel, char* c)
+{
+	int CharFlag = SortChar(c); // 1이면 모음, 0이면 자음
+	int EumjeolFlag = SortEumjeol(stsyllabel);
+	if (CharFlag == 1)
+	{
+		switch (EumjeolFlag)
+		{
+		case 0: // 000 -> 초성에 삽입
+			stsyllabel.choseong = FindIndex(charset_cho, c);
+			break;
+		case 1: // 010 -> 리셋 후 초성에 삽입
+			ResetEumjeol(stsyllabel);
+			stsyllabel.choseong = FindIndex(charset_cho, c);
+			break;
+		case 2: // 100 -> 리셋 후 초성에 삽입
+			ResetEumjeol(stsyllabel);
+			stsyllabel.choseong = FindIndex(charset_cho, c);
+			break;
+		case 3: // 110 -> 종성에 삽입
+			stsyllabel.jongseong = FindIndex(charset_jong, c);
+			break;
+		case 4: // 111 -> 기존의 종성에 있는 문자열과 합쳐서 charset_jong에 있는지 확인하고, 있으면 합쳐서 삽입 / 없으면 리셋 후 초성에 삽입
+			char* tmpchar = (char*)charset_jong[stsyllabel.jongseong];
+			strncat_s(tmpchar, 1, c, 1);
+			int Index = FindIndex(charset_jong, tmpchar);
+			if (Index != -1)
+				stsyllabel.jongseong = Index;
+			else
+			{
+				ResetEumjeol(stsyllabel);
+				stsyllabel.choseong = FindIndex(charset_cho, c);
+			}
+			break;
+		}
+	}
+	else
+	{
+		switch (EumjeolFlag)
+		{
+		case 0: // 000 -> 중성에 삽입
+			stsyllabel.jungseong = FindIndex(charset_jung, c);
+			break;
+		case 1: // 010 -> 리셋후 중성에 삽입
+			ResetEumjeol(stsyllabel);
+			stsyllabel.jungseong = FindIndex(charset_jung, c);
+			break;
+		case 2: // 100-> 중성에 삽입
+			stsyllabel.jungseong = FindIndex(charset_jung, c);
+			break;
+		case 3: // 110 -> 기존의 중성에 있는 문자열과 합쳐서 charset_jung에 있는지 확인하고, 있으면 합쳐서 삽입 / 없으면 리셋 후 중성에 삽입 
+			char* tmpchar = (char*)charset_jung[stsyllabel.jungseong];
+			strncat_s(tmpchar, 1, c, 1);
+			int Index = FindIndex(charset_jung, tmpchar);
+			if (Index != -1)
+			{
+				ResetEumjeol(stsyllabel);
+				stsyllabel.jungseong = FindIndex(charset_jung, c);
+			}
+			else
+			{
+				stsyllabel.jungseong = Index;
+			}
+			break;
+		case 4: // 111 -> 
+			if (stsyllabel.jongseong == 2 ||
+				stsyllabel.jongseong == 4 ||
+				stsyllabel.jongseong == 5 ||
+				stsyllabel.jongseong == 8 ||
+				stsyllabel.jongseong == 9 ||
+				stsyllabel.jongseong == 10 ||
+				stsyllabel.jongseong == 11 ||
+				stsyllabel.jongseong == 12 ||
+				stsyllabel.jongseong == 13 ||
+				stsyllabel.jongseong == 14 ||
+				stsyllabel.jongseong == 17)
+			{
+
+			}
+			else
+			{
+				int tmpIndex = stsyllabel.jongseong;
+				ResetEumjeol(stsyllabel);
+				stsyllabel.choseong = tmpIndex;
+				stsyllabel.jungseong = FindIndex(charset_jung, c);
+			}
+		}
+	}
+}
+
+std::wstring AssembleHangul(std::wstring strCurrentContext, CompletedEumjeol &stsyllabel, char* c)
 {
 	if ("\n" == c)
 		return strCurrentContext;
@@ -82,7 +166,7 @@ int main()
 {
 	std::wstring strContext;
 
-	Completed_Eumjeol stsyllable;
+	CompletedEumjeol stsyllable;
 	while (true)
 	{
 		char c = (char)_getch();
