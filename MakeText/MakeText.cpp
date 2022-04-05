@@ -7,10 +7,13 @@ const char* charset_cho[] = { "r","R","s","e","E","f","a","q","Q","t","T","d","w
 const char* charset_jung[] = { "k","o","i","O","j,","p","u","P","h","hk","ho","hl","y","n","nj","np","nl","b","m","ml","l" };
 const char* charset_jong[] = { "", "r","R","rt","s","sw","sg","e","f","fr","fa","fq","ft","fx","fv","fg","a","q","qt","t","T","d","w","c","z","x","v","g" };
 
+int charset_single[40] = { 0x3131, 0x3132, 0x3134, 0x3137, 0x3138, 0x3139, 0x3141, 0x3142, 0x3143, 0x3145, 0x3146, 0x3147, 0x3148, 0x3149, 0x314A, 0x314B, 0x314C, 0x314D, 0x314E, 0x314F, 0x3150, 0x3151, 0x3152, 0x3153, 0x3154, 0x3155, 0x3156, 0x3157, 0x3158, 0x3159, 0x315A, 0x315B, 0x315C, 0x315D, 0x315E, 0x315F, 0x3160, 0x3161, 0x3162, 0x3163 };
+
 struct CompletedEumjeol
 {
-	int choseong = 0;
-	int jungseong = 0;
+	int flag = 0;
+	int choseong = 99;
+	int jungseong = 99;
 	int jongseong = 0;
 };
 
@@ -19,11 +22,14 @@ int FindUnicode(CompletedEumjeol stsyllable)
 	return 44032 + ((stsyllable.choseong * 21) + stsyllable.jungseong) * 28 + stsyllable.jongseong;
 }
 
+// 배열에서 몇번째 인덱스를 가지는지 리턴
 int FindIndex(const char* chararray[], char* c)
 {
-	for (int i = 0; i < (int)sizeof(chararray); i++)
+	char szInput[2] = { *c, 0 };
+	int i = 0;
+	for (i; i < 28; i++) // sizeof가 잘못되었음
 	{
-		if (strcmp(c, (char*)chararray[i]) == 0)
+		if (strcmp(szInput, chararray[i]) == 0)
 			return i;
 	}
 	return -1;
@@ -33,10 +39,11 @@ int FindIndex(const char* chararray[], char* c)
 int SortChar(char* c)
 {
 	char* tmp;
+	char szInput[2] = { *c, 0 };
 	for (int i = 0; i < 19; i++)
 	{
 		tmp = (char*)charset_cho[i];
-		if (strcmp(c, tmp) == 0) {
+		if (strcmp(szInput, tmp) == 0) {
 			return 0;
 			break;
 		}
@@ -47,42 +54,38 @@ int SortChar(char* c)
 // 글자가 어디까지 완성되었는지
 int SortEumjeol(CompletedEumjeol stsyllabel)
 {
-	if (stsyllabel.choseong == 0 && stsyllabel.jungseong == 0 && stsyllabel.jongseong == 0)
+	if (stsyllabel.choseong == 99 && stsyllabel.jungseong == 99 && stsyllabel.jongseong == 0)
 		return 0;
-	else if (stsyllabel.choseong == 0 && stsyllabel.jungseong != 0 && stsyllabel.jongseong == 0)
+	else if (stsyllabel.choseong == 99 && stsyllabel.jungseong != 99 && stsyllabel.jongseong == 0)
 		return 1;
-	else if (stsyllabel.choseong != 0 && stsyllabel.jungseong == 0 && stsyllabel.jongseong == 0)
+	else if (stsyllabel.choseong != 99 && stsyllabel.jungseong == 99 && stsyllabel.jongseong == 0)
 		return 2;
-	else if (stsyllabel.choseong != 0 && stsyllabel.jungseong != 0 && stsyllabel.jongseong == 0)
+	else if (stsyllabel.choseong != 99 && stsyllabel.jungseong != 99 && stsyllabel.jongseong == 0)
 		return 3;
-	else if (stsyllabel.choseong != 0 && stsyllabel.jungseong != 0 && stsyllabel.jongseong != 0)
+	else if (stsyllabel.choseong != 99 && stsyllabel.jungseong != 99 && stsyllabel.jongseong != 0)
 		return 4;
 }
 
 void ResetEumjeol(CompletedEumjeol& stsyllabel)
 {
-	stsyllabel.choseong = 0;
-	stsyllabel.jungseong = 0;
+	stsyllabel.flag = 0;
+	stsyllabel.choseong = 99;
+	stsyllabel.jungseong = 99;
 	stsyllabel.jongseong = 0;
-}
-
-void PrintUnicode(CompletedEumjeol stsyllabel)
-{
-
 }
 
 void InsertChar(CompletedEumjeol& stsyllabel, char* c)
 {
 	int CharFlag = SortChar(c); // 1이면 모음, 0이면 자음
-	int EumjeolFlag = SortEumjeol(stsyllabel);
+	stsyllabel.flag = SortEumjeol(stsyllabel); // 글자 완성도 구분
 	if (CharFlag == 0)
 	{
-		switch (EumjeolFlag)
+		switch (stsyllabel.flag)
 		{
 		case 0: // 000 -> 초성에 삽입
 			stsyllabel.choseong = FindIndex(charset_cho, c);
 			break;
-		case 1: // 010 -> 리셋 후 초성에 삽입
+		case 1: // 010 -> 리셋 후 초성에 삽입W
 			ResetEumjeol(stsyllabel);
 			stsyllabel.choseong = FindIndex(charset_cho, c);
 			break;
@@ -94,7 +97,10 @@ void InsertChar(CompletedEumjeol& stsyllabel, char* c)
 			stsyllabel.jongseong = FindIndex(charset_jong, c);
 			break;
 		case 4: // 111 -> 기존의 종성에 있는 문자열과 합쳐서 charset_jong에 있는지 확인하고, 있으면 합쳐서 삽입 / 없으면 리셋 후 초성에 삽입
-			char* tmpchar = (char*)charset_jong[stsyllabel.jongseong];
+			std::string tmpchar = charset_jong[stsyllabel.jongseong];
+			tmpchar.push_back((char)(&c));
+
+
 			strncat_s(tmpchar, 1, c, 1);
 			int Index = FindIndex(charset_jong, tmpchar);
 			if (Index != -1)
@@ -107,9 +113,9 @@ void InsertChar(CompletedEumjeol& stsyllabel, char* c)
 			break;
 		}
 	}
-	else //자음일 경우
+	else //모음일 경우
 	{
-		switch (EumjeolFlag)
+		switch (stsyllabel.flag)
 		{
 		case 0: // 000 -> 중성에 삽입
 			stsyllabel.jungseong = FindIndex(charset_jung, c);
@@ -180,10 +186,26 @@ std::wstring AssembleHangul(std::wstring strCurrentContext, CompletedEumjeol& st
 	if ('b' == c)
 		return strCurrentContext = strCurrentContext.substr(0, strCurrentContext.length() - 1);
 
-	InsertChar(stsyllabel, &c);
-
 	std::wstring strRet = strCurrentContext;
-	strRet.push_back(FindUnicode(stsyllabel));
+
+	if (' ' == c)
+	{
+		strRet.push_back(c);
+		return strRet;
+	}
+
+	//char InsertedChar = c;
+	InsertChar(stsyllabel, &c); // 여기서부터 갑자기 &c 문자열에 잘못된 문자가 있다고 뜸.
+	stsyllabel.flag = SortEumjeol(stsyllabel);
+
+	
+	if (stsyllabel.flag != 0 && stsyllabel.flag != 1 && stsyllabel.flag != 2)
+		strRet.push_back(FindUnicode(stsyllabel));
+	else if (stsyllabel.flag == 1)
+		strRet.push_back(charset_single[stsyllabel.jungseong + 19]);
+	else if (stsyllabel.flag == 2)
+		strRet.push_back(charset_single[stsyllabel.choseong]);
+
 	return strRet;
 }
 
@@ -193,9 +215,6 @@ int main()
 	std::wstring strContext;
 
 	CompletedEumjeol stsyllabel;
-	stsyllabel.choseong = 0;
-	stsyllabel.jungseong = 0;
-	stsyllabel.jongseong = 0;
 
 	while (true)
 	{
