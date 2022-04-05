@@ -36,7 +36,7 @@ int FindIndex(const char* chararray[], char* c)
 }
 
 // 자음인지 모음인지 구분
-int SortChar(char* c)
+int SortChar(char *c)
 {
 	char* tmp;
 	char szInput[2] = { *c, 0 };
@@ -97,12 +97,11 @@ void InsertChar(CompletedEumjeol& stsyllabel, char* c)
 			stsyllabel.jongseong = FindIndex(charset_jong, c);
 			break;
 		case 4: // 111 -> 기존의 종성에 있는 문자열과 합쳐서 charset_jong에 있는지 확인하고, 있으면 합쳐서 삽입 / 없으면 리셋 후 초성에 삽입
-			std::string tmpchar = charset_jong[stsyllabel.jongseong];
-			tmpchar.push_back((char)(&c));
-
-
-			strncat_s(tmpchar, 1, c, 1);
-			int Index = FindIndex(charset_jong, tmpchar);
+			//char tmp2char[] = { *c, 0 };
+			char* tmp2char = c;
+			char* tmpchar = (char*)(charset_jong[stsyllabel.jongseong]);
+			//tmpchar += tmp2char;
+			int Index = FindIndex(charset_jong, tmp2char);
 			if (Index != -1)
 				stsyllabel.jongseong = Index;
 			else
