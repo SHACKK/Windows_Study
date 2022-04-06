@@ -3,6 +3,7 @@
 #include <cstring>
 #include <iostream>
 
+const char* keyboard_char[] = { "q","w","e","r","t","y","u","i","o","p","a","s","d","f","g","h","j","k","l","z","x","c","v","b","n","m" };
 const char* charset_cho[] = { "r","R","s","e","E","f","a","q","Q","t","T","d","w","W","c","z","x","v","g" }; // 19개
 const char* charset_jung[] = { "k","o","i","O","j","p","u","P","h","hk","ho","hl","y","n","nj","np","nl","b","m","ml","l" }; // 21개
 const char* charset_jong[] = { "", "r","R","rt","s","sw","sg","e","f","fr","fa","fq","ft","fx","fv","fg","a","q","qt","t","T","d","w","c","z","x","v","g" }; // 28개
@@ -194,13 +195,17 @@ int InsertChar(CompletedEumjeol& stsyllabel, char c)
 
 std::wstring AssembleHangul(std::wstring strCurrentContext, CompletedEumjeol& stsyllabel, char c)
 {
-	if ('\n' == c)
+	if ('\r' == c)
+	{
 		//ResetEumjeol(stsyllabel);
 		return strCurrentContext;
+	}
 
 	if ('\b' == c)
-		//ResetEumjeol(stsyllabel);
+	{
+		ResetEumjeol(stsyllabel);
 		return strCurrentContext = strCurrentContext.substr(0, strCurrentContext.length() - 1);
+	}
 
 	std::wstring strRet = strCurrentContext;
 
@@ -232,7 +237,7 @@ std::wstring AssembleHangul(std::wstring strCurrentContext, CompletedEumjeol& st
 		strRet.pop_back();
 		strRet.push_back(FindUnicode(stsyllabel));
 		ResetEumjeol(stsyllabel);
-		stsyllabel.choseong = res; // 완벽
+		stsyllabel.choseong = res;
 		std::string ch;
 		ch.push_back(c);
 		stsyllabel.jungseong = FindIndex(charset_jung, ch.c_str(), 21);
@@ -240,6 +245,14 @@ std::wstring AssembleHangul(std::wstring strCurrentContext, CompletedEumjeol& st
 	}
 	
 	return strRet;
+}
+
+int IsKeyboardChar(char c)
+{
+	std::string tmp;
+	tmp.push_back(c);
+	int res = FindIndex(keyboard_char, tmp.c_str(), 26);
+	return res;
 }
 
 int main()
@@ -252,6 +265,9 @@ int main()
 	while (true)
 	{
 		char c = (char)_getch();
+		//int key_flag = IsKeyboardChar(c);
+
+		//std::wstring strNewContext;
 		std::wstring strNewContext = AssembleHangul(strContext, stsyllabel, c);
 
 		if (strNewContext == strContext)
