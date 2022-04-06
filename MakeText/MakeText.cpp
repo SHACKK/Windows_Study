@@ -1,6 +1,5 @@
 ﻿#include <string>
 #include <conio.h>
-#include <cstring>
 #include <iostream>
 
 const char* keyboard_char[] = { "q","w","e","r","t","y","u","i","o","p","a","s","d","f","g","h","j","k","l","z","x","c","v","b","n","m" };
@@ -193,8 +192,76 @@ int InsertChar(CompletedEumjeol& stsyllabel, char c)
 	return -1;
 }
 
+// 0 반환 : stsyllabel에 아무것도 없음
+// 1 반환 : stsyllabel에 무언가 들어있음
+void DeleteEumjeol(CompletedEumjeol& stsyllabel, int status)
+{
+	switch (status)
+	{
+	case 0 : // 000
+		ResetEumjeol(stsyllabel);
+	case 1 : // 010
+	{
+		std::string tmp = charset_jung[stsyllabel.jungseong];
+
+		stsyllabel.jungseong = 99;
+	}
+	case 2: // 100
+	{
+		stsyllabel.choseong = 99;
+	}
+	case 3: // 110
+	{
+		// 9 10 11 14 15 16 19
+		if (stsyllabel.jungseong == 9 ||
+			stsyllabel.jungseong == 10 ||
+			stsyllabel.jungseong == 11 ||
+			stsyllabel.jungseong == 14 ||
+			stsyllabel.jungseong == 15 ||
+			stsyllabel.jungseong == 16 ||
+			stsyllabel.jungseong == 19)
+		{
+			std::string tmp = charset_jung[stsyllabel.jungseong];
+			tmp.pop_back();
+			int Index = FindIndex(charset_jung, tmp.c_str(), 21);
+			stsyllabel.jungseong = Index;
+		}
+		else
+		{
+			stsyllabel.jungseong = 99;
+		}
+	}
+	case 4: // 111
+	{
+		if (stsyllabel.jongseong == 3 ||
+			stsyllabel.jongseong == 5 ||
+			stsyllabel.jongseong == 6 ||
+			stsyllabel.jongseong == 9 ||
+			stsyllabel.jongseong == 10 ||
+			stsyllabel.jongseong == 11 ||
+			stsyllabel.jongseong == 12 ||
+			stsyllabel.jongseong == 13 ||
+			stsyllabel.jongseong == 14 ||
+			stsyllabel.jongseong == 15 ||
+			stsyllabel.jongseong == 18)
+		{
+			std::string tmp = charset_jong[stsyllabel.jongseong];
+			tmp.pop_back();
+			int Index = FindIndex(charset_jong, tmp.c_str(), 28);
+			stsyllabel.jongseong = Index;
+		}
+		else
+		{
+			stsyllabel.jongseong = 0;
+		}
+	}
+	}
+}
+
 std::wstring AssembleHangul(std::wstring strCurrentContext, CompletedEumjeol& stsyllabel, char c)
 {
+	std::wstring strRet = strCurrentContext;
+
 	if ('\r' == c)
 	{
 		//ResetEumjeol(stsyllabel);
@@ -203,11 +270,47 @@ std::wstring AssembleHangul(std::wstring strCurrentContext, CompletedEumjeol& st
 
 	if ('\b' == c)
 	{
-		ResetEumjeol(stsyllabel);
-		return strCurrentContext = strCurrentContext.substr(0, strCurrentContext.length() - 1);
+		int status = SortEumjeol(stsyllabel);
+
+		if (status == 0) // 이미 아무것도 없으면
+			return strCurrentContext = strCurrentContext.substr(0, strCurrentContext.length() - 1);
+
+		DeleteEumjeol(stsyllabel, status);
+		status = SortEumjeol(stsyllabel);
+
+		strCurrentContext = strCurrentContext.substr(0, strCurrentContext.length() - 1);
+		strRet = strCurrentContext;
+
+		switch (status)
+		{
+		case 0:
+		{
+			return strRet;
+		}
+		case 1:
+		{
+			strRet.push_back(charset_single[stsyllabel.jungseong+19]);
+			return strRet;
+		}
+		case 2:
+		{
+			strRet.push_back(charset_single[stsyllabel.choseong]);
+			return strRet;
+		}
+		case 3:
+		{
+			strRet.push_back(FindUnicode(stsyllabel));
+			return strRet;
+		}
+		case 4:
+		{
+			strRet.push_back(FindUnicode(stsyllabel));
+			return strRet;
+		}
+		}
+
 	}
 
-	std::wstring strRet = strCurrentContext;
 
 	if (' ' == c)
 	{
