@@ -3,9 +3,11 @@
 #include <iostream>
 
 const char* keyboard_char[] = { "q","w","e","r","t","y","u","i","o","p","a","s","d","f","g","h","j","k","l","z","x","c","v","b","n","m" };
-const char* charset_cho[] = { "r","R","s","e","E","f","a","q","Q","t","T","d","w","W","c","z","x","v","g" }; // 19개
+
+const char* charset_cho[] = { "r","R","s","e","E","f","a","q","Q","t","T","d","w","W","c","z","x","v","g"}; // 19개
 const char* charset_jung[] = { "k","o","i","O","j","p","u","P","h","hk","ho","hl","y","n","nj","np","nl","b","m","ml","l" }; // 21개
 const char* charset_jong[] = { "", "r","R","rt","s","sw","sg","e","f","fr","fa","fq","ft","fx","fv","fg","a","q","qt","t","T","d","w","c","z","x","v","g" }; // 28개
+const char* charset_Useless[] = { "F","A","D","C","Z","X","V","G","K","I","J","U","N","B","H","Y","M","L","S"}; // 19개
 
 int charset_single[40] = { 0x3131, 0x3132, 0x3134, 0x3137, 0x3138, 0x3139, 0x3141, 0x3142, 0x3143, 0x3145, 0x3146, 0x3147, 0x3148, 0x3149, 0x314A, 0x314B, 0x314C, 0x314D, 0x314E, 0x314F, 0x3150, 0x3151, 0x3152, 0x3153, 0x3154, 0x3155, 0x3156, 0x3157, 0x3158, 0x3159, 0x315A, 0x315B, 0x315C, 0x315D, 0x315E, 0x315F, 0x3160, 0x3161, 0x3162, 0x3163 };
 
@@ -25,7 +27,6 @@ int FindUnicode(CompletedEumjeol stsyllable)
 // 배열에서 몇번째 인덱스를 가지는지 리턴
 int FindIndex(const char* chararray[], const char* c, int SizeofArray)
 {
-	//char szInput[3] = { *c, 0 };
 	int i = 0;
 	for (i; i < SizeofArray; i++)
 	{
@@ -39,13 +40,11 @@ int FindIndex(const char* chararray[], const char* c, int SizeofArray)
 int SortChar(const char* c)
 {
 	char* tmp;
-	char szInput[2] = { *c, 0 };
 	for (int i = 0; i < 19; i++)
 	{
 		tmp = (char*)charset_cho[i];
-		if (strcmp(szInput, tmp) == 0) {
+		if (strcmp(c, tmp) == 0) {
 			return 0;
-			break;
 		}
 	}
 	return 1; // 없으면 모음
@@ -311,12 +310,18 @@ std::wstring AssembleHangul(std::wstring strCurrentContext, CompletedEumjeol& st
 
 	}
 
-
 	if (' ' == c)
 	{
 		ResetEumjeol(stsyllabel);
 		strRet.push_back(c);
 		return strRet;
+	}
+
+	std::string tmp;
+	tmp.push_back(c);
+	if (FindIndex(charset_Useless, tmp.c_str(), 19) != -1) // charset_Useless[] 에 있다면
+	{
+		c ^= 32;
 	}
 
 	int res = InsertChar(stsyllabel, c);
