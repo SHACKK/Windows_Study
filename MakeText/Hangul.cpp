@@ -1,11 +1,12 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
+#include "Hangul.h"
 
 const char* keyboard_char[] = { "q","w","e","r","t","y","u","i","o","p","a","s","d","f","g","h","j","k","l","z","x","c","v","b","n","m" };
 
-const char* charset_cho[] = { "r","R","s","e","E","f","a","q","Q","t","T","d","w","W","c","z","x","v","g" }; // 19ê°œ
-const char* charset_jung[] = { "k","o","i","O","j","p","u","P","h","hk","ho","hl","y","n","nj","np","nl","b","m","ml","l" }; // 21ê°œ
-const char* charset_jong[] = { "", "r","R","rt","s","sw","sg","e","f","fr","fa","fq","ft","fx","fv","fg","a","q","qt","t","T","d","w","c","z","x","v","g" }; // 28ê°œ
-const char* charset_Useless[] = { "F","A","D","C","Z","X","V","G","K","I","J","U","N","B","H","Y","M","L","S" }; // 19ê°œ
+const char* charset_cho[] = { "r","R","s","e","E","f","a","q","Q","t","T","d","w","W","c","z","x","v","g" }; // 19°³
+const char* charset_jung[] = { "k","o","i","O","j","p","u","P","h","hk","ho","hl","y","n","nj","np","nl","b","m","ml","l" }; // 21°³
+const char* charset_jong[] = { "", "r","R","rt","s","sw","sg","e","f","fr","fa","fq","ft","fx","fv","fg","a","q","qt","t","T","d","w","c","z","x","v","g" }; // 28°³
+const char* charset_Useless[] = { "F","A","D","C","Z","X","V","G","K","I","J","U","N","B","H","Y","M","L","S" }; // 19°³
 
 int charset_single[40] = { 0x3131, 0x3132, 0x3134, 0x3137, 0x3138, 0x3139, 0x3141, 0x3142, 0x3143, 0x3145, 0x3146, 0x3147, 0x3148, 0x3149, 0x314A, 0x314B, 0x314C, 0x314D, 0x314E, 0x314F, 0x3150, 0x3151, 0x3152, 0x3153, 0x3154, 0x3155, 0x3156, 0x3157, 0x3158, 0x3159, 0x315A, 0x315B, 0x315C, 0x315D, 0x315E, 0x315F, 0x3160, 0x3161, 0x3162, 0x3163 };
 
@@ -22,7 +23,7 @@ int FindUnicode(CompletedEumjeol stsyllable)
 	return 44032 + ((stsyllable.choseong * 21) + stsyllable.jungseong) * 28 + stsyllable.jongseong;
 }
 
-// ë°°ì—´ì—ì„œ ëª‡ë²ˆì§¸ ì¸ë±ìŠ¤ë¥¼ ê°€ì§€ëŠ”ì§€ ë¦¬í„´
+// ¹è¿­¿¡¼­ ¸î¹øÂ° ÀÎµ¦½º¸¦ °¡Áö´ÂÁö ¸®ÅÏ
 int FindIndex(const char* chararray[], const char* c, int SizeofArray)
 {
 	int i = 0;
@@ -34,7 +35,7 @@ int FindIndex(const char* chararray[], const char* c, int SizeofArray)
 	return -1;
 }
 
-// ììŒì¸ì§€ ëª¨ìŒì¸ì§€ êµ¬ë¶„
+// ÀÚÀ½ÀÎÁö ¸ğÀ½ÀÎÁö ±¸ºĞ
 int SortChar(const char* c)
 {
 	char* tmp;
@@ -45,10 +46,10 @@ int SortChar(const char* c)
 			return 0;
 		}
 	}
-	return 1; // ì—†ìœ¼ë©´ ëª¨ìŒ
+	return 1; // ¾øÀ¸¸é ¸ğÀ½
 }
 
-// ê¸€ìê°€ ì–´ë””ê¹Œì§€ ì™„ì„±ë˜ì—ˆëŠ”ì§€
+// ±ÛÀÚ°¡ ¾îµğ±îÁö ¿Ï¼ºµÇ¾ú´ÂÁö
 int SortEumjeol(CompletedEumjeol stsyllabel)
 {
 	if (stsyllabel.choseong == 99 && stsyllabel.jungseong == 99 && stsyllabel.jongseong == 0)
@@ -76,25 +77,25 @@ int InsertChar(CompletedEumjeol& stsyllabel, char c)
 	std::string ch;
 	ch.push_back(c);
 
-	int CharFlag = SortChar(ch.c_str()); // 1ì´ë©´ ëª¨ìŒ, 0ì´ë©´ ììŒ
-	stsyllabel.flag = SortEumjeol(stsyllabel); // ê¸€ì ì™„ì„±ë„ êµ¬ë¶„
+	int CharFlag = SortChar(ch.c_str()); // 1ÀÌ¸é ¸ğÀ½, 0ÀÌ¸é ÀÚÀ½
+	stsyllabel.flag = SortEumjeol(stsyllabel); // ±ÛÀÚ ¿Ï¼ºµµ ±¸ºĞ
 
-	if (CharFlag == 0) // ììŒì¼ ê²½ìš°
+	if (CharFlag == 0) // ÀÚÀ½ÀÏ °æ¿ì
 	{
 		switch (stsyllabel.flag)
 		{
-		case 0: // 000 -> ì´ˆì„±ì— ì‚½ì…
+		case 0: // 000 -> ÃÊ¼º¿¡ »ğÀÔ
 			stsyllabel.choseong = FindIndex(charset_cho, ch.c_str(), 19);
 			break;
-		case 1: // 010 -> ë¦¬ì…‹ í›„ ì´ˆì„±ì— ì‚½ì…
+		case 1: // 010 -> ¸®¼Â ÈÄ ÃÊ¼º¿¡ »ğÀÔ
 			ResetEumjeol(stsyllabel);
 			stsyllabel.choseong = FindIndex(charset_cho, ch.c_str(), 19);
 			break;
-		case 2: // 100 -> ë¦¬ì…‹ í›„ ì´ˆì„±ì— ì‚½ì…
+		case 2: // 100 -> ¸®¼Â ÈÄ ÃÊ¼º¿¡ »ğÀÔ
 			ResetEumjeol(stsyllabel);
 			stsyllabel.choseong = FindIndex(charset_cho, ch.c_str(), 19);
 			break;
-		case 3: // 110 -> ì¢…ì„±ì— ì‚½ì…, ì¢…ì„±ì´ ë  ìˆ˜ ì—†ëŠ” ê²½ìš° ë¦¬ì…‹ í›„ ì‚½ì…
+		case 3: // 110 -> Á¾¼º¿¡ »ğÀÔ, Á¾¼ºÀÌ µÉ ¼ö ¾ø´Â °æ¿ì ¸®¼Â ÈÄ »ğÀÔ
 		{
 			int Index = FindIndex(charset_jong, ch.c_str(), 28);
 			if (Index != -1)
@@ -107,7 +108,7 @@ int InsertChar(CompletedEumjeol& stsyllabel, char c)
 			break;
 		}
 
-		case 4: // 111 -> ê¸°ì¡´ì˜ ì¢…ì„±ì— ìˆëŠ” ë¬¸ìì—´ê³¼ í•©ì³ì„œ charset_jongì— ìˆëŠ”ì§€ í™•ì¸í•˜ê³ , ìˆìœ¼ë©´ í•©ì³ì„œ ì‚½ì… / ì—†ìœ¼ë©´ ë¦¬ì…‹ í›„ ì´ˆì„±ì— ì‚½ì…
+		case 4: // 111 -> ±âÁ¸ÀÇ Á¾¼º¿¡ ÀÖ´Â ¹®ÀÚ¿­°ú ÇÕÃÄ¼­ charset_jong¿¡ ÀÖ´ÂÁö È®ÀÎÇÏ°í, ÀÖÀ¸¸é ÇÕÃÄ¼­ »ğÀÔ / ¾øÀ¸¸é ¸®¼Â ÈÄ ÃÊ¼º¿¡ »ğÀÔ
 		{
 			std::string tmp = charset_jong[stsyllabel.jongseong];
 			tmp.push_back(c);
@@ -123,22 +124,22 @@ int InsertChar(CompletedEumjeol& stsyllabel, char c)
 		}
 		}
 	}
-	else //ëª¨ìŒì¼ ê²½ìš°
+	else //¸ğÀ½ÀÏ °æ¿ì
 	{
 		switch (stsyllabel.flag)
 		{
-		case 0: // 000 -> ì¤‘ì„±ì— ì‚½ì…
+		case 0: // 000 -> Áß¼º¿¡ »ğÀÔ
 			stsyllabel.jungseong = FindIndex(charset_jung, ch.c_str(), 21);
 			break;
-		case 1: // 010 -> ë¦¬ì…‹í›„ ì¤‘ì„±ì— ì‚½ì…
+		case 1: // 010 -> ¸®¼ÂÈÄ Áß¼º¿¡ »ğÀÔ
 			ResetEumjeol(stsyllabel);
 			stsyllabel.jungseong = FindIndex(charset_jung, ch.c_str(), 21);
 			break;
-		case 2: // 100-> ì¤‘ì„±ì— ì‚½ì…
+		case 2: // 100-> Áß¼º¿¡ »ğÀÔ
 			stsyllabel.jungseong = FindIndex(charset_jung, ch.c_str(), 21);
 			break;
 		case 3:
-		{// 110 -> ê¸°ì¡´ì˜ ì¤‘ì„±ì— ìˆëŠ” ë¬¸ìì—´ê³¼ í•©ì³ì„œ charset_jungì— ìˆëŠ”ì§€ í™•ì¸í•˜ê³ , ìˆìœ¼ë©´ í•©ì³ì„œ ì‚½ì… / ì—†ìœ¼ë©´ ë¦¬ì…‹ í›„ ì¤‘ì„±ì— ì‚½ì… 
+		{// 110 -> ±âÁ¸ÀÇ Áß¼º¿¡ ÀÖ´Â ¹®ÀÚ¿­°ú ÇÕÃÄ¼­ charset_jung¿¡ ÀÖ´ÂÁö È®ÀÎÇÏ°í, ÀÖÀ¸¸é ÇÕÃÄ¼­ »ğÀÔ / ¾øÀ¸¸é ¸®¼Â ÈÄ Áß¼º¿¡ »ğÀÔ 
 			std::string tmp = charset_jung[stsyllabel.jungseong];
 			tmp.push_back(c);
 
@@ -154,7 +155,7 @@ int InsertChar(CompletedEumjeol& stsyllabel, char c)
 			}
 			break;
 		}
-		case 4: // 111 -> ì¢…ì„±ì´ ë‘ê°œì¸ ê²½ìš° í•˜ë‚˜ë¥¼ ë¹¼ê³  í‘œì‹œ í›„ ë‹¤ìŒ ê¸€ìì— í•©ì¹œë‹¤. ì¢…ì„±ì´ í•œê°œì¸ ê²½ìš° ë¹¼ê³  í‘œì‹œ í›„ ë‹¤ìŒ ê¸€ìì— í•©ì¹œë‹¤. 
+		case 4: // 111 -> Á¾¼ºÀÌ µÎ°³ÀÎ °æ¿ì ÇÏ³ª¸¦ »©°í Ç¥½Ã ÈÄ ´ÙÀ½ ±ÛÀÚ¿¡ ÇÕÄ£´Ù. Á¾¼ºÀÌ ÇÑ°³ÀÎ °æ¿ì »©°í Ç¥½Ã ÈÄ ´ÙÀ½ ±ÛÀÚ¿¡ ÇÕÄ£´Ù. 
 		{
 			int PrevIndex;
 			if (stsyllabel.jongseong == 3 ||
@@ -171,7 +172,7 @@ int InsertChar(CompletedEumjeol& stsyllabel, char c)
 			{
 				std::string tmp = charset_jong[stsyllabel.jongseong];
 				std::string tmp2 = tmp.substr(1, 1);
-				//ë‘ë²ˆì§¸ ê¸€ì ì €ì¥í•´ë‘ê³ 
+				//µÎ¹øÂ° ±ÛÀÚ ÀúÀåÇØµÎ°í
 				PrevIndex = FindIndex(charset_cho, tmp2.c_str(), 19);
 				tmp.pop_back();
 				stsyllabel.jongseong = FindIndex(charset_jong, tmp.c_str(), 28);
@@ -189,8 +190,8 @@ int InsertChar(CompletedEumjeol& stsyllabel, char c)
 	return -1;
 }
 
-// 0 ë°˜í™˜ : stsyllabelì— ì•„ë¬´ê²ƒë„ ì—†ìŒ
-// 1 ë°˜í™˜ : stsyllabelì— ë¬´ì–¸ê°€ ë“¤ì–´ìˆìŒ
+// 0 ¹İÈ¯ : stsyllabel¿¡ ¾Æ¹«°Íµµ ¾øÀ½
+// 1 ¹İÈ¯ : stsyllabel¿¡ ¹«¾ğ°¡ µé¾îÀÖÀ½
 void DeleteEumjeol(CompletedEumjeol& stsyllabel, int status)
 {
 	switch (status)
@@ -261,129 +262,4 @@ int IsKeyboardChar(char c)
 	tmp.push_back(c);
 	int res = FindIndex(keyboard_char, tmp.c_str(), 26);
 	return res;
-}
-
-std::wstring AssembleHangul(std::wstring strCurrentContext, CompletedEumjeol& stsyllabel, char c)
-{
-	std::wstring strRet = strCurrentContext;
-
-	if ('\r' == c)
-	{
-		//ResetEumjeol(stsyllabel);
-		return strCurrentContext;
-	}
-
-	if ('\b' == c)
-	{
-		int status = SortEumjeol(stsyllabel);
-
-		if (status == 0) // ì´ë¯¸ ì•„ë¬´ê²ƒë„ ì—†ìœ¼ë©´
-			return strCurrentContext = strCurrentContext.substr(0, strCurrentContext.length() - 1);
-
-		DeleteEumjeol(stsyllabel, status);
-		status = SortEumjeol(stsyllabel);
-
-		strCurrentContext = strCurrentContext.substr(0, strCurrentContext.length() - 1);
-		strRet = strCurrentContext;
-
-		switch (status)
-		{
-		case 0:
-		{
-			return strRet;
-		}
-		case 1:
-		{
-			strRet.push_back(charset_single[stsyllabel.jungseong+19]);
-			return strRet;
-		}
-		case 2:
-		{
-			strRet.push_back(charset_single[stsyllabel.choseong]);
-			return strRet;
-		}
-		case 3:
-		{
-			strRet.push_back(FindUnicode(stsyllabel));
-			return strRet;
-		}
-		case 4:
-		{
-			strRet.push_back(FindUnicode(stsyllabel));
-			return strRet;
-		}
-		}
-
-	}
-
-	if (' ' == c)
-	{
-		ResetEumjeol(stsyllabel);
-		strRet.push_back(c);
-		return strRet;
-	}
-
-	std::string tmp;
-	tmp.push_back(c);
-	if (FindIndex(charset_Useless, tmp.c_str(), 19) != -1) // charset_Useless[] ì— ìˆë‹¤ë©´
-	{
-		c ^= 32;
-	}
-
-	int res = InsertChar(stsyllabel, c);
-
-	stsyllabel.flag = SortEumjeol(stsyllabel);
-
-	if (res == -1)
-	{
-		if (stsyllabel.flag != 0 && stsyllabel.flag != 1 && stsyllabel.flag != 2)
-		{
-			strRet.pop_back();
-			strRet.push_back(FindUnicode(stsyllabel));
-		}
-		else if (stsyllabel.flag == 1)
-			strRet.push_back(charset_single[stsyllabel.jungseong + 19]);
-		else if (stsyllabel.flag == 2)
-			strRet.push_back(charset_single[stsyllabel.choseong]);
-	}
-	else
-	{
-		strRet.pop_back();
-		strRet.push_back(FindUnicode(stsyllabel));
-		ResetEumjeol(stsyllabel);
-		stsyllabel.choseong = res;
-		std::string ch;
-		ch.push_back(c);
-		stsyllabel.jungseong = FindIndex(charset_jung, ch.c_str(), 21);
-		strRet.push_back(FindUnicode(stsyllabel));
-	}
-	
-	return strRet;
-}
-
-
-int main()
-{
-	std::setlocale(LC_ALL, "ko_KR.UTF-8");
-	std::wstring strContext;
-
-	CompletedEumjeol stsyllabel;
-
-	while (true)
-	{
-		char c = (char)_getch();
-		//int key_flag = IsKeyboardChar(c);
-
-		//std::wstring strNewContext;
-		std::wstring strNewContext = AssembleHangul(strContext, stsyllabel, c);
-
-		if (strNewContext == strContext)
-			continue;
-
-		strContext = strNewContext;
-
-		system("cls");
-		wprintf(L"%s\n", strContext.c_str());
-	}
-	return 0;
 }
