@@ -1,30 +1,12 @@
 #include "stdafx.h"
 #include "Hangul.h"
 
-const char* keyboard_char[] = { "q","w","e","r","t","y","u","i","o","p","a","s","d","f","g","h","j","k","l","z","x","c","v","b","n","m" };
-
-const char* charset_cho[] = { "r","R","s","e","E","f","a","q","Q","t","T","d","w","W","c","z","x","v","g" }; // 19개
-const char* charset_jung[] = { "k","o","i","O","j","p","u","P","h","hk","ho","hl","y","n","nj","np","nl","b","m","ml","l" }; // 21개
-const char* charset_jong[] = { "", "r","R","rt","s","sw","sg","e","f","fr","fa","fq","ft","fx","fv","fg","a","q","qt","t","T","d","w","c","z","x","v","g" }; // 28개
-const char* charset_Useless[] = { "F","A","D","C","Z","X","V","G","K","I","J","U","N","B","H","Y","M","L","S" }; // 19개
-
-int charset_single[40] = { 0x3131, 0x3132, 0x3134, 0x3137, 0x3138, 0x3139, 0x3141, 0x3142, 0x3143, 0x3145, 0x3146, 0x3147, 0x3148, 0x3149, 0x314A, 0x314B, 0x314C, 0x314D, 0x314E, 0x314F, 0x3150, 0x3151, 0x3152, 0x3153, 0x3154, 0x3155, 0x3156, 0x3157, 0x3158, 0x3159, 0x315A, 0x315B, 0x315C, 0x315D, 0x315E, 0x315F, 0x3160, 0x3161, 0x3162, 0x3163 };
-
-struct CompletedEumjeol
+int Hangul::FindUnicode(CompletedEumjeol stsyllabel)
 {
-	int flag = 0;
-	int choseong = 99;
-	int jungseong = 99;
-	int jongseong = 0;
-};
-
-int FindUnicode(CompletedEumjeol stsyllable)
-{
-	return 44032 + ((stsyllable.choseong * 21) + stsyllable.jungseong) * 28 + stsyllable.jongseong;
+	return 44032 + ((stsyllabel.choseong * 21) + stsyllabel.jungseong) * 28 + stsyllabel.jongseong;
 }
 
-// 배열에서 몇번째 인덱스를 가지는지 리턴
-int FindIndex(const char* chararray[], const char* c, int SizeofArray)
+int Hangul::FindIndex(const char* chararray[], const char* c, int SizeofArray)
 {
 	int i = 0;
 	for (i; i < SizeofArray; i++)
@@ -35,8 +17,7 @@ int FindIndex(const char* chararray[], const char* c, int SizeofArray)
 	return -1;
 }
 
-// 자음인지 모음인지 구분
-int SortChar(const char* c)
+int Hangul::SortChar(const char* c)
 {
 	char* tmp;
 	for (int i = 0; i < 19; i++)
@@ -49,8 +30,7 @@ int SortChar(const char* c)
 	return 1; // 없으면 모음
 }
 
-// 글자가 어디까지 완성되었는지
-int SortEumjeol(CompletedEumjeol stsyllabel)
+int Hangul::SortEumjeol(CompletedEumjeol stsyllabel)
 {
 	if (stsyllabel.choseong == 99 && stsyllabel.jungseong == 99 && stsyllabel.jongseong == 0)
 		return 0;
@@ -64,7 +44,7 @@ int SortEumjeol(CompletedEumjeol stsyllabel)
 		return 4;
 }
 
-void ResetEumjeol(CompletedEumjeol& stsyllabel)
+void Hangul::ResetEumjeol(CompletedEumjeol& stsyllabel)
 {
 	stsyllabel.flag = 0;
 	stsyllabel.choseong = 99;
@@ -72,7 +52,7 @@ void ResetEumjeol(CompletedEumjeol& stsyllabel)
 	stsyllabel.jongseong = 0;
 }
 
-int InsertChar(CompletedEumjeol& stsyllabel, char c)
+int Hangul::InsertChar(CompletedEumjeol& stsyllabel, char c)
 {
 	std::string ch;
 	ch.push_back(c);
@@ -190,9 +170,7 @@ int InsertChar(CompletedEumjeol& stsyllabel, char c)
 	return -1;
 }
 
-// 0 반환 : stsyllabel에 아무것도 없음
-// 1 반환 : stsyllabel에 무언가 들어있음
-void DeleteEumjeol(CompletedEumjeol& stsyllabel, int status)
+void Hangul::DeleteEumjeol(CompletedEumjeol& stsyllabel, int status)
 {
 	switch (status)
 	{
@@ -256,10 +234,108 @@ void DeleteEumjeol(CompletedEumjeol& stsyllabel, int status)
 	}
 }
 
-int IsKeyboardChar(char c)
+int Hangul::IsKeyboardChar(char c)
 {
 	std::string tmp;
 	tmp.push_back(c);
 	int res = FindIndex(keyboard_char, tmp.c_str(), 26);
 	return res;
+}
+
+std::wstring Hangul::AssembleHangul(std::wstring strCurrentContext, char c)
+{
+	std::wstring strRet = strCurrentContext;
+
+	if ('\r' == c)
+	{
+		//ResetEumjeol(stsyllabel);
+		return strCurrentContext;
+	}
+
+	if ('\b' == c)
+	{
+		int status = SortEumjeol(stsyllabel);
+
+		if (status == 0) // 이미 아무것도 없으면
+			return strCurrentContext = strCurrentContext.substr(0, strCurrentContext.length() - 1);
+
+		DeleteEumjeol(stsyllabel, status);
+		status = SortEumjeol(stsyllabel);
+
+		strCurrentContext = strCurrentContext.substr(0, strCurrentContext.length() - 1);
+		strRet = strCurrentContext;
+
+		switch (status)
+		{
+		case 0:
+		{
+			return strRet;
+		}
+		case 1:
+		{
+			strRet.push_back(charset_single[stsyllabel.jungseong + 19]);
+			return strRet;
+		}
+		case 2:
+		{
+			strRet.push_back(charset_single[stsyllabel.choseong]);
+			return strRet;
+		}
+		case 3:
+		{
+			strRet.push_back(FindUnicode(stsyllabel));
+			return strRet;
+		}
+		case 4:
+		{
+			strRet.push_back(FindUnicode(stsyllabel));
+			return strRet;
+		}
+		}
+
+	}
+
+	if (' ' == c)
+	{
+		ResetEumjeol(stsyllabel);
+		strRet.push_back(c);
+		return strRet;
+	}
+
+	std::string tmp;
+	tmp.push_back(c);
+	if (FindIndex(charset_Useless, tmp.c_str(), 19) != -1) // charset_Useless[] 에 있다면
+	{
+		c ^= 32;
+	}
+
+	int res = InsertChar(stsyllabel, c);
+
+	stsyllabel.flag = SortEumjeol(stsyllabel);
+
+	if (res == -1)
+	{
+		if (stsyllabel.flag != 0 && stsyllabel.flag != 1 && stsyllabel.flag != 2)
+		{
+			strRet.pop_back();
+			strRet.push_back(FindUnicode(stsyllabel));
+		}
+		else if (stsyllabel.flag == 1)
+			strRet.push_back(charset_single[stsyllabel.jungseong + 19]);
+		else if (stsyllabel.flag == 2)
+			strRet.push_back(charset_single[stsyllabel.choseong]);
+	}
+	else
+	{
+		strRet.pop_back();
+		strRet.push_back(FindUnicode(stsyllabel));
+		ResetEumjeol(stsyllabel);
+		stsyllabel.choseong = res;
+		std::string ch;
+		ch.push_back(c);
+		stsyllabel.jungseong = FindIndex(charset_jung, ch.c_str(), 21);
+		strRet.push_back(FindUnicode(stsyllabel));
+	}
+
+	return strRet;
 }
