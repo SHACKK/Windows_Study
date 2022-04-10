@@ -17,6 +17,7 @@ private:
 		int jungseong = 99;
 		int jongseong = 0;
 	}stsyllabel;
+
 	int FindUnicode(CompletedEumjeol stsyllabel); //CompletedEumjeol 구조체를 통해 유니코드값을 계산 후 리턴
 	int FindIndex(const char* chararray[], const char*c, int SizeofArray); // 배열의 몇번째 값인지 검색, 없으면 -1 반환
 	int SortChar(const char* c); // 자음인지 모음인지 판단
