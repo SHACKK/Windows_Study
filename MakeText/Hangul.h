@@ -16,16 +16,16 @@ private:
 		int choseong = 99;
 		int jungseong = 99;
 		int jongseong = 0;
-	};
-	int FindUnicode(CompletedEumjeol stsyllabel);
-	int FindIndex(const char* chararray[], const char*c, int SizeofArray);
-	int SortChar(const char* c);
-	int SortEumjeol(CompletedEumjeol stsyllabel);
-	void ResetEumjeol(CompletedEumjeol& stsyllabel);
-	int InsertChar(CompletedEumjeol& stsyllabel, char c);
-	void DeleteEumjeol(CompletedEumjeol& stsyllabel, int status);
-	int IsKeyboardChar(char c);
-	CompletedEumjeol stsyllabel;
+	}stsyllabel;
+	int FindUnicode(CompletedEumjeol stsyllabel); //CompletedEumjeol 구조체를 통해 유니코드값을 계산 후 리턴
+	int FindIndex(const char* chararray[], const char*c, int SizeofArray); // 배열의 몇번째 값인지 검색, 없으면 -1 반환
+	int SortChar(const char* c); // 자음인지 모음인지 판단
+	int SortEumjeol(CompletedEumjeol stsyllabel); // 현재 CompletedEumjeol 구조체의 상태를 리턴 (000, 010, 100, 110, 111)
+	void ResetEumjeol(CompletedEumjeol& stsyllabel); // CompletedEumjeol 구조체 초기화
+	void DeleteEumjeol(CompletedEumjeol& stsyllabel, int status); // CompletedEumjeol의 값을 차례대로 지움
+	int IsKeyboardChar(char c); // 키보드 입력값인지 판단
+	int InsertChar(CompletedEumjeol& stsyllabel, char c); // CompletedEumjeol 구조체에 c를 채워넣는 함수
+	//CompletedEumjeol stsyllabel;
 public:
 
 	std::wstring AssembleHangul(std::wstring strCurrentContext, char c);
