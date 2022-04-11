@@ -20,7 +20,7 @@ private:
 
 	int FindUnicode(CompletedEumjeol stsyllabel); //CompletedEumjeol 구조체를 통해 유니코드값을 계산 후 리턴
 	int FindIndex(const char* chararray[], const char*c, int SizeofArray); // 배열의 몇번째 값인지 검색, 없으면 -1 반환
-	int SortChar(const char* c); // 자음인지 모음인지 판단
+	int SortChar(const char* c); // 자음인지 모음인지 판단 
 	int SortEumjeol(CompletedEumjeol stsyllabel); // 현재 CompletedEumjeol 구조체의 상태를 리턴 (000, 010, 100, 110, 111)
 	void ResetEumjeol(CompletedEumjeol& stsyllabel); // CompletedEumjeol 구조체 초기화
 	void DeleteEumjeol(CompletedEumjeol& stsyllabel, int status); // CompletedEumjeol의 값을 차례대로 지움
