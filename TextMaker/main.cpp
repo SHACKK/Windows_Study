@@ -5,6 +5,7 @@ bool GetKeyInput(int* VirtualKey)
 {
 
 }
+
 int main()
 {
 	CStringBuilder builder;

@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "StContext.h"
 #include "CAsciiCharset.h"
 
 void CAsciiCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)

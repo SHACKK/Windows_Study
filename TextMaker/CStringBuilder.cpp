@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "CStringBuilder.h"
+#include "ICharSet.h"
 
 CStringBuilder::CStringBuilder(void)
 {

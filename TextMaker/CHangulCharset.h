@@ -1,5 +1,4 @@
 #pragma once
-#include "StContext.h"
 
 class CHangulCharset : public ICharSet
 {
