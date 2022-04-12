@@ -1,7 +1,6 @@
 #pragma once
 
-class CHangulCharset : public ICharSet
+enum E_CONSTRUCT_STATE
 {
-	void Update(int nVirtualKey, ST_STRING_CONTEXT& context);
-};
 
+};

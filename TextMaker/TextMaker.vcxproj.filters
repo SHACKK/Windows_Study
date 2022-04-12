@@ -12,15 +12,11 @@
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="CStringBuilder.h" />
-    <ClInclude Include="CAsciiCharset.h" />
-    <ClInclude Include="CHangulCharset.h" />
     <ClInclude Include="ICharSet.h" />
     <ClInclude Include="StContext.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CStringBuilder.cpp" />
-    <ClCompile Include="CAsciiCharset.cpp" />
-    <ClCompile Include="CHangulCharset.cpp" />
     <ClCompile Include="ICharSet.cpp" />
     <ClCompile Include="StContext.cpp" />
   </ItemGroup>

@@ -1,6 +1,9 @@
+#pragma once
+
 #include "stdafx.h"
 #include "CStringBuilder.h"
 #include "ICharSet.h"
+#include "StContext.h"
 
 CStringBuilder::CStringBuilder(void)
 {
