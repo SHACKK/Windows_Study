@@ -14,10 +14,14 @@
     <ClInclude Include="CStringBuilder.h" />
     <ClInclude Include="ICharSet.h" />
     <ClInclude Include="StContext.h" />
+    <ClInclude Include="CAsciiCharset.h" />
+    <ClInclude Include="CHangulCharset.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CStringBuilder.cpp" />
     <ClCompile Include="ICharSet.cpp" />
     <ClCompile Include="StContext.cpp" />
+    <ClCompile Include="CAsciiCharset.cpp" />
+    <ClCompile Include="CHangulCharset.cpp" />
   </ItemGroup>
 </Project>

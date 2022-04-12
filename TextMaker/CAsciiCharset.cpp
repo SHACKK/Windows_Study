@@ -1,6 +1,7 @@
 #pragma once
 
 #include "stdafx.h"
+#include "ICharSet.h"
 #include "StContext.h"
 #include "CAsciiCharset.h"
 

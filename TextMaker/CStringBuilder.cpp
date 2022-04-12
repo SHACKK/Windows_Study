@@ -3,6 +3,8 @@
 #include "stdafx.h"
 #include "CStringBuilder.h"
 #include "ICharSet.h"
+#include "CAsciiCharset.h"
+#include "CHangulCharset.h"
 #include "StContext.h"
 
 CStringBuilder::CStringBuilder(void)

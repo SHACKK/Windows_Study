@@ -3,7 +3,8 @@
 
 bool GetKeyInput(int* VirtualKey)
 {
-
+	char c = (char)_getch();
+	return true;
 }
 
 int main()

@@ -1,5 +1,9 @@
 #pragma once
 
+#include "CStringBuilder.h"
+#include "ICharSet.h"
+#include "StContext.h"
+
 #define VK_HANGUL 0x0001
 #define VK_ENGLISH 0x0002
 
