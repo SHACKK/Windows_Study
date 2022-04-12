@@ -234,14 +234,6 @@ void Hangul::DeleteEumjeol(CompletedEumjeol& stsyllabel, int status)
 	}
 }
 
-int Hangul::IsKeyboardChar(char c)
-{
-	std::string tmp;
-	tmp.push_back(c);
-	int res = FindIndex(keyboard_char, tmp.c_str(), 26);
-	return res;
-}
-
 std::wstring Hangul::AssembleHangul(std::wstring strCurrentContext, char c)
 {
 	std::wstring strRet = strCurrentContext;
@@ -302,6 +294,7 @@ std::wstring Hangul::AssembleHangul(std::wstring strCurrentContext, char c)
 		return strRet;
 	}
 
+	// 사용되지 않는 문자 처리
 	std::string tmp;
 	tmp.push_back(c);
 	if (FindIndex(charset_Useless, tmp.c_str(), 19) != -1) // charset_Useless[] 에 있다면

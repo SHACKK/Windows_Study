@@ -3,8 +3,6 @@
 class Hangul
 {
 private:
-	// 키보드의 모든 입력값
-	const char* keyboard_char[26] = { "q","w","e","r","t","y","u","i","o","p","a","s","d","f","g","h","j","k","l","z","x","c","v","b","n","m" };
 	// 초성 19개
 	const char* charset_cho[19] = { "r","R","s","e","E","f","a","q","Q","t","T","d","w","W","c","z","x","v","g" };
 	// 중성 21개
@@ -30,7 +28,6 @@ private:
 	int SortEumjeol(CompletedEumjeol stsyllabel); // 현재 CompletedEumjeol 구조체의 상태를 리턴 (000, 010, 100, 110, 111)
 	void ResetEumjeol(CompletedEumjeol& stsyllabel); // CompletedEumjeol 구조체 초기화
 	void DeleteEumjeol(CompletedEumjeol& stsyllabel, int status); // CompletedEumjeol의 값을 차례대로 지움
-	int IsKeyboardChar(char c); // 키보드 입력값인지 판단
 	int InsertChar(CompletedEumjeol& stsyllabel, char c); // CompletedEumjeol 구조체에 c를 채워넣는 함수
 	//CompletedEumjeol stsyllabel;
 
