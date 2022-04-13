@@ -1,8 +1,6 @@
 #pragma once
 
 #include "stdafx.h"
-#include "ICharSet.h"
-#include "StContext.h"
 #include "CHangulCharset.h"
 
 int CHangulCharset::FindIndex(const char* chararray[], int SizeofArray, const char* c)

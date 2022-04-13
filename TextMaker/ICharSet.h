@@ -1,6 +1,4 @@
 #pragma once
-#include "ICharSet.h"
-#include "StContext.h"
 
 class ICharSet
 {

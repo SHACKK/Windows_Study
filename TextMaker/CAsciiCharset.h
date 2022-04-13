@@ -1,4 +1,5 @@
 #pragma once
+#include "ICharSet.h"
 
 class CAsciiCharset : public ICharSet
 {

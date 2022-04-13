@@ -1,4 +1,5 @@
 #pragma once
+#include "ICharSet.h"
 
 #define VOWEL 0x0001
 #define CONSONANT 0x0002
@@ -53,4 +54,3 @@ private:
 public:
 	void Update(int nVirtualKey, ST_STRING_CONTEXT& context);
 };
-
