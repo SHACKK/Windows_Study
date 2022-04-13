@@ -4,14 +4,19 @@
 #define VOWEL 0x0001
 #define CONSONANT 0x0002
 
+#define UNICODE_BASE 44032 // 0xAC00
+#define NUM_OF_CHOSEONG 19
+#define NUM_OF_JUNGSEONG 21
+#define NUM_OF_JONGSEONG 28
+
 enum E_CONSTRUCT_STATE
 {
 	BLINK,						// 비어있는 상태
 	ONLY_CHOSEONG,				// 초성만 있는 음절
 	ONLY_JUNGSEONG,				// 중성만 있는 음절
-	NO_JONGSEONG_COMB_ABLE_H,		// 받침 없는 조합가능 음절 "ㅗ"
-	NO_JONGSEONG_COMB_ABLE_N,		// 받침 없는 조합가능 음절 "ㅜ"
-	NO_JONGSEONG_COMB_ABLE_M,		// 받침 없는 조합가능 음절 "ㅡ"
+	NO_JONGSEONG_COMB_ABLE_H,	// 받침 없는 조합가능 음절 "ㅗ"
+	NO_JONGSEONG_COMB_ABLE_N,	// 받침 없는 조합가능 음절 "ㅜ"
+	NO_JONGSEONG_COMB_ABLE_M,	// 받침 없는 조합가능 음절 "ㅡ"
 	NO_JONGSEONG_COMB_UNABLE,	// 받침 없는 조합불가 음절
 	ONE_JONGSEONG_COMB_ABLE_R,	// 홑받침 조합가능 음절 "ㄱ"
 	ONE_JONGSEONG_COMB_ABLE_S,	// 홑받침 조합가능 음절 "ㄴ"
@@ -19,13 +24,6 @@ enum E_CONSTRUCT_STATE
 	ONE_JONGSEONG_COMB_ABLE_Q,	// 홑받침 조합가능 음절 "ㅂ"
 	ONE_JONGSEONG_COMB_UNABLE,	// 홑밭침 조합불가 음절
 	DOUBLE_JONGSEONG			// 쌍받침 음절
-};
-
-struct CONSTRUCT
-{
-	int choseong;
-	int jungseong;
-	int jongseong;
 };
 
 class CHangulCharset : public ICharSet
@@ -45,7 +43,7 @@ private:
 	E_CONSTRUCT_STATE state = BLINK;
 	CONSTRUCT stCurrentConstruct;
 	
-	int FindIndex(const char* chararray[], int SizeofArray, const char* c);
+	int GetIndexNum(const char* chararray[], int SizeofArray, const char* c);
 	std::string StrFromVirtualKey(int VirtualKey);
 	int AssemUnicode(CONSTRUCT stCurrentConstruct);
 	CONSTRUCT DisassemUnicode(std::string strUnderConstruct);

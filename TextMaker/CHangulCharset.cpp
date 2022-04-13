@@ -3,7 +3,7 @@
 #include "stdafx.h"
 #include "CHangulCharset.h"
 
-int CHangulCharset::FindIndex(const char* chararray[], int SizeofArray, const char* c)
+int CHangulCharset::GetIndexNum(const char* chararray[], int SizeofArray, const char* c)
 {
 	for (int i = 0; i < SizeofArray; i++)
 	{
@@ -20,12 +20,20 @@ std::string CHangulCharset::StrFromVirtualKey(int VirtualKey)
 
 int CHangulCharset::AssemUnicode(CONSTRUCT stCurrentConstruct)
 {
-	return 0;
+	return UNICODE_BASE + (((stCurrentConstruct.choseong * 21) + stCurrentConstruct.jungseong) * 28) + stCurrentConstruct.jongseong;
 }
 
 CONSTRUCT CHangulCharset::DisassemUnicode(std::string strUnderConstruct)
 {
+	int nValueofUnicode = std::stoi(strUnderConstruct);
+
 	CONSTRUCT stConstruct;
+	stConstruct.choseong = 
+		(nValueofUnicode - UNICODE_BASE) / (NUM_OF_CHOSEONG * NUM_OF_JUNGSEONG);
+	stConstruct.jungseong = 
+		(nValueofUnicode - UNICODE_BASE) - ((stConstruct.choseong * (NUM_OF_CHOSEONG * NUM_OF_JUNGSEONG)) / NUM_OF_JONGSEONG);
+	stConstruct.jongseong = 
+		(nValueofUnicode - UNICODE_BASE) - ((stConstruct.choseong * (NUM_OF_CHOSEONG * NUM_OF_JUNGSEONG)) - (stConstruct.jungseong * NUM_OF_JONGSEONG));
 
 	return stConstruct;
 }
@@ -60,7 +68,8 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 			std::string strPreContext = context.strContext.substr(0, context.nCursorPos);
 			std::string strPosContext = context.strContext.substr(context.nCursorPos);
 			
-			context.strContext = strPreContext + "" + strPosContext;
+			context.strUnderConstruct = charset_cho[GetIndexNum(charset_cho, NUM_OF_CHOSEONG, c.c_str())]; // To Check for Logic 
+			context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 			state = ONLY_CHOSEONG;
 			break;
 		}

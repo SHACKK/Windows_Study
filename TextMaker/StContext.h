@@ -11,3 +11,15 @@ struct ST_STRING_CONTEXT
 	// 현재 조립중인 음절
 	std::string strUnderConstruct;
 };
+
+struct CONSTRUCT
+{
+	// 초성 인덱스 번호
+	int choseong;
+
+	// 중성 인덱스 번호
+	int jungseong;
+
+	// 종성 인덱스 번호
+	int jongseong;
+};
