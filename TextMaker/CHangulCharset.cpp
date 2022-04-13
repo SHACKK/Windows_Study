@@ -5,34 +5,54 @@
 #include "StContext.h"
 #include "CHangulCharset.h"
 
-int CHangulCharset::AssemUnicode()
+int CHangulCharset::FindIndex(const char* chararray[], int SizeofArray, const char* c)
+{
+	for (int i = 0; i < SizeofArray; i++)
+	{
+		if (strcmp(c, chararray[i]) == 0)
+			return i;
+	}
+	return -1;
+}
+
+std::string CHangulCharset::StrFromVirtualKey(int VirtualKey)
+{
+	return std::string();
+}
+
+int CHangulCharset::AssemUnicode(CONSTRUCT stCurrentConstruct)
 {
 	return 0;
 }
 
-int CHangulCharset::DisassemUnicode()
+CONSTRUCT CHangulCharset::DisassemUnicode(std::string strUnderConstruct)
 {
-	return 0;
+	CONSTRUCT stConstruct;
+
+	return stConstruct;
 }
 
-int CHangulCharset::CheckChar(int nVirtualKey)
+// 자음인지 모음인지 체크
+int CHangulCharset::CheckChar(std::string c)
 {
-	std::string input;
-	input.push_back(nVirtualKey);
-	char* index;
+	std::string index = charset_cho[10];
+
 	for (int i = 0; i < 19; i++)
 	{
-		index = (char*)charset_cho[i];
-		if (strcmp(input.c_str(), index) == 0) {
-			return CONSONANT;
+		index = charset_cho[i];
+		if (strcmp(c.c_str(), index.c_str()) == 0) {
+			return CONSONANT; // 있으면 자음
 		}
 	}
 	return VOWEL; // 없으면 모음
 }
 
+
 void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 {
-	int style = CheckChar(nVirtualKey);
+	std::string c = StrFromVirtualKey(nVirtualKey);
+	int style = CheckChar(c);
+
 	if (style == CONSONANT) // 자음일 경우
 	{
 		switch (state)
@@ -41,28 +61,88 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 		{
 			std::string strPreContext = context.strContext.substr(0, context.nCursorPos);
 			std::string strPosContext = context.strContext.substr(context.nCursorPos);
-
-
+			
+			context.strContext = strPreContext + "" + strPosContext;
+			state = ONLY_CHOSEONG;
 			break;
 		}
 		case ONLY_CHOSEONG:
 		{
+			std::string strPreContext = context.strContext.substr(0, context.nCursorPos);
+			std::string strPosContext = context.strContext.substr(context.nCursorPos);
+
+
 			break;
 		}
 		case ONLY_JUNGSEONG:
 		{
+			std::string strPreContext = context.strContext.substr(0, context.nCursorPos);
+			std::string strPosContext = context.strContext.substr(context.nCursorPos);
+
+
 			break;
 		}
-		case ONE_JONGSEONG_COMB_ABLE:
+		case NO_JONGSEONG_COMB_ABLE_H:
 		{
+			break;
+		}
+		case NO_JONGSEONG_COMB_ABLE_N:
+		{
+			break;
+		}
+		case NO_JONGSEONG_COMB_ABLE_M:
+		{
+			break;
+		}
+		case NO_JONGSEONG_COMB_UNABLE:
+		{
+			break;
+		}
+		case ONE_JONGSEONG_COMB_ABLE_R:
+		{
+			std::string strPreContext = context.strContext.substr(0, context.nCursorPos);
+			std::string strPosContext = context.strContext.substr(context.nCursorPos);
+
+
+			break;
+		}
+		case ONE_JONGSEONG_COMB_ABLE_S:
+		{
+			std::string strPreContext = context.strContext.substr(0, context.nCursorPos);
+			std::string strPosContext = context.strContext.substr(context.nCursorPos);
+
+
+			break;
+		}
+		case ONE_JONGSEONG_COMB_ABLE_F:
+		{
+			std::string strPreContext = context.strContext.substr(0, context.nCursorPos);
+			std::string strPosContext = context.strContext.substr(context.nCursorPos);
+
+
+			break;
+		}
+		case ONE_JONGSEONG_COMB_ABLE_Q:
+		{
+			std::string strPreContext = context.strContext.substr(0, context.nCursorPos);
+			std::string strPosContext = context.strContext.substr(context.nCursorPos);
+
+
 			break;
 		}
 		case ONE_JONGSEONG_COMB_UNABLE:
 		{
+			std::string strPreContext = context.strContext.substr(0, context.nCursorPos);
+			std::string strPosContext = context.strContext.substr(context.nCursorPos);
+
+
 			break;
 		}
 		case DOUBLE_JONGSEONG:
 		{
+			std::string strPreContext = context.strContext.substr(0, context.nCursorPos);
+			std::string strPosContext = context.strContext.substr(context.nCursorPos);
+
 			break;
 		}
 		}
@@ -73,6 +153,8 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 		{
 		case BLINK:
 		{
+
+			state = ONLY_JUNGSEONG;
 			break;
 		}
 		case ONLY_CHOSEONG:
@@ -83,7 +165,35 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 		{
 			break;
 		}
-		case ONE_JONGSEONG_COMB_ABLE:
+		case NO_JONGSEONG_COMB_ABLE_H:
+		{
+			break;
+		}
+		case NO_JONGSEONG_COMB_ABLE_M:
+		{
+			break;
+		}
+		case NO_JONGSEONG_COMB_ABLE_N:
+		{
+			break;
+		}
+		case NO_JONGSEONG_COMB_UNABLE:
+		{
+			break;
+		}
+		case ONE_JONGSEONG_COMB_ABLE_R:
+		{
+			break;
+		}
+		case ONE_JONGSEONG_COMB_ABLE_S:
+		{
+			break;
+		}
+		case ONE_JONGSEONG_COMB_ABLE_F:
+		{
+			break;
+		}
+		case ONE_JONGSEONG_COMB_ABLE_Q:
 		{
 			break;
 		}

@@ -8,11 +8,23 @@ enum E_CONSTRUCT_STATE
 	BLINK,						// 비어있는 상태
 	ONLY_CHOSEONG,				// 초성만 있는 음절
 	ONLY_JUNGSEONG,				// 중성만 있는 음절
-	NO_JONGSEONG_COMB_ABLE,		// 받침 없는 조합가능 음절
+	NO_JONGSEONG_COMB_ABLE_H,		// 받침 없는 조합가능 음절 "ㅗ"
+	NO_JONGSEONG_COMB_ABLE_N,		// 받침 없는 조합가능 음절 "ㅜ"
+	NO_JONGSEONG_COMB_ABLE_M,		// 받침 없는 조합가능 음절 "ㅡ"
 	NO_JONGSEONG_COMB_UNABLE,	// 받침 없는 조합불가 음절
-	ONE_JONGSEONG_COMB_ABLE,	// 홑받침 조합가능 음절
+	ONE_JONGSEONG_COMB_ABLE_R,	// 홑받침 조합가능 음절 "ㄱ"
+	ONE_JONGSEONG_COMB_ABLE_S,	// 홑받침 조합가능 음절 "ㄴ"
+	ONE_JONGSEONG_COMB_ABLE_F,	// 홑받침 조합가능 음절 "ㄹ"
+	ONE_JONGSEONG_COMB_ABLE_Q,	// 홑받침 조합가능 음절 "ㅂ"
 	ONE_JONGSEONG_COMB_UNABLE,	// 홑밭침 조합불가 음절
 	DOUBLE_JONGSEONG			// 쌍받침 음절
+};
+
+struct CONSTRUCT
+{
+	int choseong;
+	int jungseong;
+	int jongseong;
 };
 
 class CHangulCharset : public ICharSet
@@ -30,9 +42,13 @@ private:
 	int charset_single[40] = { 0x3131, 0x3132, 0x3134, 0x3137, 0x3138, 0x3139, 0x3141, 0x3142, 0x3143, 0x3145, 0x3146, 0x3147, 0x3148, 0x3149, 0x314A, 0x314B, 0x314C, 0x314D, 0x314E, 0x314F, 0x3150, 0x3151, 0x3152, 0x3153, 0x3154, 0x3155, 0x3156, 0x3157, 0x3158, 0x3159, 0x315A, 0x315B, 0x315C, 0x315D, 0x315E, 0x315F, 0x3160, 0x3161, 0x3162, 0x3163 };
 
 	E_CONSTRUCT_STATE state = BLINK;
-	int AssemUnicode();
-	int DisassemUnicode();
-	int CheckChar(int nVirtualKey);		//자음인지 모음인지 체크
+	CONSTRUCT stCurrentConstruct;
+	
+	int FindIndex(const char* chararray[], int SizeofArray, const char* c);
+	std::string StrFromVirtualKey(int VirtualKey);
+	int AssemUnicode(CONSTRUCT stCurrentConstruct);
+	CONSTRUCT DisassemUnicode(std::string strUnderConstruct);
+	int CheckChar(std::string c);
 
 public:
 	void Update(int nVirtualKey, ST_STRING_CONTEXT& context);

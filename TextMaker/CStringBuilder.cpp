@@ -20,7 +20,7 @@ void CStringBuilder::Clear()
 {
 	m_Context.strContext = "";
 	m_Context.nCursorPos = 0;
-	m_Context.strUnderConstruct = "";
+    m_Context.strUnderConstruct = "";
 }
 
 std::string CStringBuilder::Input(int nVirtualKey)
