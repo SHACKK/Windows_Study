@@ -64,6 +64,16 @@ int CHangulCharset::CheckChar(std::string c)
 	return VOWEL; // 없으면 모음
 }
 
+E_CONSONANT_TYPE CHangulCharset::CheckConsonantType(std::string consonant)
+{
+	return E_CONSONANT_TYPE();
+}
+
+E_VOWEL_TYPE CHangulCharset::CheckVowelType(std::string vowel)
+{
+	return E_VOWEL_TYPE();
+}
+
 
 void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 {
@@ -82,6 +92,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 
 			stCurrentConstruct.choseong = GetIndexNum(charset_cho, NUM_OF_CHOSEONG, c.c_str());
 			context.strUnderConstruct.push_back(AssemUnicode(stCurrentConstruct));
+
 			context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 			state = ONLY_CHOSEONG;
 			break;
@@ -93,6 +104,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 
 			stCurrentConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, c.c_str());
 			context.strUnderConstruct.push_back(AssemUnicode(stCurrentConstruct));
+
 			context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 			state = ONLY_JUNGSEONG;
 			break;
@@ -114,13 +126,46 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 			stCurrentConstruct.clear();
 
 			stCurrentConstruct.choseong = GetIndexNum(charset_cho, NUM_OF_CHOSEONG, c.c_str());
+			context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 
-
+			context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
+			context.nCursorPos++;
+			state = ONLY_CHOSEONG;
 			break;
 		}
 		else if (style == VOWEL) // 모음일 경우
 		{
-			break;
+			std::string strPreContext = context.strContext.substr(0, context.nCursorPos);
+			std::string strPosContext = context.strContext.substr(context.nCursorPos);
+
+			context.strUnderConstruct.pop_back();
+
+			stCurrentConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, c.c_str());
+			context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
+
+			switch (CheckVowelType(c))
+			{
+			case H:
+			{
+				state = NO_JONGSEONG_COMB_ABLE_H;
+				break;
+			}
+			case N:
+			{
+				state = NO_JONGSEONG_COMB_ABLE_N;
+				break;
+			}
+			case M:
+			{
+				state = NO_JONGSEONG_COMB_ABLE_M;
+				break;
+			}
+			case NORMAL:
+			{
+				state = NO_JONGSEONG_COMB_UNABLE;
+				break;
+			}
+			}
 		}
 	}
 	case ONLY_JUNGSEONG:

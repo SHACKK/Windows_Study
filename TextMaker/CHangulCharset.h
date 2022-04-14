@@ -28,6 +28,23 @@ enum E_CONSTRUCT_STATE
 	DOUBLE_JONGSEONG			// ½Ö¹ÞÄ§ À½Àý
 };
 
+enum E_CONSONANT_TYPE
+{
+	R,
+	S,
+	F,
+	Q,
+	NORMAL
+};
+
+enum E_VOWEL_TYPE
+{
+	H,
+	N,
+	M,
+	NORMAL
+};
+
 class CHangulCharset : public ICharSet
 {
 private:
@@ -42,11 +59,13 @@ private:
 	E_CONSTRUCT_STATE state = BLINK;
 	CONSTRUCT stCurrentConstruct = { CONSTRUCT_DEFAULT, CONSTRUCT_DEFAULT, 0 };
 	
-	int GetIndexNum(const char* chararray[], int SizeofArray, const char* c);
 	std::string StrFromVirtualKey(int VirtualKey);
+	int GetIndexNum(const char* chararray[], int SizeofArray, const char* c);
+	int CheckChar(std::string c);
 	int AssemUnicode(CONSTRUCT stCurrentConstruct);
 	CONSTRUCT DisassemUnicode(std::string strUnderConstruct);
-	int CheckChar(std::string c);
+	E_CONSONANT_TYPE CheckConsonantType(std::string consonant);
+	E_VOWEL_TYPE CheckVowelType(std::string vowel);
 
 public:
 	void Update(int nVirtualKey, ST_STRING_CONTEXT& context);
