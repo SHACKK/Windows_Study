@@ -4,7 +4,7 @@
 #define VOWEL 0x0001		//모음
 #define CONSONANT 0x0002	//자음
 
-#define UNICODE_BASE 44032		// 0xAC00
+#define UNICODE_BASE 44032		// 0xAC00, Unicode 기본 값
 #define NUM_OF_CHOSEONG 19		// 초성 수
 #define NUM_OF_JUNGSEONG 21		// 중성 수
 #define NUM_OF_JONGSEONG 28		// 종성 수
@@ -27,21 +27,30 @@ enum E_CONSTRUCT_STATE
 	ONE_JONGSEONG_COMB_UNABLE,	// 홑밭침 조합불가 음절
 	DOUBLE_JONGSEONG			// 쌍받침 음절
 };
-
 enum E_CONSONANT_TYPE
 {
 	R,
 	S,
 	F,
 	Q,
+	T,
+	W,
+	G,
+	A,
+	X,
+	V,
 	NORMAL
 };
-
 enum E_VOWEL_TYPE
 {
 	H,
 	N,
 	M,
+	K,
+	O,
+	L,
+	J,
+	P,
 	NORMAL
 };
 
@@ -64,8 +73,8 @@ private:
 	int CheckChar(std::string c);
 	int AssemUnicode(CONSTRUCT stCurrentConstruct);
 	CONSTRUCT DisassemUnicode(std::string strUnderConstruct);
-	E_CONSONANT_TYPE CheckConsonantType(std::string consonant);
-	E_VOWEL_TYPE CheckVowelType(std::string vowel);
+	E_CONSONANT_TYPE CheckConsonantType(const char* consonant);
+	E_VOWEL_TYPE CheckVowelType(const char* vowel);
 
 public:
 	void Update(int nVirtualKey, ST_STRING_CONTEXT& context);
