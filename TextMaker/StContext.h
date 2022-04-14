@@ -14,6 +14,7 @@ struct ST_STRING_CONTEXT
 
 struct CONSTRUCT
 {
+public:
 	// 초성 인덱스 번호
 	int choseong;
 
@@ -22,4 +23,5 @@ struct CONSTRUCT
 
 	// 종성 인덱스 번호
 	int jongseong;
+	void clear();
 };

@@ -20,7 +20,18 @@ std::string CHangulCharset::StrFromVirtualKey(int VirtualKey)
 
 int CHangulCharset::AssemUnicode(CONSTRUCT stCurrentConstruct)
 {
-	return UNICODE_BASE + (((stCurrentConstruct.choseong * 21) + stCurrentConstruct.jungseong) * 28) + stCurrentConstruct.jongseong;
+	int nResult;
+	if (stCurrentConstruct.choseong == CONSTRUCT_DEFAULT)
+	{
+		nResult = charset_single[stCurrentConstruct.jungseong + 19];
+	}
+	else if (stCurrentConstruct.jungseong == CONSTRUCT_DEFAULT)
+	{
+		nResult = charset_single[stCurrentConstruct.choseong];
+	}
+
+	nResult = UNICODE_BASE + (((stCurrentConstruct.choseong * NUM_OF_JUNGSEONG) + stCurrentConstruct.jungseong) * NUM_OF_JONGSEONG) + stCurrentConstruct.jongseong;
+	return nResult;
 }
 
 CONSTRUCT CHangulCharset::DisassemUnicode(std::string strUnderConstruct)
@@ -59,158 +70,79 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 	std::string c = StrFromVirtualKey(nVirtualKey);
 	int style = CheckChar(c);
 
-	if (style == CONSONANT) // 자음일 경우
+	switch (state)
 	{
-		switch (state)
-		{
-		case BLINK:
+	case BLINK:
+	{
+		if (style == CONSONANT) //자음일 경우
 		{
 			std::string strPreContext = context.strContext.substr(0, context.nCursorPos);
 			std::string strPosContext = context.strContext.substr(context.nCursorPos);
-			
-			context.strUnderConstruct = charset_cho[GetIndexNum(charset_cho, NUM_OF_CHOSEONG, c.c_str())]; // To Check for Logic 
+			//std::string strCursorContext;
+
+			stCurrentConstruct.choseong = GetIndexNum(charset_cho, NUM_OF_CHOSEONG, c.c_str());
+			context.strUnderConstruct.push_back(AssemUnicode(stCurrentConstruct));
 			context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 			state = ONLY_CHOSEONG;
 			break;
 		}
-		case ONLY_CHOSEONG:
+		else if (style == VOWEL) // 모음일 경우
 		{
 			std::string strPreContext = context.strContext.substr(0, context.nCursorPos);
 			std::string strPosContext = context.strContext.substr(context.nCursorPos);
 
-
-			break;
-		}
-		case ONLY_JUNGSEONG:
-		{
-			std::string strPreContext = context.strContext.substr(0, context.nCursorPos);
-			std::string strPosContext = context.strContext.substr(context.nCursorPos);
-
-
-			break;
-		}
-		case NO_JONGSEONG_COMB_ABLE_H:
-		{
-			break;
-		}
-		case NO_JONGSEONG_COMB_ABLE_N:
-		{
-			break;
-		}
-		case NO_JONGSEONG_COMB_ABLE_M:
-		{
-			break;
-		}
-		case NO_JONGSEONG_COMB_UNABLE:
-		{
-			break;
-		}
-		case ONE_JONGSEONG_COMB_ABLE_R:
-		{
-			std::string strPreContext = context.strContext.substr(0, context.nCursorPos);
-			std::string strPosContext = context.strContext.substr(context.nCursorPos);
-
-
-			break;
-		}
-		case ONE_JONGSEONG_COMB_ABLE_S:
-		{
-			std::string strPreContext = context.strContext.substr(0, context.nCursorPos);
-			std::string strPosContext = context.strContext.substr(context.nCursorPos);
-
-
-			break;
-		}
-		case ONE_JONGSEONG_COMB_ABLE_F:
-		{
-			std::string strPreContext = context.strContext.substr(0, context.nCursorPos);
-			std::string strPosContext = context.strContext.substr(context.nCursorPos);
-
-
-			break;
-		}
-		case ONE_JONGSEONG_COMB_ABLE_Q:
-		{
-			std::string strPreContext = context.strContext.substr(0, context.nCursorPos);
-			std::string strPosContext = context.strContext.substr(context.nCursorPos);
-
-
-			break;
-		}
-		case ONE_JONGSEONG_COMB_UNABLE:
-		{
-			std::string strPreContext = context.strContext.substr(0, context.nCursorPos);
-			std::string strPosContext = context.strContext.substr(context.nCursorPos);
-
-
-			break;
-		}
-		case DOUBLE_JONGSEONG:
-		{
-			std::string strPreContext = context.strContext.substr(0, context.nCursorPos);
-			std::string strPosContext = context.strContext.substr(context.nCursorPos);
-
-			break;
-		}
-		}
-	}
-	else if (style == VOWEL) // 모음일 경우
-	{
-		switch (state)
-		{
-		case BLINK:
-		{
-
+			stCurrentConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, c.c_str());
+			context.strUnderConstruct.push_back(AssemUnicode(stCurrentConstruct));
+			context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 			state = ONLY_JUNGSEONG;
 			break;
 		}
-		case ONLY_CHOSEONG:
+		else
+		{
+			//에러처리
+			break;
+		}
+	}
+	case ONLY_CHOSEONG:
+	{
+		if (style == CONSONANT) // 자음일 경우
+		{
+			std::string strPreContext = context.strContext.substr(0, context.nCursorPos);
+			std::string strPosContext = context.strContext.substr(context.nCursorPos);
+
+			context.strUnderConstruct.pop_back();
+			stCurrentConstruct.clear();
+
+			stCurrentConstruct.choseong = GetIndexNum(charset_cho, NUM_OF_CHOSEONG, c.c_str());
+
+
+			break;
+		}
+		else if (style == VOWEL) // 모음일 경우
 		{
 			break;
 		}
-		case ONLY_JUNGSEONG:
-		{
-			break;
-		}
-		case NO_JONGSEONG_COMB_ABLE_H:
-		{
-			break;
-		}
-		case NO_JONGSEONG_COMB_ABLE_M:
-		{
-			break;
-		}
-		case NO_JONGSEONG_COMB_ABLE_N:
-		{
-			break;
-		}
-		case NO_JONGSEONG_COMB_UNABLE:
-		{
-			break;
-		}
-		case ONE_JONGSEONG_COMB_ABLE_R:
-		{
-			break;
-		}
-		case ONE_JONGSEONG_COMB_ABLE_S:
-		{
-			break;
-		}
-		case ONE_JONGSEONG_COMB_ABLE_F:
-		{
-			break;
-		}
-		case ONE_JONGSEONG_COMB_ABLE_Q:
-		{
-			break;
-		}
-		case ONE_JONGSEONG_COMB_UNABLE:
-		{
-			break;
-		}
-		case DOUBLE_JONGSEONG:
-		{
-			break;
-		}
-		}
+	}
+	case ONLY_JUNGSEONG:
+	{}
+	case NO_JONGSEONG_COMB_ABLE_H:
+	{}
+	case NO_JONGSEONG_COMB_ABLE_M:
+	{}
+	case NO_JONGSEONG_COMB_ABLE_N:
+	{}
+	case NO_JONGSEONG_COMB_UNABLE:
+	{}
+	case ONE_JONGSEONG_COMB_ABLE_F:
+	{}
+	case ONE_JONGSEONG_COMB_ABLE_Q:
+	{}
+	case ONE_JONGSEONG_COMB_ABLE_R:
+	{}
+	case ONE_JONGSEONG_COMB_ABLE_S:
+	{}
+	case ONE_JONGSEONG_COMB_UNABLE:
+	{}
+	case DOUBLE_JONGSEONG:
+	{}
 }
