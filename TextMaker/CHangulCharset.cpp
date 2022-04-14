@@ -49,7 +49,7 @@ CONSTRUCT CHangulCharset::DisassemUnicode(std::string strUnderConstruct)
 }
 
 // 자음인지 모음인지 체크
-int CHangulCharset::CheckChar(std::string c)
+int CHangulCharset::CheckStr(std::string c)
 {
 	std::string index = charset_cho[10];
 
@@ -77,7 +77,7 @@ E_VOWEL_TYPE CHangulCharset::CheckVowelType(const char* vowel)
 void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 {
 	std::string c = StrFromVirtualKey(nVirtualKey);
-	int style = CheckChar(c);
+	int style = CheckStr(c);
 
 	switch (state)
 	{

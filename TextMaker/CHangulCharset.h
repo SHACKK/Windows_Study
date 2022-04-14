@@ -70,7 +70,7 @@ private:
 	
 	std::string StrFromVirtualKey(int VirtualKey);
 	int GetIndexNum(const char* chararray[], int SizeofArray, const char* c);
-	int CheckChar(std::string c);
+	int CheckStr(std::string c);
 	int AssemUnicode(CONSTRUCT stCurrentConstruct);
 	CONSTRUCT DisassemUnicode(std::string strUnderConstruct);
 	E_CONSONANT_TYPE CheckConsonantType(const char* consonant);
