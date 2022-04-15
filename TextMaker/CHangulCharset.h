@@ -39,6 +39,7 @@ enum E_CONSONANT_TYPE
 	A,
 	X,
 	V,
+	CANNOT_BE_JONGSEONG,
 	NORMAL
 };
 enum E_VOWEL_TYPE
@@ -66,7 +67,7 @@ private:
 	int charset_single[40] = { 0x3131, 0x3132, 0x3134, 0x3137, 0x3138, 0x3139, 0x3141, 0x3142, 0x3143, 0x3145, 0x3146, 0x3147, 0x3148, 0x3149, 0x314A, 0x314B, 0x314C, 0x314D, 0x314E, 0x314F, 0x3150, 0x3151, 0x3152, 0x3153, 0x3154, 0x3155, 0x3156, 0x3157, 0x3158, 0x3159, 0x315A, 0x315B, 0x315C, 0x315D, 0x315E, 0x315F, 0x3160, 0x3161, 0x3162, 0x3163 };
 
 	E_CONSTRUCT_STATE state = BLINK;
-	CONSTRUCT stCurrentConstruct = { CONSTRUCT_DEFAULT, CONSTRUCT_DEFAULT, 0 };
+	CONSTRUCT stUnderConstruct = { CONSTRUCT_DEFAULT, CONSTRUCT_DEFAULT, 0 };
 	
 	std::string StrFromVirtualKey(int VirtualKey);
 	int GetIndexNum(const char* chararray[], int SizeofArray, const char* c);
