@@ -104,8 +104,8 @@ private:
 	int CheckStr(std::string c);
 	int AssemUnicode(ST_CONSTRUCT stCurrentConstruct);
 	ST_CONSTRUCT DisassemUnicode(std::string strUnderConstruct);
-	E_CONSONANT_TYPE CheckConsonantType(const char* consonant);
-	E_VOWEL_TYPE CheckVowelType(const char* vowel);
+	//E_CONSONANT_TYPE CheckConsonantType(const char* consonant);
+	//E_VOWEL_TYPE CheckVowelType(const char* vowel);
 	void DeleteChar(int nVirtualKey, ST_STRING_CONTEXT& context, ST_CONSTRUCT& stUnderConstruct);
 
 public:
