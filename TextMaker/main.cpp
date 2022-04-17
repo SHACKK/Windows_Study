@@ -4,7 +4,7 @@
 
 bool GetKeyInput(int &nVitrualKey)
 { 
-
+	
 };
 
 int main()
