@@ -74,6 +74,8 @@ void CHangulCharset::DeleteChar(int nVirtualKey, ST_STRING_CONTEXT& context, ST_
 {
 	switch (state)
 	{
+	case BLINK:
+	{}
 	}
 }
 
