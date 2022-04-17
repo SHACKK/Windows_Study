@@ -88,9 +88,12 @@ std::map<int, std::string> mStringFromVitrualKey
 class CHangulCharset : public ICharSet
 {
 private:
-	const char* charset_cho[19] = { "r","R","s","e","E","f","a","q","Q","t","T","d","w","W","c","z","x","v","g" };
-	const char* charset_jung[21] = { "k","o","i","O","j","p","u","P","h","hk","ho","hl","y","n","nj","np","nl","b","m","ml","l" };
-	const char* charset_jong[28] = { "", "r","R","rt","s","sw","sg","e","f","fr","fa","fq","ft","fx","fv","fg","a","q","qt","t","T","d","w","c","z","x","v","g" };
+	const char* charset_cho[19] = 
+	{ "r","R","s","e","E","f","a","q","Q","t","T","d","w","W","c","z","x","v","g" };
+	const char* charset_jung[21] = 
+	{ "k","o","i","O","j","p","u","P","h","hk","ho","hl","y","n","nj","np","nl","b","m","ml","l" };
+	const char* charset_jong[28] = 
+	{ "", "r","R","rt","s","sw","sg","e","f","fr","fa","fq","ft","fx","fv","fg","a","q","qt","t","T","d","w","c","z","x","v","g" };
 
 	const char* charset_Useless[19] = { "F","A","D","C","Z","X","V","G","K","I","J","U","N","B","H","Y","M","L","S" };
 

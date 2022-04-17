@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "CStringBuilder.h"
 
-bool GetKeyInput(int* VirtualKey)
+bool GetKeyInput(int& nVirtualKey)
 {
-	char c = (char)_getch();
+	int c = GetKeyState(nVirtualKey);
 	return true;
 }
 
@@ -14,7 +14,7 @@ int main()
 	while (true)
 	{
 		int nVirtualKey = 0;
-		bool bPressed = GetKeyInput(&nVirtualKey);
+		bool bPressed = GetKeyInput(nVirtualKey);
 		if (!bPressed)
 			continue;
 		builder.Input(nVirtualKey);
