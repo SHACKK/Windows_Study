@@ -17,7 +17,7 @@ std::string CHangulCharset::StrFromVirtualKey(int VirtualKey)
 	return std::string();
 }
 
-int CHangulCharset::AssemUnicode(CONSTRUCT stCurrentConstruct)
+int CHangulCharset::AssemUnicode(ST_CONSTRUCT stCurrentConstruct)
 {
 	int nResult;
 	if (stCurrentConstruct.choseong == CONSTRUCT_DEFAULT && stCurrentConstruct.jungseong != CONSTRUCT_DEFAULT)		// 초성은 없는데 중성이 있는 경우
@@ -30,11 +30,11 @@ int CHangulCharset::AssemUnicode(CONSTRUCT stCurrentConstruct)
 	return nResult;
 }
 
-CONSTRUCT CHangulCharset::DisassemUnicode(std::string strUnderConstruct)
+ST_CONSTRUCT CHangulCharset::DisassemUnicode(std::string strUnderConstruct)
 {
 	int nValueofUnicode = std::stoi(strUnderConstruct);
 
-	CONSTRUCT stConstruct;
+	ST_CONSTRUCT stConstruct;
 	stConstruct.choseong = 
 		(nValueofUnicode - UNICODE_BASE) / (NUM_OF_CHOSEONG * NUM_OF_JUNGSEONG);
 	stConstruct.jungseong = 
@@ -70,9 +70,18 @@ E_VOWEL_TYPE CHangulCharset::CheckVowelType(const char* vowel)
 	return E_VOWEL_TYPE();
 }
 
+void CHangulCharset::DeleteChar(int nVirtualKey, ST_STRING_CONTEXT& context, ST_CONSTRUCT& stUnderConstruct)
+{
+	switch (state)
+	{
+	}
+}
+
 
 void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 {
+	if (nVirtualKey == 0x0C)
+		DeleteChar(nVirtualKey, context, stUnderConstruct);
 	std::string c = StrFromVirtualKey(nVirtualKey);
 	int style = CheckStr(c);
 
@@ -614,7 +623,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 
 			context.strUnderConstruct.clear();
 
-			CONSTRUCT stPreConstruct = DisassemUnicode(context.strUnderConstruct);
+			ST_CONSTRUCT stPreConstruct = DisassemUnicode(context.strUnderConstruct);
 			stUnderConstruct.clear();
 			stUnderConstruct.choseong = stPreConstruct.jongseong;
 			stUnderConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, c.c_str());
@@ -681,7 +690,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 
 			context.strUnderConstruct.clear();
 
-			CONSTRUCT stPreConstruct = DisassemUnicode(context.strUnderConstruct);
+			ST_CONSTRUCT stPreConstruct = DisassemUnicode(context.strUnderConstruct);
 			stUnderConstruct.clear();
 			stUnderConstruct.choseong = stPreConstruct.jongseong;
 			stUnderConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, c.c_str());
@@ -748,7 +757,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 
 			context.strUnderConstruct.clear();
 
-			CONSTRUCT stPreConstruct = DisassemUnicode(context.strUnderConstruct);
+			ST_CONSTRUCT stPreConstruct = DisassemUnicode(context.strUnderConstruct);
 			stUnderConstruct.clear();
 			stUnderConstruct.choseong = stPreConstruct.jongseong;
 			stUnderConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, c.c_str());
@@ -815,7 +824,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 
 			context.strUnderConstruct.clear();
 
-			CONSTRUCT stPreConstruct = DisassemUnicode(context.strUnderConstruct);
+			ST_CONSTRUCT stPreConstruct = DisassemUnicode(context.strUnderConstruct);
 			stUnderConstruct.clear();
 			stUnderConstruct.choseong = stPreConstruct.jongseong;
 			stUnderConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, c.c_str());
@@ -871,7 +880,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 
 			context.strUnderConstruct.clear();
 
-			CONSTRUCT stPreConstruct = DisassemUnicode(context.strUnderConstruct);
+			ST_CONSTRUCT stPreConstruct = DisassemUnicode(context.strUnderConstruct);
 			stUnderConstruct.clear();
 			stUnderConstruct.choseong = stPreConstruct.jongseong;
 			stUnderConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, c.c_str());
@@ -925,7 +934,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 			std::string strPreContext = context.strContext.substr(0, context.nCursorPos - 1);
 			std::string strPosContext = context.strContext.substr(context.nCursorPos);
 
-			CONSTRUCT stPreConstruct = DisassemUnicode(context.strUnderConstruct);
+			ST_CONSTRUCT stPreConstruct = DisassemUnicode(context.strUnderConstruct);
 			stUnderConstruct.clear();
 
 			std::string strOriginConsonant = charset_jong[stPreConstruct.jongseong];

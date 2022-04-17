@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "StContext.h"
 
-void CONSTRUCT::clear()
+void ST_CONSTRUCT::clear()
 {
 	this->choseong = 99;
 	this->jungseong = 99;

@@ -12,7 +12,7 @@ struct ST_STRING_CONTEXT
 	std::string strUnderConstruct;
 };
 
-struct CONSTRUCT
+struct ST_CONSTRUCT
 {
 public:
 	// 초성 인덱스 번호
