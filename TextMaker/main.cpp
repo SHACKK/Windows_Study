@@ -1,11 +1,6 @@
 #include "stdafx.h"
 #include "CStringBuilder.h"
-
-bool GetKeyInput(int& nVirtualKey)
-{
-	int c = GetKeyState(nVirtualKey);
-	return true;
-}
+#include "KeyInput.h"
 
 int main()
 {
