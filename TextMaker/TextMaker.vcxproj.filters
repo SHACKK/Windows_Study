@@ -16,6 +16,7 @@
     <ClInclude Include="StContext.h" />
     <ClInclude Include="CAsciiCharset.h" />
     <ClInclude Include="CHangulCharset.h" />
+    <ClInclude Include="KeyInput.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CStringBuilder.cpp" />
@@ -23,5 +24,6 @@
     <ClCompile Include="StContext.cpp" />
     <ClCompile Include="CAsciiCharset.cpp" />
     <ClCompile Include="CHangulCharset.cpp" />
+    <ClCompile Include="KeyInput.cpp" />
   </ItemGroup>
 </Project>

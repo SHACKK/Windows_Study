@@ -2,6 +2,11 @@
 #include "CStringBuilder.h"
 #include "KeyInput.h"
 
+bool GetKeyInput(int &nVitrualKey)
+{ 
+
+};
+
 int main()
 {
 	CStringBuilder builder;

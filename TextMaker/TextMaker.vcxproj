@@ -146,6 +146,7 @@
     <ClInclude Include="CHangulCharset.h" />
     <ClInclude Include="CStringBuilder.h" />
     <ClInclude Include="ICharSet.h" />
+    <ClInclude Include="KeyInput.h" />
     <ClInclude Include="StContext.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
@@ -154,6 +155,7 @@
     <ClCompile Include="CHangulCharset.cpp" />
     <ClCompile Include="CStringBuilder.cpp" />
     <ClCompile Include="ICharSet.cpp" />
+    <ClCompile Include="KeyInput.cpp" />
     <ClCompile Include="StContext.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -6,4 +6,4 @@
 #include <Windows.h>
 #include <conio.h>
 
-#include "StContext.h"
+#include "Struct.h"
