@@ -1,5 +1,5 @@
 #pragma once
-#include "stdafx.h"
+#include "pch.h"
 #include "CHangulCharset.h"
 
 int CHangulCharset::GetIndexNum(const char* chararray[], int SizeofArray, const char* c)
@@ -14,6 +14,7 @@ int CHangulCharset::GetIndexNum(const char* chararray[], int SizeofArray, const 
 
 std::string CHangulCharset::StrFromVirtualKey(int VirtualKey)
 {
+
 	return std::string();
 }
 
@@ -60,24 +61,24 @@ int CHangulCharset::CheckStr(std::string c)
 	return VOWEL; // 없으면 모음
 }
 
-void CHangulCharset::DeleteChar(int nVirtualKey, ST_STRING_CONTEXT& context, ST_CONSTRUCT& stUnderConstruct)
+void CHangulCharset::DeleteChar(int nVirtualKey, ST_STRING_CONTEXT& context)
 {
 	std::string strPreContext = context.strContext.substr(0, context.nCursorPos);
 	std::string strPosContext = context.strContext.substr(context.nCursorPos);
+	
+	//strPreContext.pop_back();
+	context.strUnderConstruct.clear();
 
 	switch (state)
 	{
 	case BLINK:
 	{
-		strPreContext.pop_back();
 		context.nCursorPos--;
 		break;
 	}
 	case ONLY_CHOSEONG:
 	{
-		strPreContext.pop_back();
-		context.nCursorPos--;
-		stUnderConstruct.choseong = CONSTRUCT_DEFAULT;
+		stCurrentConstruct.choseong = CONSTRUCT_DEFAULT;
 		context.strUnderConstruct.clear();
 
 		state = BLINK;
@@ -85,9 +86,7 @@ void CHangulCharset::DeleteChar(int nVirtualKey, ST_STRING_CONTEXT& context, ST_
 	}
 	case ONLY_JUNGSEONG:
 	{
-		strPreContext.pop_back();
-		context.nCursorPos--;
-		stUnderConstruct.jungseong = CONSTRUCT_DEFAULT;
+		stCurrentConstruct.jungseong = CONSTRUCT_DEFAULT;
 		context.strUnderConstruct.clear();
 
 		state = BLINK;
@@ -95,35 +94,165 @@ void CHangulCharset::DeleteChar(int nVirtualKey, ST_STRING_CONTEXT& context, ST_
 	}
 	case NO_JONGSEONG_COMB_ABLE_H:
 	{
-		strPreContext.pop_back();
-		stUnderConstruct.jungseong = CONSTRUCT_DEFAULT;
+		stCurrentConstruct.jungseong = CONSTRUCT_DEFAULT;
+		context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 		
+		state = ONLY_CHOSEONG;
+		break;
 	}
 	case NO_JONGSEONG_COMB_ABLE_N:
-	{}
-	case NO_JONGSEONG_COMB_ABLE_M:
-	{}
-	case ONE_JONGSEONG_COMB_ABLE_R:
-	{}
-	case ONE_JONGSEONG_COMB_ABLE_S:
-	{}
-	case ONE_JONGSEONG_COMB_ABLE_F:
-	{}
-	case ONE_JONGSEONG_COMB_ABLE_Q:
-	{}
-	case DOUBLE_JONGSEONG:
-	{}
+	{
+		stCurrentConstruct.jungseong = CONSTRUCT_DEFAULT;
+		context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 
-	context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
-
+		state = ONLY_CHOSEONG;
+		break;
 	}
+	case NO_JONGSEONG_COMB_ABLE_M:
+	{
+		stCurrentConstruct.jungseong = CONSTRUCT_DEFAULT;
+		context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
+
+		state = ONLY_CHOSEONG;
+		break;
+	}
+	case NO_JONGSEONG_COMB_UNABLE:
+	{
+		// 중성이 두개가 합쳐있는 경우
+		if (stCurrentConstruct.jungseong == 9 || stCurrentConstruct.jungseong == 10 || stCurrentConstruct.jungseong == 11) // ㅗ
+		{
+			std::string strSingleVowel = charset_jung[stCurrentConstruct.jungseong];
+			strSingleVowel.pop_back();
+			stCurrentConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, strSingleVowel.c_str());
+			
+			state = NO_JONGSEONG_COMB_ABLE_H;
+		}
+		else if (stCurrentConstruct.jungseong == 14 || stCurrentConstruct.jungseong == 15 || stCurrentConstruct.jungseong == 16) // ㅜ
+		{
+			std::string strSingleVowel = charset_jung[stCurrentConstruct.jungseong];
+			strSingleVowel.pop_back();
+			stCurrentConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, strSingleVowel.c_str());
+
+			state = NO_JONGSEONG_COMB_ABLE_N;
+		}
+		else if (stCurrentConstruct.jungseong == 19) // ㅡ
+		{
+			std::string strSingleVowel = charset_jung[stCurrentConstruct.jungseong];
+			strSingleVowel.pop_back();
+			stCurrentConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, strSingleVowel.c_str());
+
+			state = NO_JONGSEONG_COMB_ABLE_M;
+		}
+		else // 나머지
+		{
+			stCurrentConstruct.jungseong = CONSTRUCT_DEFAULT;
+		}
+		context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
+		break;
+	}
+	case ONE_JONGSEONG_COMB_ABLE_R:
+	{
+		stCurrentConstruct.jongseong = 0;
+		context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
+
+		if (stCurrentConstruct.jungseong == 8) // 중성이 "ㅗ"인 경우
+			state = NO_JONGSEONG_COMB_ABLE_H;
+		else if (stCurrentConstruct.jungseong == 13) // 중성이 "ㅜ"인 경우
+			state = NO_JONGSEONG_COMB_ABLE_N;
+		else if (stCurrentConstruct.jungseong == 18) // 중성이 "ㅡ"인 경우
+			state = NO_JONGSEONG_COMB_ABLE_M;
+		else
+			state = NO_JONGSEONG_COMB_UNABLE;
+		break;
+	}
+	case ONE_JONGSEONG_COMB_ABLE_S:
+	{
+		stCurrentConstruct.jongseong = 0;
+		context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
+
+		if (stCurrentConstruct.jungseong == 8) // 중성이 "ㅗ"인 경우
+			state = NO_JONGSEONG_COMB_ABLE_H;
+		else if (stCurrentConstruct.jungseong == 13) // 중성이 "ㅜ"인 경우
+			state = NO_JONGSEONG_COMB_ABLE_N;
+		else if (stCurrentConstruct.jungseong == 18) // 중성이 "ㅡ"인 경우
+			state = NO_JONGSEONG_COMB_ABLE_M;
+		else
+			state = NO_JONGSEONG_COMB_UNABLE;
+		break; 
+	}
+	case ONE_JONGSEONG_COMB_ABLE_F:
+	{
+		stCurrentConstruct.jongseong = 0;
+		context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
+
+		if (stCurrentConstruct.jungseong == 8) // 중성이 "ㅗ"인 경우
+			state = NO_JONGSEONG_COMB_ABLE_H;
+		else if (stCurrentConstruct.jungseong == 13) // 중성이 "ㅜ"인 경우
+			state = NO_JONGSEONG_COMB_ABLE_N;
+		else if (stCurrentConstruct.jungseong == 18) // 중성이 "ㅡ"인 경우
+			state = NO_JONGSEONG_COMB_ABLE_M;
+		else
+			state = NO_JONGSEONG_COMB_UNABLE;
+		break;
+	}
+	case ONE_JONGSEONG_COMB_ABLE_Q:
+	{
+		stCurrentConstruct.jongseong = 0;
+		context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
+
+		if (stCurrentConstruct.jungseong == 8) // 중성이 "ㅗ"인 경우
+			state = NO_JONGSEONG_COMB_ABLE_H;
+		else if (stCurrentConstruct.jungseong == 13) // 중성이 "ㅜ"인 경우
+			state = NO_JONGSEONG_COMB_ABLE_N;
+		else if (stCurrentConstruct.jungseong == 18) // 중성이 "ㅡ"인 경우
+			state = NO_JONGSEONG_COMB_ABLE_M;
+		else
+			state = NO_JONGSEONG_COMB_UNABLE;
+		break;
+	}
+	case ONE_JONGSEONG_COMB_UNABLE:
+	{
+		stCurrentConstruct.jongseong = 0;
+		context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
+
+		if (stCurrentConstruct.jungseong == 8) // 중성이 "ㅗ"인 경우
+			state = NO_JONGSEONG_COMB_ABLE_H;
+		else if (stCurrentConstruct.jungseong == 13) // 중성이 "ㅜ"인 경우
+			state = NO_JONGSEONG_COMB_ABLE_N;
+		else if (stCurrentConstruct.jungseong == 18) // 중성이 "ㅡ"인 경우
+			state = NO_JONGSEONG_COMB_ABLE_M;
+		else
+			state = NO_JONGSEONG_COMB_UNABLE;
+		break;
+	}
+	case DOUBLE_JONGSEONG:
+	{
+		std::string strSingleConsonant = charset_jong[stCurrentConstruct.jongseong];
+		strSingleConsonant.pop_back();
+		stCurrentConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, strSingleConsonant.c_str());
+		context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
+
+		if (stCurrentConstruct.jongseong == 1)
+			state = ONE_JONGSEONG_COMB_ABLE_R;
+		else if (stCurrentConstruct.jongseong == 4)
+			state = ONE_JONGSEONG_COMB_ABLE_S;
+		else if (stCurrentConstruct.jongseong == 8)
+			state = ONE_JONGSEONG_COMB_ABLE_F;
+		else if (stCurrentConstruct.jongseong == 17)
+			state = ONE_JONGSEONG_COMB_ABLE_Q;
+		else
+			state = ONE_JONGSEONG_COMB_UNABLE;
+		break;
+	}
+	}
+	context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 }
 
 void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 {
 	if (nVirtualKey == 0x0C)
 	{
-		DeleteChar(nVirtualKey, context, stUnderConstruct);
+		DeleteChar(nVirtualKey, context);
 		return;
 	}
 	std::string c = StrFromVirtualKey(nVirtualKey);
@@ -138,8 +267,8 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 	{
 		if (style == CONSONANT) //자음
 		{
-			stUnderConstruct.choseong = GetIndexNum(charset_cho, NUM_OF_CHOSEONG, c.c_str());
-			context.strUnderConstruct.push_back(AssemUnicode(stUnderConstruct));
+			stCurrentConstruct.choseong = GetIndexNum(charset_cho, NUM_OF_CHOSEONG, c.c_str());
+			context.strUnderConstruct.push_back(AssemUnicode(stCurrentConstruct));
 
 			context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 			state = ONLY_CHOSEONG;
@@ -147,8 +276,8 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 		}
 		else if (style == VOWEL) // 모음
 		{
-			stUnderConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, c.c_str());
-			context.strUnderConstruct.push_back(AssemUnicode(stUnderConstruct));
+			stCurrentConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, c.c_str());
+			context.strUnderConstruct.push_back(AssemUnicode(stCurrentConstruct));
 
 			context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 			state = ONLY_JUNGSEONG;
@@ -160,10 +289,10 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 		if (style == CONSONANT) // 자음
 		{
 			context.strUnderConstruct.clear();
-			stUnderConstruct.clear();
+			stCurrentConstruct.clear();
 
-			stUnderConstruct.choseong = GetIndexNum(charset_cho, NUM_OF_CHOSEONG, c.c_str());
-			context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+			stCurrentConstruct.choseong = GetIndexNum(charset_cho, NUM_OF_CHOSEONG, c.c_str());
+			context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 
 			context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 			state = ONLY_CHOSEONG;
@@ -174,8 +303,8 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 		{
 			context.strUnderConstruct.clear();
 
-			stUnderConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, c.c_str());
-			context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+			stCurrentConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, c.c_str());
+			context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 			context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 			if(c == "h")
@@ -206,10 +335,10 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 		if (style == CONSONANT) // 자음
 		{
 			context.strUnderConstruct.clear();
-			stUnderConstruct.clear();
+			stCurrentConstruct.clear();
 
-			stUnderConstruct.choseong = GetIndexNum(charset_cho, NUM_OF_CHOSEONG, c.c_str());
-			context.strUnderConstruct.push_back(AssemUnicode(stUnderConstruct));
+			stCurrentConstruct.choseong = GetIndexNum(charset_cho, NUM_OF_CHOSEONG, c.c_str());
+			context.strUnderConstruct.push_back(AssemUnicode(stCurrentConstruct));
 			context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 			state = ONLY_CHOSEONG;
@@ -219,10 +348,10 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 		else if (style == VOWEL) // 모음
 		{
 			context.strUnderConstruct.clear();
-			stUnderConstruct.clear();
+			stCurrentConstruct.clear();
 
-			stUnderConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, c.c_str());
-			context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+			stCurrentConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, c.c_str());
+			context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 			context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 			state = ONLY_CHOSEONG;
@@ -238,8 +367,8 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 
 			if (c == "r")
 			{
-				stUnderConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+				stCurrentConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = ONE_JONGSEONG_COMB_ABLE_R;
@@ -247,8 +376,8 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 			}
 			else if (c == "s")
 			{
-				stUnderConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+				stCurrentConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = ONE_JONGSEONG_COMB_ABLE_S;
@@ -256,8 +385,8 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 			}
 			else if (c == "f")
 			{
-				stUnderConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+				stCurrentConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = ONE_JONGSEONG_COMB_ABLE_F;
@@ -265,8 +394,8 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 			}
 			else if (c == "q")
 			{
-				stUnderConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+				stCurrentConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = ONE_JONGSEONG_COMB_ABLE_Q;
@@ -274,9 +403,9 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 			}
 			else if (c == "Q" || c == "W" || c == "E")
 			{
-				stUnderConstruct.clear();
-				stUnderConstruct.choseong = GetIndexNum(charset_cho, NUM_OF_CHOSEONG, c.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+				stCurrentConstruct.clear();
+				stCurrentConstruct.choseong = GetIndexNum(charset_cho, NUM_OF_CHOSEONG, c.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = ONLY_CHOSEONG;
@@ -285,8 +414,8 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 			}
 			else
 			{
-				stUnderConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+				stCurrentConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = ONE_JONGSEONG_COMB_UNABLE;
@@ -299,9 +428,9 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 
 			if (c == "k" || c == "o" || c == "l")
 			{
-				std::string strDoubleVowel = charset_jung[stUnderConstruct.jungseong] + c;
-				stUnderConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, strDoubleVowel.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+				std::string strDoubleVowel = charset_jung[stCurrentConstruct.jungseong] + c;
+				stCurrentConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, strDoubleVowel.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = NO_JONGSEONG_COMB_UNABLE;
@@ -309,9 +438,9 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 			}
 			else
 			{
-				stUnderConstruct.clear();
-				stUnderConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, c.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+				stCurrentConstruct.clear();
+				stCurrentConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, c.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = ONLY_JUNGSEONG;
@@ -329,8 +458,8 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 
 			if (c == "r")
 			{
-				stUnderConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct); 
+				stCurrentConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct); 
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = ONE_JONGSEONG_COMB_ABLE_R;
@@ -338,8 +467,8 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 			}
 			else if (c == "s")
 			{
-				stUnderConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+				stCurrentConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = ONE_JONGSEONG_COMB_ABLE_S;
@@ -347,8 +476,8 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 			}
 			else if (c == "f")
 			{
-				stUnderConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+				stCurrentConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = ONE_JONGSEONG_COMB_ABLE_F;
@@ -356,8 +485,8 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 			}
 			else if (c == "q")
 			{
-				stUnderConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+				stCurrentConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = ONE_JONGSEONG_COMB_ABLE_Q;
@@ -365,9 +494,9 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 			}
 			else if (c == "Q" || c == "W" || c == "E")
 			{
-				stUnderConstruct.clear();
-				stUnderConstruct.choseong = GetIndexNum(charset_cho, NUM_OF_CHOSEONG, c.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+				stCurrentConstruct.clear();
+				stCurrentConstruct.choseong = GetIndexNum(charset_cho, NUM_OF_CHOSEONG, c.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = ONLY_CHOSEONG;
@@ -376,8 +505,8 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 			}
 			else
 			{
-				stUnderConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+				stCurrentConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = ONE_JONGSEONG_COMB_UNABLE;
@@ -390,9 +519,9 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 
 			if (c == "j" || c == "p" || c == "l")
 			{
-				std::string strDoubleVowel = charset_jung[stUnderConstruct.jungseong] + c;
-				stUnderConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, strDoubleVowel.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+				std::string strDoubleVowel = charset_jung[stCurrentConstruct.jungseong] + c;
+				stCurrentConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, strDoubleVowel.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = NO_JONGSEONG_COMB_UNABLE;
@@ -400,9 +529,9 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 			}
 			else
 			{
-				stUnderConstruct.clear();
-				stUnderConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, c.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+				stCurrentConstruct.clear();
+				stCurrentConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, c.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = ONLY_JUNGSEONG;
@@ -419,8 +548,8 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 
 			if (c == "r")
 			{
-				stUnderConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+				stCurrentConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = ONE_JONGSEONG_COMB_ABLE_R;
@@ -428,8 +557,8 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 			}
 			if (c == "s")
 			{
-				stUnderConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+				stCurrentConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = ONE_JONGSEONG_COMB_ABLE_S;
@@ -437,8 +566,8 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 			}
 			if (c == "f")
 			{
-				stUnderConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+				stCurrentConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = ONE_JONGSEONG_COMB_ABLE_F;
@@ -446,8 +575,8 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 			}
 			if (c == "q")
 			{
-				stUnderConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+				stCurrentConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = ONE_JONGSEONG_COMB_ABLE_Q;
@@ -455,9 +584,9 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 			}
 			if (c == "Q" || c == "W" || c == "E")
 			{
-				stUnderConstruct.clear();
-				stUnderConstruct.choseong = GetIndexNum(charset_cho, NUM_OF_CHOSEONG, c.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+				stCurrentConstruct.clear();
+				stCurrentConstruct.choseong = GetIndexNum(charset_cho, NUM_OF_CHOSEONG, c.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = ONLY_CHOSEONG;
@@ -466,8 +595,8 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 			}
 			else
 			{
-				stUnderConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+				stCurrentConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = ONE_JONGSEONG_COMB_UNABLE;
@@ -480,9 +609,9 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 
 			if (c == "l")
 			{
-				std::string strDoubleVowel = charset_jung[stUnderConstruct.jungseong] + c;
-				stUnderConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, strDoubleVowel.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+				std::string strDoubleVowel = charset_jung[stCurrentConstruct.jungseong] + c;
+				stCurrentConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, strDoubleVowel.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = NO_JONGSEONG_COMB_UNABLE;
@@ -490,9 +619,9 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 			}
 			else
 			{
-				stUnderConstruct.clear();
-				stUnderConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, c.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+				stCurrentConstruct.clear();
+				stCurrentConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, c.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = ONLY_JUNGSEONG;
@@ -509,8 +638,8 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 
 			if (c == "r")
 			{
-				stUnderConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+				stCurrentConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = ONE_JONGSEONG_COMB_ABLE_R;
@@ -518,8 +647,8 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 			}
 			else if (c == "s")
 			{
-				stUnderConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+				stCurrentConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = ONE_JONGSEONG_COMB_ABLE_S;
@@ -527,8 +656,8 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 			}
 			else if (c == "f")
 			{
-				stUnderConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+				stCurrentConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = ONE_JONGSEONG_COMB_ABLE_F;
@@ -536,8 +665,8 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 			}
 			else if (c == "q")
 			{
-				stUnderConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+				stCurrentConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = ONE_JONGSEONG_COMB_ABLE_Q;
@@ -545,9 +674,9 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 			}
 			else if (c == "Q" || c == "W" || c == "E")
 			{
-				stUnderConstruct.clear();
-				stUnderConstruct.choseong = GetIndexNum(charset_cho, NUM_OF_CHOSEONG, c.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+				stCurrentConstruct.clear();
+				stCurrentConstruct.choseong = GetIndexNum(charset_cho, NUM_OF_CHOSEONG, c.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = ONLY_CHOSEONG;
@@ -556,8 +685,8 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 			}
 			else
 			{
-				stUnderConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+				stCurrentConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, c.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = ONE_JONGSEONG_COMB_UNABLE;
@@ -567,9 +696,9 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 		else if (style == VOWEL) // 모음
 		{
 			context.strUnderConstruct.clear();
-			stUnderConstruct.clear();
-			stUnderConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, c.c_str());
-			context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+			stCurrentConstruct.clear();
+			stCurrentConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, c.c_str());
+			context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 			context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 			state = ONLY_JUNGSEONG;
@@ -584,9 +713,9 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 			context.strUnderConstruct.clear();
 			if (c == "t")
 			{
-				std::string strDoubleConsonant = charset_jong[stUnderConstruct.jongseong] + c; //Warning : 숫자로 더해져서 이상한 값이 들어갈 수도 있음
-				stUnderConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, strDoubleConsonant.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+				std::string strDoubleConsonant = charset_jong[stCurrentConstruct.jongseong] + c; //Warning : 숫자로 더해져서 이상한 값이 들어갈 수도 있음
+				stCurrentConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, strDoubleConsonant.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = DOUBLE_JONGSEONG;
@@ -594,9 +723,9 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 			}
 			else
 			{
-				stUnderConstruct.clear();
-				stUnderConstruct.choseong = GetIndexNum(charset_cho, NUM_OF_CHOSEONG, c.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+				stCurrentConstruct.clear();
+				stCurrentConstruct.choseong = GetIndexNum(charset_cho, NUM_OF_CHOSEONG, c.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = ONLY_CHOSEONG;
@@ -609,13 +738,13 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 			context.strUnderConstruct.clear();
 
 			ST_CONSTRUCT stPreConstruct = DisassemUnicode(context.strUnderConstruct);
-			stUnderConstruct.clear();
-			stUnderConstruct.choseong = stPreConstruct.jongseong;
-			stUnderConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, c.c_str());
+			stCurrentConstruct.clear();
+			stCurrentConstruct.choseong = stPreConstruct.jongseong;
+			stCurrentConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, c.c_str());
 			stPreConstruct.jongseong = 0;
 
 			context.strUnderConstruct = AssemUnicode(stPreConstruct);
-			context.strUnderConstruct.push_back(AssemUnicode(stUnderConstruct));
+			context.strUnderConstruct.push_back(AssemUnicode(stCurrentConstruct));
 
 			if (c == "h")
 			{
@@ -646,18 +775,18 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 			context.strUnderConstruct.clear();
 			if (c == "w" || c =="g")
 			{
-				std::string strDoubleConsonant = charset_jong[stUnderConstruct.jongseong] + c; //Warning : 숫자로 더해져서 이상한 값이 들어갈 수도 있음
-				stUnderConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, strDoubleConsonant.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+				std::string strDoubleConsonant = charset_jong[stCurrentConstruct.jongseong] + c; //Warning : 숫자로 더해져서 이상한 값이 들어갈 수도 있음
+				stCurrentConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, strDoubleConsonant.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = DOUBLE_JONGSEONG;
 			}
 			else
 			{
-				stUnderConstruct.clear();
-				stUnderConstruct.choseong = GetIndexNum(charset_cho, NUM_OF_CHOSEONG, c.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+				stCurrentConstruct.clear();
+				stCurrentConstruct.choseong = GetIndexNum(charset_cho, NUM_OF_CHOSEONG, c.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = ONLY_CHOSEONG;
@@ -670,13 +799,13 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 			context.strUnderConstruct.clear();
 
 			ST_CONSTRUCT stPreConstruct = DisassemUnicode(context.strUnderConstruct);
-			stUnderConstruct.clear();
-			stUnderConstruct.choseong = stPreConstruct.jongseong;
-			stUnderConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, c.c_str());
+			stCurrentConstruct.clear();
+			stCurrentConstruct.choseong = stPreConstruct.jongseong;
+			stCurrentConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, c.c_str());
 			stPreConstruct.jongseong = 0;
 
 			context.strUnderConstruct = AssemUnicode(stPreConstruct);
-			context.strUnderConstruct.push_back(AssemUnicode(stUnderConstruct));
+			context.strUnderConstruct.push_back(AssemUnicode(stCurrentConstruct));
 
 			if (c == "h")
 			{
@@ -707,18 +836,18 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 			context.strUnderConstruct.clear();
 			if (c == "r" || c == "a" || c == "q" || c == "t" || c == "x" || c == "v" || c == "g")
 			{
-				std::string strDoubleConsonant = charset_jong[stUnderConstruct.jongseong] + c; //Warning : 숫자로 더해져서 이상한 값이 들어갈 수도 있음
-				stUnderConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, strDoubleConsonant.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+				std::string strDoubleConsonant = charset_jong[stCurrentConstruct.jongseong] + c; //Warning : 숫자로 더해져서 이상한 값이 들어갈 수도 있음
+				stCurrentConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, strDoubleConsonant.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = DOUBLE_JONGSEONG;
 			}
 			else
 			{
-				stUnderConstruct.clear();
-				stUnderConstruct.choseong = GetIndexNum(charset_cho, NUM_OF_CHOSEONG, c.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+				stCurrentConstruct.clear();
+				stCurrentConstruct.choseong = GetIndexNum(charset_cho, NUM_OF_CHOSEONG, c.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = ONLY_CHOSEONG;
@@ -731,13 +860,13 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 			context.strUnderConstruct.clear();
 
 			ST_CONSTRUCT stPreConstruct = DisassemUnicode(context.strUnderConstruct);
-			stUnderConstruct.clear();
-			stUnderConstruct.choseong = stPreConstruct.jongseong;
-			stUnderConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, c.c_str());
+			stCurrentConstruct.clear();
+			stCurrentConstruct.choseong = stPreConstruct.jongseong;
+			stCurrentConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, c.c_str());
 			stPreConstruct.jongseong = 0;
 
 			context.strUnderConstruct = AssemUnicode(stPreConstruct);
-			context.strUnderConstruct.push_back(AssemUnicode(stUnderConstruct));
+			context.strUnderConstruct.push_back(AssemUnicode(stCurrentConstruct));
 
 			if (c == "h")
 			{
@@ -768,18 +897,18 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 			context.strUnderConstruct.clear();
 			if (c == "t")
 			{
-				std::string strDoubleConsonant = charset_jong[stUnderConstruct.jongseong] + c; //Warning : 숫자로 더해져서 이상한 값이 들어갈 수도 있음
-				stUnderConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, strDoubleConsonant.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+				std::string strDoubleConsonant = charset_jong[stCurrentConstruct.jongseong] + c; //Warning : 숫자로 더해져서 이상한 값이 들어갈 수도 있음
+				stCurrentConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, strDoubleConsonant.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = DOUBLE_JONGSEONG;
 			}
 			else
 			{
-				stUnderConstruct.clear();
-				stUnderConstruct.choseong = GetIndexNum(charset_cho, NUM_OF_CHOSEONG, c.c_str());
-				context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+				stCurrentConstruct.clear();
+				stCurrentConstruct.choseong = GetIndexNum(charset_cho, NUM_OF_CHOSEONG, c.c_str());
+				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 				state = ONLY_CHOSEONG;
@@ -792,13 +921,13 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 			context.strUnderConstruct.clear();
 
 			ST_CONSTRUCT stPreConstruct = DisassemUnicode(context.strUnderConstruct);
-			stUnderConstruct.clear();
-			stUnderConstruct.choseong = stPreConstruct.jongseong;
-			stUnderConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, c.c_str());
+			stCurrentConstruct.clear();
+			stCurrentConstruct.choseong = stPreConstruct.jongseong;
+			stCurrentConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, c.c_str());
 			stPreConstruct.jongseong = 0;
 
 			context.strUnderConstruct = AssemUnicode(stPreConstruct);
-			context.strUnderConstruct.push_back(AssemUnicode(stUnderConstruct));
+			context.strUnderConstruct.push_back(AssemUnicode(stCurrentConstruct));
 
 			if (c == "h")
 			{
@@ -827,10 +956,10 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 		if (style == CONSONANT) // 자음
 		{
 			context.strUnderConstruct.clear();
-			stUnderConstruct.clear();
+			stCurrentConstruct.clear();
 
-			stUnderConstruct.choseong = GetIndexNum(charset_cho, NUM_OF_CHOSEONG, c.c_str());
-			context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+			stCurrentConstruct.choseong = GetIndexNum(charset_cho, NUM_OF_CHOSEONG, c.c_str());
+			context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 			context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 			state = ONLY_CHOSEONG;
@@ -842,13 +971,13 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 			context.strUnderConstruct.clear();
 
 			ST_CONSTRUCT stPreConstruct = DisassemUnicode(context.strUnderConstruct);
-			stUnderConstruct.clear();
-			stUnderConstruct.choseong = stPreConstruct.jongseong;
-			stUnderConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, c.c_str());
+			stCurrentConstruct.clear();
+			stCurrentConstruct.choseong = stPreConstruct.jongseong;
+			stCurrentConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, c.c_str());
 			stPreConstruct.jongseong = 0;
 
 			context.strUnderConstruct = AssemUnicode(stPreConstruct);
-			context.strUnderConstruct.push_back(AssemUnicode(stUnderConstruct));
+			context.strUnderConstruct.push_back(AssemUnicode(stCurrentConstruct));
 
 			if (c == "h")
 			{
@@ -876,11 +1005,11 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 	{
 		if (style == CONSONANT) // 자음
 		{
-			stUnderConstruct.clear();
+			stCurrentConstruct.clear();
 			context.strUnderConstruct.clear();
 
-			stUnderConstruct.choseong = GetIndexNum(charset_cho, NUM_OF_CHOSEONG, c.c_str());
-			context.strUnderConstruct = AssemUnicode(stUnderConstruct);
+			stCurrentConstruct.choseong = GetIndexNum(charset_cho, NUM_OF_CHOSEONG, c.c_str());
+			context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 			context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
 			state = ONLY_CHOSEONG;
@@ -890,17 +1019,17 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 		else if (style == VOWEL) // 모음
 		{
 			ST_CONSTRUCT stPreConstruct = DisassemUnicode(context.strUnderConstruct);
-			stUnderConstruct.clear();
+			stCurrentConstruct.clear();
 
 			std::string strOriginConsonant = charset_jong[stPreConstruct.jongseong];
 			std::string strNewConsonant = strOriginConsonant.substr(1, 1);
 			strOriginConsonant.pop_back();
 			stPreConstruct.jongseong = GetIndexNum(charset_jong, NUM_OF_JONGSEONG, strOriginConsonant.c_str());
-			stUnderConstruct.choseong = GetIndexNum(charset_cho, NUM_OF_CHOSEONG, strNewConsonant.c_str());
-			stUnderConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, c.c_str());
+			stCurrentConstruct.choseong = GetIndexNum(charset_cho, NUM_OF_CHOSEONG, strNewConsonant.c_str());
+			stCurrentConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, c.c_str());
 
 			context.strUnderConstruct = AssemUnicode(stPreConstruct);
-			context.strUnderConstruct.push_back(AssemUnicode(stUnderConstruct));
+			context.strUnderConstruct.push_back(AssemUnicode(stCurrentConstruct));
 
 			if (c == "h")
 			{

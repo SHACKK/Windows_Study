@@ -10,13 +10,12 @@
     <None Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="pch.h" />
     <ClInclude Include="CStringBuilder.h" />
     <ClInclude Include="ICharSet.h" />
     <ClInclude Include="Struct.h" />
     <ClInclude Include="CAsciiCharset.h" />
     <ClInclude Include="CHangulCharset.h" />
-    <ClInclude Include="KeyInput.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CStringBuilder.cpp" />
@@ -24,6 +23,5 @@
     <ClCompile Include="Struct.cpp" />
     <ClCompile Include="CAsciiCharset.cpp" />
     <ClCompile Include="CHangulCharset.cpp" />
-    <ClCompile Include="KeyInput.cpp" />
   </ItemGroup>
 </Project>

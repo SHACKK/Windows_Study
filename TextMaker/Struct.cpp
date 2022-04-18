@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "pch.h"
 #include "Struct.h"
 
 void ST_CONSTRUCT::clear()

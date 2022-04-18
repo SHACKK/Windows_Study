@@ -1,6 +1,5 @@
-#include "stdafx.h"
+#include "pch.h"
 #include "CStringBuilder.h"
-#include "KeyInput.h"
 
 bool GetKeyInput(int &nVitrualKey)
 { 
