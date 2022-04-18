@@ -62,17 +62,70 @@ int CHangulCharset::CheckStr(std::string c)
 
 void CHangulCharset::DeleteChar(int nVirtualKey, ST_STRING_CONTEXT& context, ST_CONSTRUCT& stUnderConstruct)
 {
+	std::string strPreContext = context.strContext.substr(0, context.nCursorPos);
+	std::string strPosContext = context.strContext.substr(context.nCursorPos);
+
 	switch (state)
 	{
 	case BLINK:
+	{
+		strPreContext.pop_back();
+		context.nCursorPos--;
+		break;
+	}
+	case ONLY_CHOSEONG:
+	{
+		strPreContext.pop_back();
+		context.nCursorPos--;
+		stUnderConstruct.choseong = CONSTRUCT_DEFAULT;
+		context.strUnderConstruct.clear();
+
+		state = BLINK;
+		break;
+	}
+	case ONLY_JUNGSEONG:
+	{
+		strPreContext.pop_back();
+		context.nCursorPos--;
+		stUnderConstruct.jungseong = CONSTRUCT_DEFAULT;
+		context.strUnderConstruct.clear();
+
+		state = BLINK;
+		break;
+	}
+	case NO_JONGSEONG_COMB_ABLE_H:
+	{
+		strPreContext.pop_back();
+		stUnderConstruct.jungseong = CONSTRUCT_DEFAULT;
+		
+	}
+	case NO_JONGSEONG_COMB_ABLE_N:
 	{}
+	case NO_JONGSEONG_COMB_ABLE_M:
+	{}
+	case ONE_JONGSEONG_COMB_ABLE_R:
+	{}
+	case ONE_JONGSEONG_COMB_ABLE_S:
+	{}
+	case ONE_JONGSEONG_COMB_ABLE_F:
+	{}
+	case ONE_JONGSEONG_COMB_ABLE_Q:
+	{}
+	case DOUBLE_JONGSEONG:
+	{}
+
+	context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
+
 	}
 }
 
 void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context)
 {
 	if (nVirtualKey == 0x0C)
+	{
 		DeleteChar(nVirtualKey, context, stUnderConstruct);
+		return;
+	}
 	std::string c = StrFromVirtualKey(nVirtualKey);
 	int style = CheckStr(c);
 

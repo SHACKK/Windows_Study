@@ -27,33 +27,6 @@ enum E_CONSTRUCT_STATE
 	ONE_JONGSEONG_COMB_UNABLE,	// È¬¹çÄ§ Á¶ÇÕºÒ°¡ À½Àý
 	DOUBLE_JONGSEONG			// ½Ö¹ÞÄ§ À½Àý
 };
-enum E_CONSONANT_TYPE
-{
-	R,
-	S,
-	F,
-	Q,
-	T,
-	W,
-	G,
-	A,
-	X,
-	V,
-	CANNOT_BE_JONGSEONG,
-	NORMAL
-};
-enum E_VOWEL_TYPE
-{
-	H,
-	N,
-	M,
-	K,
-	O,
-	L,
-	J,
-	P,
-	NORMAL
-};
 
 std::map<int, std::string> mStringFromVitrualKey
 {
