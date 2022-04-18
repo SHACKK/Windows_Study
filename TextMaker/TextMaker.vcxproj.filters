@@ -13,7 +13,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="CStringBuilder.h" />
     <ClInclude Include="ICharSet.h" />
-    <ClInclude Include="StContext.h" />
+    <ClInclude Include="Struct.h" />
     <ClInclude Include="CAsciiCharset.h" />
     <ClInclude Include="CHangulCharset.h" />
     <ClInclude Include="KeyInput.h" />
@@ -21,7 +21,7 @@
   <ItemGroup>
     <ClCompile Include="CStringBuilder.cpp" />
     <ClCompile Include="ICharSet.cpp" />
-    <ClCompile Include="StContext.cpp" />
+    <ClCompile Include="Struct.cpp" />
     <ClCompile Include="CAsciiCharset.cpp" />
     <ClCompile Include="CHangulCharset.cpp" />
     <ClCompile Include="KeyInput.cpp" />
