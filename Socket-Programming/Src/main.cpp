@@ -1,23 +1,33 @@
 #include "pch.h"
-#include <vector>
-#include <Windows.h>
+#pragma comment(lib, "ws2_32.lib")
 
-CServer server;
-CClient client;
-CConnection connect;
+DWORD WINAPI ServerThreadCaller(void* pFuncName)
+{
+	CServer* server = (CServer*)(pFuncName);
+	return server->ServerThread();
+}
+
+DWORD WINAPI ClientThreadCaller(void* pFuncName)
+{
+	CClient* client = (CClient*)pFuncName;
+	return client->ClientThread();
+}
 
 int main(void)
 {
-	
+	ST_WSA_INITIALIZER init;
+	CServer server;
+	CClient client;
+
 	DWORD dwThreadId = 0;
-	HANDLE hServerThread = ::CreateThread(nullptr, 0, server.ServerThread, nullptr, 0, &dwThreadId);
+	HANDLE hServerThread = ::CreateThread(nullptr, 0, ServerThreadCaller, &server, 0, &dwThreadId);
 
 	Sleep(200);
 
 	std::vector<HANDLE> vecClientThread;
 	for (int i = 0; i < 5; i++)
 	{
-		HANDLE hClientThread = CreateThread(nullptr, 0, ClientThread, nullptr, 0, nullptr);
+		HANDLE hClientThread = CreateThread(nullptr, 0, ClientThreadCaller, &client, 0, nullptr);
 		vecClientThread.push_back(hClientThread);
 		Sleep(500);
 	}

@@ -1,3 +1,6 @@
 #pragma once
 
-#include "../Socket/대표헤더.h"
+#include <Windows.h>
+#include <vector>
+
+#include "../Socket/Socket.h"

@@ -1,7 +1,7 @@
 #include "pch.h"
-#include "CClient.h"
+#include "Client.h"
 
-DWORD WINAPI CClient::ClientThread(void* pContext)
+DWORD CClient::ClientThread()
 {
 	SOCKET hClientSocket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (INVALID_SOCKET == hClientSocket)

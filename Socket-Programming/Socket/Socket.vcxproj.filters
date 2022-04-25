@@ -7,17 +7,17 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Struct.cpp" />
-    <ClCompile Include="CServer.cpp" />
-    <ClCompile Include="CClient.cpp" />
-    <ClCompile Include="CConnection.cpp" />
+    <ClCompile Include="Init.cpp" />
+    <ClCompile Include="Server.cpp" />
+    <ClCompile Include="Client.cpp" />
+    <ClCompile Include="Connection.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
-    <ClInclude Include="대표헤더.h" />
-    <ClInclude Include="Struct.h" />
-    <ClInclude Include="CServer.h" />
-    <ClInclude Include="CClient.h" />
-    <ClInclude Include="CConnection.h" />
+    <ClInclude Include="Socket.h" />
+    <ClInclude Include="Init.h" />
+    <ClInclude Include="Server.h" />
+    <ClInclude Include="Client.h" />
+    <ClInclude Include="Connection.h" />
   </ItemGroup>
 </Project>
