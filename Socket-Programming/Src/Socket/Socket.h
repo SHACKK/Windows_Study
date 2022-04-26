@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Server.h"
-#include "Client.h"
-#include "Connection.h"
+#include "Socket_Server.h"
+#include "Socket_Client.h"
+#include "Socket_Connection.h"
 #include "Init.h"
