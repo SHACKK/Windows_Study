@@ -162,8 +162,8 @@
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Socket\Socket.vcxproj">
-      <Project>{4d32de07-d2fb-4b54-9977-6c610f2843a3}</Project>
+    <ProjectReference Include="..\Socket_Server\Socket_Server.vcxproj">
+      <Project>{0d035594-7da6-42b1-83aa-ab551cacbc50}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

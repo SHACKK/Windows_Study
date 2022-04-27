@@ -1,39 +1,56 @@
 #include "pch.h"
 #pragma comment(lib, "ws2_32.lib")
 
-DWORD WINAPI ServerThreadCaller(void* pFuncName)
+std::map<std::wstring, std::wstring> v_UserIdData =
 {
-	CServer* server = (CServer*)(pFuncName);
-	return server->ServerThread();
+	{L"jfhg456", L"ÀÓÃ¢Çö"}
+};
+
+std::map<std::wstring, std::wstring> v_ChatData;
+std::vector<std::vector<std::wstring, std::wstring>> v_DashBoard;
+
+struct ST_WSA_INITIALIZER
+{
+	WSAData wsa;
+	ST_WSA_INITIALIZER(void)
+	{
+		WSAStartup(MAKEWORD(2, 2), &wsa);
+	}
+	~ST_WSA_INITIALIZER(void)
+	{
+		WSACleanup();
+	}
+};
+
+DWORD ConnectionCreateCaller(void* pInstance)
+{
+	CSocketConnection* connect = (CSocketConnection*)(pInstance);
+	connect->Create();
+
+	std::wstring strUserId = v_UserIdData[connect->Recv()];
+
+	while (true)
+	{
+		std::wstring RecvMsg = connect->Recv();
+		v_ChatData.insert(std::pair<std::wstring, std::wstring>(strUserId, RecvMsg));
+		v_DashBoard.push_back();
+
+	}
 }
 
-DWORD WINAPI ClientThreadCaller(void* pFuncName)
-{
-	CClient* client = (CClient*)pFuncName;
-	return client->ClientThread();
-}
-
-int main(void)
+int main()
 {
 	ST_WSA_INITIALIZER init;
-	CServer server;
-	CClient client;
-
-	DWORD dwThreadId = 0;
-	HANDLE hServerThread = ::CreateThread(nullptr, 0, ServerThreadCaller, &server, 0, &dwThreadId);
-
-	Sleep(200);
-
-	std::vector<HANDLE> vecClientThread;
-	for (int i = 0; i < 5; i++)
-	{
-		HANDLE hClientThread = CreateThread(nullptr, 0, ClientThreadCaller, &client, 0, nullptr);
-		vecClientThread.push_back(hClientThread);
-		Sleep(500);
-	}
+	CSocketServer server;
+	printf("Server Startup");
 	
-	for (size_t i = 0; i < vecClientThread.size(); i++)
-		WaitForSingleObject(vecClientThread[i], INFINITE);
+	while (true)
+	{
+		CSocketConnection conn;
+		conn.hConnectionSocket = server.Listen();
+
+		CreateThread(nullptr, 0, ConnectionCreateCaller, &conn, 0, nullptr);
+	}
 
 	return 0;
 }

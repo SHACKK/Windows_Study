@@ -1,7 +1,9 @@
 #pragma once
 
 #include <Windows.h>
-#include <vector>
 #include <stdio.h>
+#include <map>
+#include <vector>
+#include <string>
 
-#include "../Socket/Socket.h"
+#include "../Socket_Server/Socket_Server.h"
