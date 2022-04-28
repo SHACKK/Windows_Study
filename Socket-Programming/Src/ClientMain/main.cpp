@@ -14,6 +14,8 @@ struct ST_WSA_INITIALIZER
 	}
 };
 
+std::vector<std::wstring> v_ChatData;
+
 int main(void)
 {
 	ST_WSA_INITIALIZER init;
@@ -25,13 +27,22 @@ int main(void)
 	std::wstring strUserId = L"jfhg456";
 	user.Send(strUserId);
 
+	int nVecSize = std::stoi(user.Recv());
+	for (int i = 0; i < nVecSize; i++)
+		v_ChatData.push_back(user.Recv().c_str());
+
+	for (size_t j = 0; j < v_ChatData.size(); j++)
+		wprintf(L"%s\n", v_ChatData[j].c_str());
+	
 	while (true)
 	{
 		std::wstring strSendMsg = L"Hello Server~";
 		user.Send(strSendMsg);
 
-		std::wstring strRecvMsg = user.Recv();
-		wprintf(L"%s", strRecvMsg.c_str());
+
+
+		for (size_t j = 0; j < v_ChatData.size(); j++)
+			wprintf(L"%s\n", v_ChatData[j].c_str());
 	}
 
 

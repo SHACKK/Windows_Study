@@ -4,7 +4,7 @@ class CSocketConnection
 public:
 	SOCKET hConnectionSocket;
 	int Create();
-	void Send();
+	void Send(std::wstring strMsg);
 	std::wstring Recv();
 	void Close();
 };

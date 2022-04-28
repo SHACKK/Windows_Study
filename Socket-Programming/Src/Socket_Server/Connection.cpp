@@ -9,13 +9,13 @@ int CSocketConnection::Create()
 	return 0;
 }
 
-void CSocketConnection::Send()
+void CSocketConnection::Send(std::wstring strMsg)
 {
-	std::wstring strMsg = L"Hello Client!";
 	int nLength = strMsg.length();
 	::send(hConnectionSocket, (const char*)&nLength, sizeof(nLength), 0);
 	::send(hConnectionSocket, (const char*)strMsg.c_str(), nLength, 0);
 }
+
 
 std::wstring CSocketConnection::Recv()
 {
@@ -24,7 +24,7 @@ std::wstring CSocketConnection::Recv()
 
 	std::wstring strMsg;
 	strMsg.resize(nLength);
-	::recv(hConnectionSocket, (char*)strMsg.c_str(), nLength, 0);
+	::recv(hConnectionSocket, (char*)strMsg.c_str(), nLength, 0); 
 
 	return strMsg;
 }

@@ -6,8 +6,7 @@ std::map<std::wstring, std::wstring> v_UserIdData =
 	{L"jfhg456", L"임창현"}
 };
 
-std::map<std::wstring, std::wstring> v_ChatData;
-std::vector<std::vector<std::wstring, std::wstring>> v_DashBoard;
+std::vector<std::wstring> v_ChatData = { {L"<<채팅 시작>>"} };
 
 struct ST_WSA_INITIALIZER
 {
@@ -28,12 +27,26 @@ DWORD ConnectionCreateCaller(void* pInstance)
 	connect->Create();
 
 	std::wstring strUserId = v_UserIdData[connect->Recv()];
+	std::wstring strRecvMsg = strUserId + L" : ";
+
+	std::wstring strVecSize = std::to_wstring(v_ChatData.size());
+	connect->Send(strVecSize);
+
+	for (size_t i = 0; i < v_ChatData.size(); i++)
+	{
+		connect->Send(v_ChatData[i]);
+	}
 
 	while (true)
 	{
-		std::wstring RecvMsg = connect->Recv();
-		v_ChatData.insert(std::pair<std::wstring, std::wstring>(strUserId, RecvMsg));
-		v_DashBoard.push_back();
+		strRecvMsg += connect->Recv();
+		v_ChatData.push_back(strRecvMsg.c_str());
+
+		//브로드캐스팅 해야함
+		for (size_t i = 0; i < v_ChatData.size(); i++)
+		{
+			connect->Send(v_ChatData[i]);
+		}
 
 	}
 }
@@ -43,7 +56,7 @@ int main()
 	ST_WSA_INITIALIZER init;
 	CSocketServer server;
 	printf("Server Startup");
-	
+
 	while (true)
 	{
 		CSocketConnection conn;
