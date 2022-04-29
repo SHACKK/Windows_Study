@@ -11,6 +11,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Socket_Server", "Src\Socket
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Socket_Client", "Src\Socket_Client\Socket_Client.vcxproj", "{4D32DE07-D2FB-4B54-9977-6C610F2843A3}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "000_MultiLanguage", "Src\000_MultiLanguage\000_MultiLanguage.vcxproj", "{825B17E8-3FD9-4430-9EBF-1F3D0FE1865E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -51,6 +53,14 @@ Global
 		{4D32DE07-D2FB-4B54-9977-6C610F2843A3}.Release|x64.Build.0 = Release|x64
 		{4D32DE07-D2FB-4B54-9977-6C610F2843A3}.Release|x86.ActiveCfg = Release|Win32
 		{4D32DE07-D2FB-4B54-9977-6C610F2843A3}.Release|x86.Build.0 = Release|Win32
+		{825B17E8-3FD9-4430-9EBF-1F3D0FE1865E}.Debug|x64.ActiveCfg = Debug|x64
+		{825B17E8-3FD9-4430-9EBF-1F3D0FE1865E}.Debug|x64.Build.0 = Debug|x64
+		{825B17E8-3FD9-4430-9EBF-1F3D0FE1865E}.Debug|x86.ActiveCfg = Debug|Win32
+		{825B17E8-3FD9-4430-9EBF-1F3D0FE1865E}.Debug|x86.Build.0 = Debug|Win32
+		{825B17E8-3FD9-4430-9EBF-1F3D0FE1865E}.Release|x64.ActiveCfg = Release|x64
+		{825B17E8-3FD9-4430-9EBF-1F3D0FE1865E}.Release|x64.Build.0 = Release|x64
+		{825B17E8-3FD9-4430-9EBF-1F3D0FE1865E}.Release|x86.ActiveCfg = Release|Win32
+		{825B17E8-3FD9-4430-9EBF-1F3D0FE1865E}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

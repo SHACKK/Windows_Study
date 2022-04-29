@@ -5,7 +5,7 @@
 
 int CSocketConnection::Create()
 {
-	printf("Server Connection Established.");
+	printf("Server Connection Established...!\n");
 	return 0;
 }
 
@@ -15,7 +15,6 @@ void CSocketConnection::Send(std::wstring strMsg)
 	::send(hConnectionSocket, (const char*)&nLength, sizeof(nLength), 0);
 	::send(hConnectionSocket, (const char*)strMsg.c_str(), nLength, 0);
 }
-
 
 std::wstring CSocketConnection::Recv()
 {
