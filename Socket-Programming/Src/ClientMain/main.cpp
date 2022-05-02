@@ -17,21 +17,11 @@ struct ST_WSA_INITIALIZER
 std::vector<std::wstring> v_ChatData;
 CSocketClient user;
 
-DWORD WINAPI PrintChatData(void* pContext)
+DWORD WINAPI RecvChatData(void* pContext)
 {
 	while (true)
 	{
-		system("cls");
-		std::wstring strVecSize = user.Recv();
-		int nVecSize = std::stoi(strVecSize);
-		//Receive Size
-		//int nVecSize = std::stoi(user.Recv());
-		//Receive Data of Vector
-		for (int i = 0; i < nVecSize; i++)
-			v_ChatData.push_back(user.Recv().c_str());
-		//Print Vector
-		for (size_t j = 0; j < v_ChatData.size(); j++)
-			wprintf(L"%s\n", v_ChatData[j].c_str());
+		v_ChatData = user.RecvBroadCast();
 	}
 	return 0;
 }
@@ -77,18 +67,22 @@ int main(void)
 	CStringBuilder stringbuilder;
 	bool bIsShiftEnabled;
 	bool bIsCapsLockEnabled;
-	
+
 	if (!user.Connect())
 		return -1;
 
 	std::wstring strUserId = L"jfhg456";
 	user.Send(strUserId);
 
-	HANDLE hPrintThread = ::CreateThread(nullptr, 0, PrintChatData, nullptr, 0, nullptr);
+	HANDLE hPrintThread = ::CreateThread(nullptr, 0, RecvChatData, nullptr, 0, nullptr);
 	Sleep(100);
 
 	while (true)
-	{		
+	{
+		system("cls");
+		for (size_t i = 0; i < v_ChatData.size(); i++)
+			wprintf(L"%s\n", v_ChatData[i].c_str());
+
 		std::list<ST_KEYSTATE> ListKey;
 
 		input.Query(ListKey);
@@ -100,7 +94,7 @@ int main(void)
 			bIsShiftEnabled = input.IsEnabledShift();
 
 			stringbuilder.BuildContext(ListKey, bIsShiftEnabled, bIsCapsLockEnabled);
-			system("cls");
+			
 			std::wstring strContext = stringbuilder.GetContextWithCursor();
 			wprintf(L"%s\n", strContext.c_str());
 
