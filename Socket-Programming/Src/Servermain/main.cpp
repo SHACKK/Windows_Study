@@ -21,6 +21,7 @@ struct ST_WSA_INITIALIZER
 };
 
 CSocketServer server;
+CMessage msg;
 
 DWORD ConnectionCreateCaller(void* pInstance)
 {
@@ -31,6 +32,7 @@ DWORD ConnectionCreateCaller(void* pInstance)
 	std::wstring strUserId = v_UserIdData[connect->Recv()];
 	std::wstring strRecvMsg = strUserId + L" : ";
 
+	v_ChatData = msg.GetMessgae();
 	//v_ChatData의 크기 전송
 	connect->Send(std::to_wstring(v_ChatData.size()));
 	//v_ChatData 데이터 전송
@@ -42,10 +44,8 @@ DWORD ConnectionCreateCaller(void* pInstance)
 	while (true)
 	{
 		strRecvMsg += connect->Recv();
-		v_ChatData.push_back(strRecvMsg.c_str());
-
-		//브로드캐스팅 해야함
-		//c++ 문법 문제
+		msg.InsertMessage(strUserId, strRecvMsg.c_str());
+		v_ChatData = msg.GetMessgae();
 		server.BroadCast(v_ChatData);
 	}
 }

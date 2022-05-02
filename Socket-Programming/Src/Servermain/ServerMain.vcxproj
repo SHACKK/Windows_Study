@@ -159,12 +159,15 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="pch.h" />
-  </ItemGroup>
-  <ItemGroup>
+    <ProjectReference Include="..\MessageQueue\MessageQueue.vcxproj">
+      <Project>{a9034583-9ec8-46bd-9142-1a7317c64da6}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Socket_Server\Socket_Server.vcxproj">
       <Project>{0d035594-7da6-42b1-83aa-ab551cacbc50}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -35,11 +35,14 @@ SOCKET CSocketServer::Listen()
 
 }
 
+//ÅÛÇÃ¸´ Àû¿ë ¿ä¸Á
 void CSocketServer::BroadCast(std::vector<std::wstring> v_ChatData)
 {
 	std::list<SOCKET>::iterator iter;
 	for (iter = ListSocket.begin(); iter != ListSocket.end(); iter++)
 	{
+		size_t nVecLength = v_ChatData.size();
+		::send(*iter, (const char*)&nVecLength, sizeof(nVecLength), 0);
 		for (size_t i = 0; i < v_ChatData.size(); i++)
 		{
 			int nLength = v_ChatData[i].length();
@@ -48,6 +51,8 @@ void CSocketServer::BroadCast(std::vector<std::wstring> v_ChatData)
 		}
 	}
 }
+
+
 
 void CSocketServer::Close()
 {

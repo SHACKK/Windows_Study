@@ -42,6 +42,21 @@ std::wstring CSocketClient::Recv()
 	return strRet;
 }
 
+std::vector<std::wstring> CSocketClient::RecvBroadCast()
+{
+	std::vector<std::wstring> v_ChatData;
+	size_t nVecLength;
+	::recv(hClientSocket, (char*)&nVecLength, sizeof(nVecLength), 0);
+	for (size_t i = 0; i < nVecLength; i++)
+	{
+		int nMsgLength;
+		::recv(hClientSocket, (char*)&nMsgLength, sizeof(nMsgLength), 0);
+		::recv(hClientSocket, (char*)&v_ChatData[i], nMsgLength, 0);
+	}
+
+	return v_ChatData;
+}
+
 void CSocketClient::Close()
 {
 	if(INVALID_SOCKET != hClientSocket)

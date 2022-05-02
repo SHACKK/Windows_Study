@@ -9,3 +9,4 @@
 #include <iostream>
 
 #include "../Socket_Server/Socket_Server.h"
+#include "../MessageQueue/Message.h"

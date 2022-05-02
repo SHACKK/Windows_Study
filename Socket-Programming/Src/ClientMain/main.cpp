@@ -22,8 +22,8 @@ DWORD WINAPI PrintChatData(void* pContext)
 	while (true)
 	{
 		system("cls");
-		std::wstring tmp = user.Recv();
-		int nVecSize = std::stoi(tmp);
+		std::wstring strVecSize = user.Recv();
+		int nVecSize = std::stoi(strVecSize);
 		//Receive Size
 		//int nVecSize = std::stoi(user.Recv());
 		//Receive Data of Vector
