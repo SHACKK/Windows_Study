@@ -75,7 +75,6 @@ int main(void)
 	user.Send(strUserId);
 
 	HANDLE hPrintThread = ::CreateThread(nullptr, 0, RecvChatData, nullptr, 0, nullptr);
-	Sleep(100);
 
 	while (true)
 	{
