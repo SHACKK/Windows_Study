@@ -17,12 +17,17 @@ struct ST_WSA_INITIALIZER
 std::vector<std::wstring> v_ChatData;
 CSocketClient user;
 
-DWORD WINAPI RecvChatData(void* pContext)
+DWORD WINAPI RecvChatData(LPVOID pContext)
 {
 	while (true)
 	{
 		v_ChatData = user.RecvBroadCast();
 	}
+	return 0;
+}
+
+DWORD WINAPI KeyInput(LPVOID pContext)
+{
 	return 0;
 }
 
@@ -76,39 +81,38 @@ int main(void)
 
 	HANDLE hPrintThread = ::CreateThread(nullptr, 0, RecvChatData, nullptr, 0, nullptr);
 
-	while (true)
-	{
-		system("cls");
-		for (size_t i = 0; i < v_ChatData.size(); i++)
-			wprintf(L"%s\n", v_ChatData[i].c_str());
+	//while (true)
+	//{
+	//	system("cls");
+	//	for (size_t i = 0; i < v_ChatData.size(); i++)
+	//		wprintf(L"%s\n", v_ChatData[i].c_str());
 
-		std::list<ST_KEYSTATE> ListKey;
+	//	std::list<ST_KEYSTATE> ListKey;
 
-		input.Query(ListKey);
-		if (ListKey.empty())
-			continue;
+	//	input.Query(ListKey);
+	//	if (ListKey.empty())
+	//		continue;
 
-		{	// 키 입력이 있을 경우
-			bIsCapsLockEnabled = input.IsEnabledCapsLock();
-			bIsShiftEnabled = input.IsEnabledShift();
+	//	{	// 키 입력이 있을 경우
+	//		bIsCapsLockEnabled = input.IsEnabledCapsLock();
+	//		bIsShiftEnabled = input.IsEnabledShift();
 
-			stringbuilder.BuildContext(ListKey, bIsShiftEnabled, bIsCapsLockEnabled);
-			
-			std::wstring strContext = stringbuilder.GetContextWithCursor();
-			wprintf(L"%s\n", strContext.c_str());
+	//		stringbuilder.BuildContext(ListKey, bIsShiftEnabled, bIsCapsLockEnabled);
+	//		
+	//		std::wstring strContext = stringbuilder.GetContextWithCursor();
+	//		wprintf(L"%s\n", strContext.c_str());
 
-			if (!(GetAsyncKeyState(VK_RETURN) * 0x8000))
-			{
-				strContext.clear();
-				continue;
-			}
+	//		if (!(GetAsyncKeyState(VK_RETURN) * 0x8000))
+	//		{
+	//			strContext.clear();
+	//			continue;
+	//		}
 
-			system("cls");
-			std::wstring strSendMsg = stringbuilder.GetContext();
-			user.Send(strSendMsg);
-		}
-	}
-
+	//		system("cls");
+	//		std::wstring strSendMsg = stringbuilder.GetContext();
+	//		user.Send(strSendMsg);
+	//	}
+	//}
 
 	return 0;
 }

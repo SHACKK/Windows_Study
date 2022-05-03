@@ -35,7 +35,6 @@ SOCKET CSocketServer::Listen()
 
 }
 
-//ÅÛÇÃ¸´ Àû¿ë ¿ä¸Á
 void CSocketServer::BroadCast(std::vector<std::wstring> v_ChatData)
 {
 	std::list<SOCKET>::iterator iter;
@@ -51,8 +50,6 @@ void CSocketServer::BroadCast(std::vector<std::wstring> v_ChatData)
 		}
 	}
 }
-
-
 
 void CSocketServer::Close()
 {
