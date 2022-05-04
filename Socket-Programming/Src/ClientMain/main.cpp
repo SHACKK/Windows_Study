@@ -14,27 +14,22 @@ struct ST_WSA_INITIALIZER
 	}
 };
 
-std::vector<std::wstring> v_ChatData;
 CSocketClient user;
 
 DWORD WINAPI RecvChatData(LPVOID pContext)
 {
+	std::vector<std::wstring> &v_PreChatData = *(std::vector<std::wstring>*)pContext;
+
 	while (true)
 	{
-		v_ChatData = user.RecvBroadCast();
+		v_PreChatData = user.RecvChatData();
 	}
 	return 0;
 }
 
 DWORD WINAPI KeyInput(LPVOID pContext)
 {
-	return 0;
-}
-
-int main(void)
-{
-	std::setlocale(LC_ALL, "ko_KR.UTF-8");
-	ST_WSA_INITIALIZER init;
+	std::wstring &strPreContext = *(std::wstring*)pContext;
 	CKeyInput input;
 	{
 		// 숫자
@@ -73,46 +68,65 @@ int main(void)
 	bool bIsShiftEnabled;
 	bool bIsCapsLockEnabled;
 
+	while (true)
+	{
+		std::list<ST_KEYSTATE> ListKey;
+
+		input.Query(ListKey);
+		if (ListKey.empty())
+			continue;
+
+		if (!(GetAsyncKeyState(VK_RETURN) * 0x8000))
+		{
+			std::wstring strSendMsg = stringbuilder.GetContext();
+			user.Send(strSendMsg);
+			strPreContext.clear();
+			continue;
+		}
+
+		{	// 키 입력이 있을 경우
+			bIsCapsLockEnabled = input.IsEnabledCapsLock();
+			bIsShiftEnabled = input.IsEnabledShift();
+
+			stringbuilder.BuildContext(ListKey, bIsShiftEnabled, bIsCapsLockEnabled);
+			
+			strPreContext = stringbuilder.GetContextWithCursor();
+		}
+	}
+
+	return 0;
+}
+
+int main(void)
+{
+	std::setlocale(LC_ALL, "ko_KR.UTF-8");
+	ST_WSA_INITIALIZER init;
+	
 	if (!user.Connect())
 		return -1;
+
+	std::vector<std::wstring> v_ChatData;
+	std::wstring strContext = L"|";
 
 	std::wstring strUserId = L"jfhg456";
 	user.Send(strUserId);
 
-	HANDLE hPrintThread = ::CreateThread(nullptr, 0, RecvChatData, nullptr, 0, nullptr);
+	HANDLE hInputThread = ::CreateThread(nullptr, 0, KeyInput, &strContext, 0, nullptr);
+	HANDLE hRecvThread = ::CreateThread(nullptr, 0, RecvChatData, &v_ChatData, 0, nullptr);
 
-	//while (true)
-	//{
-	//	system("cls");
-	//	for (size_t i = 0; i < v_ChatData.size(); i++)
-	//		wprintf(L"%s\n", v_ChatData[i].c_str());
 
-	//	std::list<ST_KEYSTATE> ListKey;
-
-	//	input.Query(ListKey);
-	//	if (ListKey.empty())
-	//		continue;
-
-	//	{	// 키 입력이 있을 경우
-	//		bIsCapsLockEnabled = input.IsEnabledCapsLock();
-	//		bIsShiftEnabled = input.IsEnabledShift();
-
-	//		stringbuilder.BuildContext(ListKey, bIsShiftEnabled, bIsCapsLockEnabled);
-	//		
-	//		std::wstring strContext = stringbuilder.GetContextWithCursor();
-	//		wprintf(L"%s\n", strContext.c_str());
-
-	//		if (!(GetAsyncKeyState(VK_RETURN) * 0x8000))
-	//		{
-	//			strContext.clear();
-	//			continue;
-	//		}
-
-	//		system("cls");
-	//		std::wstring strSendMsg = stringbuilder.GetContext();
-	//		user.Send(strSendMsg);
-	//	}
-	//}
+	while (true)
+	{
+		int nPrintSize = v_ChatData.size();
+		if (10 < nPrintSize)
+			nPrintSize -= 10;
+		
+		for (nPrintSize; nPrintSize < v_ChatData.size(); nPrintSize++)
+		{
+			wprintf(L"%s\n", v_ChatData[nPrintSize].c_str());
+			wprintf(L"\n\n%s", strContext.c_str());
+		}
+	}
 
 	return 0;
 }

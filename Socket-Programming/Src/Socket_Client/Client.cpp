@@ -25,7 +25,7 @@ bool CSocketClient::Connect()
 
 void CSocketClient::Send(std::wstring strMsg)
 {
-	int nLength = strMsg.length();
+	int nLength = strMsg.length() * sizeof(wchar_t);
 	::send(hClientSocket, (const char*)&nLength, sizeof(nLength), 0);
 	::send(hClientSocket, (const char*)strMsg.c_str(), nLength, 0);
 }
@@ -36,18 +36,20 @@ std::wstring CSocketClient::Recv()
 	::recv(hClientSocket, (char*)&nLength, sizeof(nLength), 0);
 
 	std::wstring strRet;
-	strRet.resize(nLength);
+	strRet.resize(nLength / sizeof(wchar_t));
 	::recv(hClientSocket, (char*)strRet.c_str(), nLength, 0);
 
 	return strRet;
 }
 
-std::vector<std::wstring> CSocketClient::RecvBroadCast()
+std::vector<std::wstring> CSocketClient::RecvChatData()
 {
 	std::vector<std::wstring> v_ChatData;
-	size_t nVecLength;
-	::recv(hClientSocket, (char*)&nVecLength, sizeof(nVecLength), 0);
-	for (size_t i = 0; i < nVecLength; i++)
+	size_t nVecSize;
+	::recv(hClientSocket, (char*)&nVecSize, sizeof(size_t), 0);
+	v_ChatData.resize(nVecSize);
+
+	for (size_t i = 0; i < nVecSize; i++)
 	{
 		int nMsgLength;
 		::recv(hClientSocket, (char*)&nMsgLength, sizeof(nMsgLength), 0);

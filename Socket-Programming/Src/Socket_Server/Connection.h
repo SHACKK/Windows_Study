@@ -2,9 +2,11 @@
 class CSocketConnection
 {
 public:
-	SOCKET hConnectionSocket;
+	SOCKET hConnectionSocket; //클라이언트랑 소통할 소켓
+
 	int Create();
 	void Send(std::wstring strMsg);
+	void Send(std::vector<std::wstring> v_ChatData);
 	std::wstring Recv();
 	void Close();
 };

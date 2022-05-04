@@ -5,39 +5,45 @@ std::map<std::wstring, std::wstring> v_UserIdData =
 {
 	{L"profrog", L"전상현"},
 	{L"hyungsuki", L"김형석"},
-	{L"", L"원종은"},
+	{L"Gracebell", L"원종은"},
 	{L"jfhg456", L"임창현"},
 	{L"ploneska", L"김지수"},
 	{L"aoi", L"이준성"}
 };
 
-std::vector<std::wstring> v_ChatData = { {L"채팅시작.."} };
 CMessage msg;
 std::mutex mtx;
 
 DWORD WINAPI ConnectionThread(LPVOID stThreadArg)
 {
 	ST_CONNECTION_PARAM& Param = *(ST_CONNECTION_PARAM*)stThreadArg;
+
 	CSocketConnection connect = (CSocketConnection)(Param.connect);
 	connect.Create();
 
-	//최초 : UserId 확인, 채팅 데이터 전송
-	std::wstring strUserId = v_UserIdData[connect.Recv()];
-	v_ChatData = Param.msg->GetMessgae();
-	connect.Send(std::to_wstring(v_ChatData.size()));
-	for (size_t i = 0; i < v_ChatData.size(); i++)
-	{
-		connect.Send(v_ChatData[i]);
-	}
+	// 최초 작업 : UserId 확인, 채팅 데이터 전송
+	std::wstring strUserId = v_UserIdData[connect.Recv()]; // 숫자 잘려서 옴
+	std::vector<std::wstring> v_ChatData = Param.msg->GetMessgae();
+	
+	connect.Send(v_ChatData);
 
 	while (true)
 	{
 		std::wstring strRecvMsg = connect.Recv();
+
 		mtx.lock();
 		Param.msg->InsertMessage(strUserId, strRecvMsg.c_str());
 		v_ChatData = Param.msg->GetMessgae();
-		Param.server->BroadCast(v_ChatData);
 		mtx.unlock();
+
+		std::list<SOCKET>::iterator iter;
+		for (iter = Param.server->ListSocket.begin();
+			iter != Param.server->ListSocket.end();
+			iter++)
+		{
+			//broadcast 안되고있음
+			connect.Send(v_ChatData);
+		}
 	}
 }
 
