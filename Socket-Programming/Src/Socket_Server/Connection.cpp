@@ -27,7 +27,6 @@ void CSocketConnection::Send(std::vector<std::wstring> v_ChatData)
 		::send(hConnectionSocket, (const char*)&nMsgLength, sizeof(nMsgLength), 0);
 		::send(hConnectionSocket, (const char*)v_ChatData[i].c_str(), nMsgLength, 0);
 	}
-
 }
 
 std::wstring CSocketConnection::Recv()

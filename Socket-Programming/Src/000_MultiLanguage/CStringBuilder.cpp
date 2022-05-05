@@ -34,10 +34,9 @@ void CStringBuilder::BuildContext(std::list<ST_KEYSTATE> listKeys, bool bIsShift
 			else
 				m_pCurCharset = m_mapCharset[CHARSET_ASCII];
 			break;
-
+		case VK_RETURN:
+			return;
 		default:
-			//if (bIsCapsLockEnabled && (!bHangulFlag))
-			//	key.bShiftPressed = true;
 			m_pCurCharset->Update(key.nVirtKey, m_Context, bIsShiftEnabled, bIsCapsLockEnabled);
 			break;
 		}

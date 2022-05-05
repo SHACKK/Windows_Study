@@ -53,7 +53,8 @@ std::vector<std::wstring> CSocketClient::RecvChatData()
 	{
 		int nMsgLength;
 		::recv(hClientSocket, (char*)&nMsgLength, sizeof(nMsgLength), 0);
-		::recv(hClientSocket, (char*)&v_ChatData[i], nMsgLength, 0);
+		v_ChatData[i].resize(nMsgLength / sizeof(wchar_t));
+		::recv(hClientSocket, (char*)v_ChatData[i].c_str(), nMsgLength, 0);
 	}
 
 	return v_ChatData;

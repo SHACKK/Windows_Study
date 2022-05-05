@@ -29,6 +29,7 @@ void CKeyInput::Query(std::list<ST_KEYSTATE>& outState)
 #endif
 	m_bCapsLockEnabled = GetKeyState(VK_CAPITAL) & 0x01;
 	m_bShiftPressed = (GetAsyncKeyState(VK_LSHIFT) & 0x8000) || (GetAsyncKeyState(VK_RSHIFT) & 0x8000);
+	m_bEnterPressed = GetAsyncKeyState(VK_RETURN) & 0x8000;
 
 	std::list<ST_KEYSTATE> tempState;
 	for (auto iter : m_mapRegisteredKey)
@@ -101,6 +102,11 @@ bool CKeyInput::IsEnabledCapsLock(void)
 bool CKeyInput::IsEnabledShift(void)
 {
 	return  m_bShiftPressed;
+}
+
+bool CKeyInput::IsEnterPressed(void)
+{
+	return m_bEnterPressed;
 }
 
 void CKeyInput::SetRepeatTick(DWORD dwRepeatTick)

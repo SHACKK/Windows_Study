@@ -18,7 +18,7 @@ CSocketClient user;
 
 DWORD WINAPI RecvChatData(LPVOID pContext)
 {
-	std::vector<std::wstring> &v_PreChatData = *(std::vector<std::wstring>*)pContext;
+	std::vector<std::wstring>& v_PreChatData = *(std::vector<std::wstring>*)pContext;
 
 	while (true)
 	{
@@ -29,7 +29,7 @@ DWORD WINAPI RecvChatData(LPVOID pContext)
 
 DWORD WINAPI KeyInput(LPVOID pContext)
 {
-	std::wstring &strPreContext = *(std::wstring*)pContext;
+	std::wstring& strContext = *(std::wstring*)pContext;
 	CKeyInput input;
 	{
 		// ¼ýÀÚ
@@ -73,14 +73,16 @@ DWORD WINAPI KeyInput(LPVOID pContext)
 		std::list<ST_KEYSTATE> ListKey;
 
 		input.Query(ListKey);
+
 		if (ListKey.empty())
 			continue;
 
-		if (!(GetAsyncKeyState(VK_RETURN) * 0x8000))
+		if (input.IsEnterPressed())
 		{
 			std::wstring strSendMsg = stringbuilder.GetContext();
 			user.Send(strSendMsg);
-			strPreContext.clear();
+			stringbuilder.Clear();
+			strContext = L"|";
 			continue;
 		}
 
@@ -89,8 +91,8 @@ DWORD WINAPI KeyInput(LPVOID pContext)
 			bIsShiftEnabled = input.IsEnabledShift();
 
 			stringbuilder.BuildContext(ListKey, bIsShiftEnabled, bIsCapsLockEnabled);
-			
-			strPreContext = stringbuilder.GetContextWithCursor();
+
+			strContext = stringbuilder.GetContextWithCursor();
 		}
 	}
 
@@ -101,7 +103,7 @@ int main(void)
 {
 	std::setlocale(LC_ALL, "ko_KR.UTF-8");
 	ST_WSA_INITIALIZER init;
-	
+
 	if (!user.Connect())
 		return -1;
 
@@ -114,18 +116,9 @@ int main(void)
 	HANDLE hInputThread = ::CreateThread(nullptr, 0, KeyInput, &strContext, 0, nullptr);
 	HANDLE hRecvThread = ::CreateThread(nullptr, 0, RecvChatData, &v_ChatData, 0, nullptr);
 
-
 	while (true)
 	{
-		int nPrintSize = v_ChatData.size();
-		if (10 < nPrintSize)
-			nPrintSize -= 10;
-		
-		for (nPrintSize; nPrintSize < v_ChatData.size(); nPrintSize++)
-		{
-			wprintf(L"%s\n", v_ChatData[nPrintSize].c_str());
-			wprintf(L"\n\n%s", strContext.c_str());
-		}
+		wprintf(L"%s\n", strContext.c_str());
 	}
 
 	return 0;

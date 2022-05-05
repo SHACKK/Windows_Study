@@ -22,13 +22,14 @@ DWORD WINAPI ConnectionThread(LPVOID stThreadArg)
 	connect.Create();
 
 	// 최초 작업 : UserId 확인, 채팅 데이터 전송
-	std::wstring strUserId = v_UserIdData[connect.Recv()]; // 숫자 잘려서 옴
+	std::wstring strUserId = v_UserIdData[connect.Recv()];
 	std::vector<std::wstring> v_ChatData = Param.msg->GetMessgae();
 	
 	connect.Send(v_ChatData);
 
 	while (true)
 	{
+		// v_ChatData를 계속 보내고 있는 듯..?
 		std::wstring strRecvMsg = connect.Recv();
 
 		mtx.lock();

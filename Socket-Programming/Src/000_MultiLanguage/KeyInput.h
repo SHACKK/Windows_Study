@@ -7,6 +7,7 @@ class CKeyInput
     std::map<int, DWORD> m_mapKeyPressTime;
     bool m_bCapsLockEnabled;
     bool m_bShiftPressed;
+    bool m_bEnterPressed;
     DWORD m_dwFirstRepeatTick;
     DWORD m_dwRepeatTick;
 
@@ -19,6 +20,7 @@ public:
 
     bool IsEnabledCapsLock(void);
     bool IsEnabledShift(void);
+    bool IsEnterPressed(void);
 
     void SetRepeatTick(DWORD dwRepeatTick = 200);
 
