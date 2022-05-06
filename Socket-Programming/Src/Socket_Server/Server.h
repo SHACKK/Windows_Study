@@ -1,5 +1,6 @@
-#pragma once
-#include <vector>
+#include <Windows.h>
+#include <list>
+#include "Connection.h"
 
 class CSocketServer
 {
@@ -10,7 +11,6 @@ public:
 		{
 			int nErrorCode = ::WSAGetLastError();
 		}
-
 
 		sockaddr_in service;
 		service.sin_family = AF_INET;
@@ -33,9 +33,8 @@ public:
 	SOCKET hListenSocket; //서버쪽 소켓
 	int nRet; // 오류메세지 담고있는 변수
 
-	std::list<SOCKET> ListSocket; // 연결된 클라이언트 수
+	std::list<CSocketConnection> ListSocket; // connection 성공 수
 
 	SOCKET Listen(); // 여기서 accept중
-	void BroadCast(void* pContext);
 	void Close();
 };

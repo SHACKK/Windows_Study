@@ -11,3 +11,8 @@ std::vector<std::wstring> CMessage::GetMessgae()
 {
 	return v_ChatData;
 }
+
+void CMessage::MsgBroadcast(CSocketServer server)
+{
+	
+}

@@ -1,4 +1,6 @@
 #pragma once
+#include "../Socket_Server/Socket_Server.h"
+
 class CMessage
 {
 private:
@@ -9,5 +11,7 @@ private:
 public:
 	void InsertMessage(std::wstring strUserId, std::wstring strRecvMsg);
 	std::vector<std::wstring> GetMessgae();
+
+	void MsgBroadcast(CSocketServer server);
 };
 

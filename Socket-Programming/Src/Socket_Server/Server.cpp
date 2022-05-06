@@ -12,7 +12,6 @@ SOCKET CSocketServer::Listen()
 		return nErrorCode;
 	}
 
-	ListSocket.push_back(hConnectionSock);
 	return hConnectionSock;
 
 }

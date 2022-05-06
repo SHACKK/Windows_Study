@@ -165,6 +165,11 @@
   <ItemGroup>
     <ClCompile Include="Message.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Socket_Server\Socket_Server.vcxproj">
+      <Project>{0d035594-7da6-42b1-83aa-ab551cacbc50}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

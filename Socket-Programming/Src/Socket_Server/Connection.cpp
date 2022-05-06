@@ -3,9 +3,9 @@
 
 #pragma comment(lib, "ws2_32.lib")
 
-int CSocketConnection::Create()
+int CSocketConnection::Create(std::wstring strUserId)
 {
-	printf("Server Connection Established...!\n");
+	wprintf(L"%s님이 접속하였습니다.\n", strUserId.c_str());
 	return 0;
 }
 
