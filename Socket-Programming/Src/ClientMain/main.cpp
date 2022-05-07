@@ -15,21 +15,40 @@ struct ST_WSA_INITIALIZER
 };
 
 CSocketClient user;
+std::mutex mtx;
+
+DWORD WINAPI UiPrint(LPVOID pContext)
+{
+	system("cls");
+	ST_THREAD_PARAM& stThreadArg = *(ST_THREAD_PARAM*)pContext;
+	std::vector<std::wstring>& v_CurrentChatData = *(std::vector<std::wstring>*)stThreadArg.v_ChatData;
+	std::wstring& strContext = *(std::wstring*)stThreadArg.strContext;
+
+	for (auto iter : v_CurrentChatData)
+		wprintf(L"%s\n", iter.c_str());
+	wprintf(L"\n\n%s", strContext.c_str());
+
+	return 0;
+}
 
 DWORD WINAPI RecvChatData(LPVOID pContext)
 {
-	std::vector<std::wstring>& v_PreChatData = *(std::vector<std::wstring>*)pContext;
+	ST_THREAD_PARAM& stThreadArg = *(ST_THREAD_PARAM*)pContext;
+	std::vector<std::wstring>& v_PreChatData = *(std::vector<std::wstring>*)stThreadArg.v_ChatData;
 
 	while (true)
 	{
 		v_PreChatData = user.RecvChatData();
+		::CreateThread(nullptr, 0, UiPrint, &stThreadArg, 0, nullptr);
 	}
 	return 0;
 }
 
 DWORD WINAPI KeyInput(LPVOID pContext)
 {
-	std::wstring& strContext = *(std::wstring*)pContext;
+	ST_THREAD_PARAM& stThreadArg = *(ST_THREAD_PARAM*)pContext;
+	std::wstring& strContext = *(std::wstring*)stThreadArg.strContext;
+
 	CKeyInput input;
 	{
 		// ¼ýÀÚ
@@ -113,13 +132,12 @@ int main(void)
 	std::wstring strUserId = L"jfhg456";
 	user.Send(strUserId);
 
-	HANDLE hInputThread = ::CreateThread(nullptr, 0, KeyInput, &strContext, 0, nullptr);
-	HANDLE hRecvThread = ::CreateThread(nullptr, 0, RecvChatData, &v_ChatData, 0, nullptr);
+	ST_THREAD_PARAM stThreadArg = { &v_ChatData, &strContext };
 
-	while (true)
-	{
-		wprintf(L"%s\n", strContext.c_str());
-	}
+	HANDLE hInputThread = ::CreateThread(nullptr, 0, KeyInput, &stThreadArg, 0, nullptr);
+	HANDLE hRecvThread = ::CreateThread(nullptr, 0, RecvChatData, &stThreadArg, 0, nullptr);
+
+	::WaitForSingleObject(hRecvThread, INFINITE);
 
 	return 0;
 }
