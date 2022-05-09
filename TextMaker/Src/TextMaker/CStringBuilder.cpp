@@ -28,9 +28,9 @@ std::string CStringBuilder::Input(int nVirtualKey)
             m_pCurCharset = m_mapCharset[CHARSET_HANGUL];
             break;
 
-        case VK_ENGLISH:
-            m_pCurCharset = m_mapCharset[CHARSET_ASCII];
-            break;
+        //case VK_ENGLISH:
+        //    m_pCurCharset = m_mapCharset[CHARSET_ASCII];
+        //    break;
 
         default:
             m_pCurCharset->Update(nVirtualKey, m_Context);

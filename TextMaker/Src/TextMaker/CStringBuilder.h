@@ -2,8 +2,8 @@
 #include "CAsciiCharset.h"
 #include "CHangulCharset.h"
 
-#define VK_HANGUL 0x0001
-#define VK_ENGLISH 0x0002
+//#define VK_HANGUL 0x0001
+//#define VK_ENGLISH 0x0002
 
 enum E_CHARSET_TYPE
 {
