@@ -17,8 +17,9 @@ struct ST_WSA_INITIALIZER
 CSocketClient user;
 std::mutex mtx;
 
-DWORD WINAPI UiPrint(LPVOID pContext)
+DWORD WINAPI PrintScreen(LPVOID pContext)
 {
+	mtx.lock();
 	system("cls");
 	ST_THREAD_PARAM& stThreadArg = *(ST_THREAD_PARAM*)pContext;
 	std::vector<std::wstring>& v_CurrentChatData = *(std::vector<std::wstring>*)stThreadArg.v_ChatData;
@@ -27,6 +28,7 @@ DWORD WINAPI UiPrint(LPVOID pContext)
 	for (auto iter : v_CurrentChatData)
 		wprintf(L"%s\n", iter.c_str());
 	wprintf(L"\n\n%s", strContext.c_str());
+	mtx.unlock();
 
 	return 0;
 }
@@ -39,7 +41,7 @@ DWORD WINAPI RecvChatData(LPVOID pContext)
 	while (true)
 	{
 		v_PreChatData = user.RecvChatData();
-		::CreateThread(nullptr, 0, UiPrint, &stThreadArg, 0, nullptr);
+		::CreateThread(nullptr, 0, PrintScreen, &stThreadArg, 0, nullptr);
 	}
 	return 0;
 }
@@ -47,7 +49,8 @@ DWORD WINAPI RecvChatData(LPVOID pContext)
 DWORD WINAPI KeyInput(LPVOID pContext)
 {
 	ST_THREAD_PARAM& stThreadArg = *(ST_THREAD_PARAM*)pContext;
-	std::wstring& strContext = *(std::wstring*)stThreadArg.strContext;
+	std::wstring& strCurrentContext = *(std::wstring*)stThreadArg.strContext;
+	std::wstring strPreContext = L"|";
 
 	CKeyInput input;
 	{
@@ -101,7 +104,7 @@ DWORD WINAPI KeyInput(LPVOID pContext)
 			std::wstring strSendMsg = stringbuilder.GetContext();
 			user.Send(strSendMsg);
 			stringbuilder.Clear();
-			strContext = L"|";
+			strCurrentContext = L"|";
 			continue;
 		}
 
@@ -111,7 +114,13 @@ DWORD WINAPI KeyInput(LPVOID pContext)
 
 			stringbuilder.BuildContext(ListKey, bIsShiftEnabled, bIsCapsLockEnabled);
 
-			strContext = stringbuilder.GetContextWithCursor();
+			strCurrentContext = stringbuilder.GetContextWithCursor();
+
+			if (strCurrentContext != strPreContext)
+			{
+				::CreateThread(nullptr, 0, PrintScreen, &stThreadArg, 0, nullptr);
+				strPreContext = strCurrentContext;
+			}
 		}
 	}
 

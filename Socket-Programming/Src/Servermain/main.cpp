@@ -16,6 +16,8 @@ std::mutex mtx;
 DWORD WINAPI BroadCastThread(LPVOID stThreadArg)
 {
 	ST_CONNECTION_PARAM& Param = *(ST_CONNECTION_PARAM*)stThreadArg;
+	CSocketServer& server = *(CSocketServer*)Param.server;
+	CMessage& msg = *(CMessage*)Param.msg;
 
 	mtx.lock();
 	std::list<CSocketConnection>::iterator iter;
@@ -25,7 +27,10 @@ DWORD WINAPI BroadCastThread(LPVOID stThreadArg)
 	{
 		iter->Send(Param.msg->GetMessgae());
 	}
-	mtx.unlock();
+
+	/*for (auto iter : server.ListSocket)
+		iter.Send(msg.GetMessgae());
+	mtx.unlock();*/
 
 	return 0;
 }
