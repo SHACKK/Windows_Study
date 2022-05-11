@@ -33,7 +33,7 @@ public:
 	SOCKET hListenSocket; //서버쪽 소켓
 	int nRet; // 오류메세지 담고있는 변수
 
-	std::list<CSocketConnection> ListSocket; // connection 성공 수
+	std::list<CSocketConnection*> ListSocket;
 
 	SOCKET Listen(); // 여기서 accept중
 	void Close();

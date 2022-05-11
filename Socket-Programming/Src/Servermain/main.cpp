@@ -21,16 +21,16 @@ DWORD WINAPI BroadCastThread(LPVOID stThreadArg)
 
 	mtx.lock();
 	std::list<CSocketConnection>::iterator iter;
-	for (iter = Param.server->ListSocket.begin();
-			iter != Param.server->ListSocket.end();
-			iter++)
-	{
-		iter->Send(Param.msg->GetMessgae());
-	}
+	//for (iter = server.ListSocket.begin();
+	//		iter != server.ListSocket.end();
+	//		iter++)
+	//{
+	//	iter->Send(msg.GetMessgae());
+	//}
 
-	/*for (auto iter : server.ListSocket)
-		iter.Send(msg.GetMessgae());
-	mtx.unlock();*/
+	//for (auto iter : server.ListSocket)
+	//	iter.Send(msg.GetMessgae());
+	mtx.unlock();
 
 	return 0;
 }
@@ -55,7 +55,7 @@ DWORD WINAPI RecvMsgThread(LPVOID stThreadArg)
 		Param.msg->InsertMessage(strUserId, strRecvMsg.c_str());
 		mtx.unlock();
 
-		::CreateThread(nullptr, 0, BroadCastThread, &stThreadArg, 0, nullptr);
+		::CreateThread(nullptr, 0, BroadCastThread, &Param, 0, nullptr);
 	}
 }
 
@@ -80,7 +80,7 @@ int main()
 
 		if (INVALID_SOCKET == conn.hConnectionSocket)
 			continue;
-		server.ListSocket.push_back(conn);
+		server.ListSocket.push_back(&conn);
 		stThreadArg.connect = conn;
 		CreateThread(nullptr, 0, RecvMsgThread, &stThreadArg, 0, nullptr);
 	}

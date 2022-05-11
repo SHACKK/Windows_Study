@@ -104,6 +104,7 @@ DWORD WINAPI KeyInput(LPVOID pContext)
 			std::wstring strSendMsg = stringbuilder.GetContext();
 			user.Send(strSendMsg);
 			stringbuilder.Clear();
+			strPreContext = L"|";
 			strCurrentContext = L"|";
 			continue;
 		}
