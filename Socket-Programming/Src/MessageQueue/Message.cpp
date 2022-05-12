@@ -7,7 +7,7 @@ void CMessage::InsertMessage(std::wstring strUserId, std::wstring strRecvMsg)
 	v_ChatData.push_back(strChatData);
 }
 
-std::vector<std::wstring> CMessage::GetMessgae()
+std::vector<std::wstring> CMessage::GetMessage()
 {
 	return v_ChatData;
 }

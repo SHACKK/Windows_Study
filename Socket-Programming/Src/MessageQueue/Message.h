@@ -10,7 +10,7 @@ private:
 	};
 public:
 	void InsertMessage(std::wstring strUserId, std::wstring strRecvMsg);
-	std::vector<std::wstring> GetMessgae();
+	std::vector<std::wstring> GetMessage();
 
 	void MsgBroadcast(CSocketServer server);
 };

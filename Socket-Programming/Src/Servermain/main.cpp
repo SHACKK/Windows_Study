@@ -20,16 +20,19 @@ DWORD WINAPI BroadCastThread(LPVOID stThreadArg)
 	CMessage& msg = *(CMessage*)Param.msg;
 
 	mtx.lock();
-	std::list<CSocketConnection>::iterator iter;
-	//for (iter = server.ListSocket.begin();
-	//		iter != server.ListSocket.end();
-	//		iter++)
-	//{
-	//	iter->Send(msg.GetMessgae());
-	//}
+	//(1)
+	std::list<CSocketConnection*>::iterator iter;
+	for (iter = server.ListSocket.begin();
+			iter != server.ListSocket.end();
+			iter++)
+	{
+		(*iter)->Send(msg.GetMessage());
+	}
 
-	//for (auto iter : server.ListSocket)
-	//	iter.Send(msg.GetMessgae());
+	//(2)
+	for (auto it : server.ListSocket)
+		(it)->Send(msg.GetMessage());
+
 	mtx.unlock();
 
 	return 0;
@@ -38,13 +41,12 @@ DWORD WINAPI BroadCastThread(LPVOID stThreadArg)
 DWORD WINAPI RecvMsgThread(LPVOID stThreadArg)
 {
 	ST_CONNECTION_PARAM& Param = *(ST_CONNECTION_PARAM*)stThreadArg;
-
 	CSocketConnection connect = (CSocketConnection)(Param.connect);
 
 	// 최초 연결 시 : UserId 확인, 채팅 데이터 전송
 	std::wstring strUserId = v_UserIdData[connect.Recv()];
 	connect.Create(strUserId);
-	connect.Send(Param.msg->GetMessgae());
+	connect.Send(Param.msg->GetMessage());
 
 	while (true)
 	{
@@ -57,6 +59,19 @@ DWORD WINAPI RecvMsgThread(LPVOID stThreadArg)
 
 		::CreateThread(nullptr, 0, BroadCastThread, &Param, 0, nullptr);
 	}
+}
+
+DWORD WINAPI ConnectionThread(LPVOID pContext)
+{
+	CSocketServer& server = *(CSocketServer*)pContext;
+	CSocketConnection connect;
+	connect.hConnectionSocket = server.Listen();
+
+	if (INVALID_SOCKET == connect.hConnectionSocket)
+		return 0;
+
+	server.ListSocket.push_back(&connect);
+	stThreadArg.connect = connect;
 }
 
 int main()

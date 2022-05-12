@@ -2,6 +2,8 @@
 class CSocketConnection
 {
 public:
+	CSocketConnection() {};
+	~CSocketConnection() {};
 	SOCKET hConnectionSocket; //클라이언트랑 소통할 소켓
 
 	int Create(std::wstring strUserId);
