@@ -1,7 +1,12 @@
 #pragma once
-#include "Struct.h"
 
 class CConnectionSuper;
+
+struct ST_SERVER_INIT
+{
+	WORD wPort;
+	std::vector<CConnectionSuper*> connections;
+};
 
 class CServer
 {
