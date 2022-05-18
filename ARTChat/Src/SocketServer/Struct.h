@@ -16,3 +16,9 @@ struct ST_WSA_INITIALIZER
 		WSACleanup();
 	}
 };
+
+enum class E_RESULT
+{
+	SUCCESS,
+	FAILED
+};

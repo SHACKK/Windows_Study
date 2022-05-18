@@ -157,6 +157,7 @@
   <ItemGroup>
     <ClInclude Include="ChatConnection.h" />
     <ClInclude Include="ConnectionSuper.h" />
+    <ClInclude Include="StreamConnection.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Server.h" />
     <ClInclude Include="Struct.h" />
@@ -164,6 +165,7 @@
   <ItemGroup>
     <ClCompile Include="ChatConnection.cpp" />
     <ClCompile Include="ConnectionSuper.cpp" />
+    <ClCompile Include="StreamConnection.cpp" />
     <ClCompile Include="Server.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

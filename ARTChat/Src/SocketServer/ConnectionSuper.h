@@ -1,12 +1,14 @@
 #pragma once
-#include "Server.h"
+
+class CServer;
 
 class CConnectionSuper
 {
 private:
+	SOCKET m_ConnectionSocket;
 	CServer* m_pServer;
-	SOCKET m_Socket;
 	void ConnectionThread();
+	sockaddr RemoteInfo;
 
 protected:
 	virtual void onConnect() = 0;
@@ -15,7 +17,7 @@ protected:
 
 public:
 	int Establish(SOCKET acceptedSocket, CServer* pServer);
-	int Send(const LPBYTE pBuffer, size_t BufferSize);
+	int Send(LPCBYTE pBuffer, size_t BufferSize);
 	int Recv(LPBYTE pBuffer, size_t BufferSize);
 };
 

@@ -6,5 +6,8 @@
 #include <queue>
 #include <list>
 #include <set>
+#include <map>
+#include <exception>
 
 #include "Struct.h"
+#include "../MessagePacket/Packet.h"
