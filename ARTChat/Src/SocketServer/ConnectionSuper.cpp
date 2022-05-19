@@ -1,14 +1,24 @@
 #include "pch.h"
 #include "ConnectionSuper.h"
+#include "ChatConnection.h"
+#include "../MessagePacket/_Packet.h"
 
-void CConnectionSuper::ConnectionThread()
+DWORD WINAPI CConnectionSuper::ConnectionThread(LPVOID pContext)
 {
-	onConnect();
+	CConnectionSuper& connection = *(CConnectionSuper*)pContext;
+	CPacketHeader header;
+
+	connection.onConnect();
 	while (true)
 	{
-		onRecv();
+		connection.Recv((LPBYTE)&header, sizeof(header), MSG_PEEK);
+		if (header.MagicOK() && header.tSize == 0)
+			break;
+
+		connection.onConnect();
 	}
-	onClose();
+	connection.onClose();
+	return 0;
 }
 
 int CConnectionSuper::Establish(SOCKET acceptedSocket, CServer* pServer)
@@ -16,8 +26,7 @@ int CConnectionSuper::Establish(SOCKET acceptedSocket, CServer* pServer)
 	m_ConnectionSocket = acceptedSocket;
 	m_pServer = pServer;
 
-	ConnectionThread();
-	//::CreateThread(nullptr, 0, ConnectionThread, nullptr, 0, nullptr);
+	::CreateThread(nullptr, 0, this->ConnectionThread, this, 0, nullptr);
 	return 0;
 }
 
@@ -35,11 +44,11 @@ int CConnectionSuper::Send(LPCBYTE pBuffer, size_t BufferSize)
 	return 0;
 }
 
-int CConnectionSuper::Recv(LPBYTE pBuffer, size_t BufferSize)
+int CConnectionSuper::Recv(LPBYTE pBuffer, size_t BufferSize, int flags = 0)
 {
 	try
 	{
-		::recv(m_ConnectionSocket, (char*)&pBuffer, (int)BufferSize, 0);
+		::recv(m_ConnectionSocket, (char*)&pBuffer, (int)BufferSize, flags);
 	}
 	catch (std::exception& e)
 	{

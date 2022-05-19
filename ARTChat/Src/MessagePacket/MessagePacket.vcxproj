@@ -156,16 +156,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="ConnectionPacket.h" />
-    <ClInclude Include="MessagePacket.h" />
-    <ClInclude Include="PacketHeader.h" />
+    <ClInclude Include="PacketHandler.h" />
+    <ClInclude Include="PacketHandlerSuper.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="Packet.h" />
+    <ClInclude Include="_Packet.h" />
+    <ClInclude Include="PCK_HEADER.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ConnectionPacket.cpp" />
-    <ClCompile Include="MessagePacket.cpp" />
-    <ClCompile Include="PacketHeader.cpp" />
+    <ClCompile Include="PacketHandler.cpp" />
+    <ClCompile Include="PacketHandlerSuper.cpp" />
+    <ClCompile Include="PCK_HEADER.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

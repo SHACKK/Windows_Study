@@ -1,7 +1,7 @@
 #pragma once
 #include "ConnectionSuper.h"
 
-class CChatConnection : protected CConnectionSuper
+class CChatConnection : public CConnectionSuper
 {
 public:
 	void onConnect();

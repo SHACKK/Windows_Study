@@ -12,12 +12,11 @@
     <ClInclude Include="ConnectionSuper.h" />
     <ClInclude Include="Struct.h" />
     <ClInclude Include="ChatConnection.h" />
-    <ClInclude Include="StreamConnection.h" />
+    <ClInclude Include="_SocketServer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Server.cpp" />
     <ClCompile Include="ConnectionSuper.cpp" />
     <ClCompile Include="ChatConnection.cpp" />
-    <ClCompile Include="StreamConnection.cpp" />
   </ItemGroup>
 </Project>

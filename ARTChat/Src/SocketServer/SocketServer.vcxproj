@@ -157,16 +157,20 @@
   <ItemGroup>
     <ClInclude Include="ChatConnection.h" />
     <ClInclude Include="ConnectionSuper.h" />
-    <ClInclude Include="StreamConnection.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Server.h" />
     <ClInclude Include="Struct.h" />
+    <ClInclude Include="_SocketServer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ChatConnection.cpp" />
     <ClCompile Include="ConnectionSuper.cpp" />
-    <ClCompile Include="StreamConnection.cpp" />
     <ClCompile Include="Server.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MessagePacket\MessagePacket.vcxproj">
+      <Project>{5366e04f-09be-423f-a05f-e0e767ac5660}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

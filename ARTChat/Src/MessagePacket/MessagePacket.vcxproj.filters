@@ -7,15 +7,15 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="PacketHeader.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="ConnectionPacket.h" />
-    <ClInclude Include="MessagePacket.h" />
-    <ClInclude Include="Packet.h" />
+    <ClInclude Include="PCK_HEADER.h" />
+    <ClInclude Include="PacketHandlerSuper.h" />
+    <ClInclude Include="PacketHandler.h" />
+    <ClInclude Include="_Packet.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="PacketHeader.cpp" />
-    <ClCompile Include="ConnectionPacket.cpp" />
-    <ClCompile Include="MessagePacket.cpp" />
+    <ClCompile Include="PCK_HEADER.cpp" />
+    <ClCompile Include="PacketHandlerSuper.cpp" />
+    <ClCompile Include="PacketHandler.cpp" />
   </ItemGroup>
 </Project>

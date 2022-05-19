@@ -1,10 +1,23 @@
 #pragma once
 
+struct ST_SERVER_INFO
+{
+	const char* IP;
+	int Port;
+};
+
 class CClient
 {
+private:
+	SOCKET m_hClientSocket;
 public:
-	SOCKET hClientSocket;
-	int Connect();
+	CClient() {};
+	~CClient() 
+	{
+		this->Close();
+	};
+
+	int Connect(ST_SERVER_INFO stServerInfo);
 	int Close();
 	int Send(LPCBYTE pData, size_t Size);
 	int Recv(LPBYTE pBuffer, size_t BufferSize);
