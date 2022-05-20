@@ -1,7 +1,7 @@
 #pragma once
 #include "PacketHandler.h"
 
-class CPacketizer : public CPacketHandler
+class CPacketizer //: public CPacketHandler
 {
 private:
 	void OnRecv();
