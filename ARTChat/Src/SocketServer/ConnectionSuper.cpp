@@ -12,7 +12,7 @@ DWORD WINAPI CConnectionSuper::ConnectionThread(LPVOID pContext)
 	while (true)
 	{
 		connection.Peek((LPBYTE)&header, sizeof(header));
-		if (header.MagicOK() && header.tSize == 0) // GetType()을 써서 종료신호를 보내는 패킷인지를 확인해야함
+		if (header.MagicOK() && header. == 0) // GetType()을 써서 종료신호를 보내는 패킷인지를 확인해야함
 			break;
 
 		connection.onRecv();

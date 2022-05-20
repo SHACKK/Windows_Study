@@ -4,30 +4,33 @@
 void CChatConnection::onConnect()
 {
 	// REQ_ACCEPT
-	CPacketHeader header;
-	header.tSize = 0;
-	Send((LPBYTE)&header, sizeof(header));
+	CResAccept resAcceptHeader;
+	resAcceptHeader.tSize = 0;
+	Send((LPBYTE)&resAcceptHeader, sizeof(resAcceptHeader));
 
 	printf("Connection Established..!");
 
 	// RES_CHAT_DATA
-	CPacketHeader header2;
-	std::vector<std::string> body = this->m_pServer->GetChatData();
+	CResChatData resChatDataheader;
+	std::vector<std::string> resChatDataBody = this->m_pServer->GetChatData();
 
-	header.tSize = sizeof(body);
-	Send((LPBYTE)&header, sizeof(header));
-	Send((LPBYTE)&body, header.tSize);
+	resChatDataheader.tSize = sizeof(resChatDataBody);
+	Send((LPBYTE)&resChatDataheader, sizeof(resChatDataheader));
+	Send((LPBYTE)&resChatDataBody, resChatDataheader.tSize);
 }
 
 void CChatConnection::onRecv()
 {
-	CPacketHeader header;
-	Recv((LPBYTE)&header, sizeof(header));
-	CPacketHandler body;
-
-	m_pServer->PushChatMessage();
+	//REQ_MESSAGE_INPUT
+	CReqMessageInput reqMessageInputHeader;
+	Recv((LPBYTE)&reqMessageInputHeader, sizeof(reqMessageInputHeader));
+	std::string strMessage;
+	strMessage.resize(reqMessageInputHeader.tSize);
+	Recv((LPBYTE)&strMessage, reqMessageInputHeader.tSize);
+	m_pServer->PushChatMessage(strMessage);
 }
 
 void CChatConnection::onClose()
 {
+
 }
