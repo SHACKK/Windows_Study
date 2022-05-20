@@ -156,16 +156,34 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BroadcastChatData.h" />
+    <ClInclude Include="BroadcastDisconnection.h" />
+    <ClInclude Include="ReqDisconnection.h" />
+    <ClInclude Include="ReqMessageInput.h" />
+    <ClInclude Include="ResAccept.h" />
+    <ClInclude Include="ReqConnection.h" />
+    <ClInclude Include="Packetizer.h" />
     <ClInclude Include="PacketHandler.h" />
     <ClInclude Include="PacketHandlerSuper.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="ResChatData.h" />
+    <ClInclude Include="ResWait.h" />
     <ClInclude Include="_Packet.h" />
     <ClInclude Include="PCK_HEADER.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BroadcastChatData.cpp" />
+    <ClCompile Include="BroadcastDisconnection.cpp" />
+    <ClCompile Include="ReqDisconnection.cpp" />
+    <ClCompile Include="ReqMessageInput.cpp" />
+    <ClCompile Include="ResAccept.cpp" />
+    <ClCompile Include="ReqConnection.cpp" />
+    <ClCompile Include="Packetizer.cpp" />
     <ClCompile Include="PacketHandler.cpp" />
     <ClCompile Include="PacketHandlerSuper.cpp" />
     <ClCompile Include="PCK_HEADER.cpp" />
+    <ClCompile Include="ResChatData.cpp" />
+    <ClCompile Include="ResWait.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

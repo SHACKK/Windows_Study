@@ -11,11 +11,11 @@ DWORD WINAPI CConnectionSuper::ConnectionThread(LPVOID pContext)
 	connection.onConnect();
 	while (true)
 	{
-		connection.Recv((LPBYTE)&header, sizeof(header), MSG_PEEK);
-		if (header.MagicOK() && header.tSize == 0)
+		connection.Peek((LPBYTE)&header, sizeof(header));
+		if (header.MagicOK() && header.tSize == 0) // GetType()을 써서 종료신호를 보내는 패킷인지를 확인해야함
 			break;
 
-		connection.onConnect();
+		connection.onRecv();
 	}
 	connection.onClose();
 	return 0;
@@ -44,11 +44,24 @@ int CConnectionSuper::Send(LPCBYTE pBuffer, size_t BufferSize)
 	return 0;
 }
 
-int CConnectionSuper::Recv(LPBYTE pBuffer, size_t BufferSize, int flags = 0)
+int CConnectionSuper::Recv(LPBYTE pBuffer, size_t BufferSize)
 {
 	try
 	{
-		::recv(m_ConnectionSocket, (char*)&pBuffer, (int)BufferSize, flags);
+		::recv(m_ConnectionSocket, (char*)&pBuffer, (int)BufferSize, 0);
+	}
+	catch (std::exception& e)
+	{
+		printf("[Receve Error] : %s", e.what());
+	}
+	return 0;
+}
+
+int CConnectionSuper::Peek(LPBYTE pBuffer, size_t BufferSize)
+{
+	try
+	{
+		::recv(m_ConnectionSocket, (char*)&pBuffer, (int)BufferSize, MSG_PEEK);
 	}
 	catch (std::exception& e)
 	{

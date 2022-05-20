@@ -12,10 +12,28 @@
     <ClInclude Include="PacketHandlerSuper.h" />
     <ClInclude Include="PacketHandler.h" />
     <ClInclude Include="_Packet.h" />
+    <ClInclude Include="Packetizer.h" />
+    <ClInclude Include="ReqConnection.h" />
+    <ClInclude Include="ResAccept.h" />
+    <ClInclude Include="ResWait.h" />
+    <ClInclude Include="ReqMessageInput.h" />
+    <ClInclude Include="ResChatData.h" />
+    <ClInclude Include="ReqDisconnection.h" />
+    <ClInclude Include="BroadcastChatData.h" />
+    <ClInclude Include="BroadcastDisconnection.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PCK_HEADER.cpp" />
     <ClCompile Include="PacketHandlerSuper.cpp" />
     <ClCompile Include="PacketHandler.cpp" />
+    <ClCompile Include="Packetizer.cpp" />
+    <ClCompile Include="ReqConnection.cpp" />
+    <ClCompile Include="ResAccept.cpp" />
+    <ClCompile Include="ResWait.cpp" />
+    <ClCompile Include="ReqMessageInput.cpp" />
+    <ClCompile Include="ResChatData.cpp" />
+    <ClCompile Include="ReqDisconnection.cpp" />
+    <ClCompile Include="BroadcastChatData.cpp" />
+    <ClCompile Include="BroadcastDisconnection.cpp" />
   </ItemGroup>
 </Project>

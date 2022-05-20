@@ -21,10 +21,11 @@ void CChatConnection::onConnect()
 
 void CChatConnection::onRecv()
 {
-	while (true)
-	{
+	CPacketHeader header;
+	Recv((LPBYTE)&header, sizeof(header));
+	CPacketHandler body;
 
-	}
+	m_pServer->PushChatMessage();
 }
 
 void CChatConnection::onClose()

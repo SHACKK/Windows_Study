@@ -17,5 +17,6 @@ protected:
 public:
 	int Establish(SOCKET acceptedSocket, CServer* pServer);
 	int Send(LPCBYTE pBuffer, size_t BufferSize);
-	int Recv(LPBYTE pBuffer, size_t BufferSize, int flags);
+	int Recv(LPBYTE pBuffer, size_t BufferSize);
+	int Peek(LPBYTE pBuffer, size_t BufferSize);
 };
