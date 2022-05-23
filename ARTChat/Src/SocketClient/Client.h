@@ -19,7 +19,8 @@ public:
 
 	int Connect(ST_SERVER_INFO stServerInfo);
 	int Close();
-	int Send(LPCBYTE pData, size_t Size);
-	int Recv(LPBYTE pBuffer, size_t BufferSize);
+	int Send(LPCBYTE pData, size_t tSize);
+	int Recv(LPBYTE pBuffer, size_t tBufferSize);
+	int Peek(LPBYTE pBuffer, size_t tBufferSize);
 };
 

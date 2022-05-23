@@ -21,16 +21,19 @@ private:
 	std::set<CConnectionSuper*> m_setConnected;
 	std::queue<CConnectionSuper*> m_queDiscon;
 	SOCKET m_ListenSocket;
-	static DWORD WINAPI AcceptThread(LPVOID pContext);
-	static DWORD WINAPI DisAcceptThread(LPVOID pContext);
+	HANDLE hAcceptThread;
+	HANDLE hDisAcceptThread;
+
 	std::vector<std::string> m_vecChatData;
 	std::mutex mtx;
 public:
-
+	DWORD AcceptThread();
+	DWORD DisAcceptThread();
 	int StartUp(ST_SERVER_INIT stInit);
 	void ShutDown();
 	void Broadcast(LPBYTE pConetxt, size_t Size);
 
 	std::vector<std::string> GetChatData();
 	bool PushChatMessage(std::string strMessage);
+	void DisConnect(CConnectionSuper* pConnection);
 };

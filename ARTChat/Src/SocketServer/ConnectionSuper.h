@@ -5,7 +5,6 @@ class CConnectionSuper
 {
 private:
 	SOCKET m_ConnectionSocket;
-	static DWORD WINAPI ConnectionThread(LPVOID pContext);
 	sockaddr m_RemoteInfo;
 
 protected:
@@ -15,6 +14,7 @@ protected:
 	virtual void onClose() = 0;
 
 public:
+	DWORD ConnectionThread();
 	int Establish(SOCKET acceptedSocket, CServer* pServer);
 	int Send(LPCBYTE pBuffer, size_t BufferSize);
 	int Recv(LPBYTE pBuffer, size_t BufferSize);

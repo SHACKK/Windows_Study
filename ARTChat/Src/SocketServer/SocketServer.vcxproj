@@ -167,11 +167,6 @@
     <ClCompile Include="ConnectionSuper.cpp" />
     <ClCompile Include="Server.cpp" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\MessagePacket\MessagePacket.vcxproj">
-      <Project>{5366e04f-09be-423f-a05f-e0e767ac5660}</Project>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

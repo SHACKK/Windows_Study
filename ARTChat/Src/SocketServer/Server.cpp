@@ -2,6 +2,18 @@
 #include "Server.h"
 #include "ConnectionSuper.h"
 
+DWORD WINAPI AcceptThreadCaller(void* pContext)
+{
+	CServer* server = (CServer*)pContext;
+	return server->AcceptThread();
+}
+
+DWORD WINAPI DisAcceptThreadCaller(void* pContext)
+{
+	CServer* server = (CServer*)pContext;
+	return server->DisAcceptThread();
+}
+
 int CServer::StartUp(ST_SERVER_INIT stInit)
 {
 	try {
@@ -26,8 +38,8 @@ int CServer::StartUp(ST_SERVER_INIT stInit)
 
 		printf("[SUCCESS] Server StartUp...\n");
 
-		HANDLE hAcceptThread = ::CreateThread(nullptr, 0, AcceptThread, this, 0, nullptr);
-		HANDLE hDisAcceptThread = ::CreateThread(nullptr, 0, DisAcceptThread, this, 0, nullptr);
+		hAcceptThread = ::CreateThread(nullptr, 0, AcceptThreadCaller, this, 0, nullptr);
+		hDisAcceptThread = ::CreateThread(nullptr, 0, DisAcceptThreadCaller, this, 0, nullptr);
 
 		return 0;
 	}
@@ -40,6 +52,8 @@ int CServer::StartUp(ST_SERVER_INIT stInit)
 
 void CServer::ShutDown()
 {
+	WaitForSingleObject(hAcceptThread, INFINITE);
+	WaitForSingleObject(hDisAcceptThread, INFINITE);
 }
 
 void CServer::Broadcast(LPBYTE pContext, size_t Size)
@@ -60,37 +74,42 @@ bool CServer::PushChatMessage(std::string strMessage)
 	return true;
 }
 
-// 클라이언트와 연결
-DWORD WINAPI CServer::AcceptThread(LPVOID pContext)
+void CServer::DisConnect(CConnectionSuper* pConnection)
 {
-	CServer& server = *(CServer*)pContext;
+	m_setConnected.erase(pConnection);
+	m_queDiscon.push(pConnection);
+}
+
+// 클라이언트와 연결
+DWORD CServer::AcceptThread()
+{
 	while (true)
 	{
-		if (server.m_queReady.empty())
+		if (m_queReady.empty())
 			continue;
 
 		sockaddr RemoteInfo;
 		int nRemoteInfoSize = (int)sizeof(RemoteInfo);
 
-		SOCKET hConnectionSocket = ::accept(server.m_ListenSocket, &RemoteInfo, &nRemoteInfoSize);
+		SOCKET hConnectionSocket = ::accept(m_ListenSocket, &RemoteInfo, &nRemoteInfoSize);
 
-		CConnectionSuper* newConnection = server.m_queReady.front();
-		newConnection->Establish(hConnectionSocket, &server);
-		server.m_setConnected.insert(newConnection);
+		CConnectionSuper* newConnection = m_queReady.front();
+		m_queReady.pop();
+		newConnection->Establish(hConnectionSocket, this);
+		m_setConnected.insert(newConnection);
 	}
 }
 
 // 클라이언트와 연결 해제
-DWORD WINAPI CServer::DisAcceptThread(LPVOID pContext)
+DWORD CServer::DisAcceptThread()
 {
-	CServer& server = *(CServer*)pContext;
 	while (true)
 	{
-		if (server.m_queDiscon.empty())
+		if (m_queDiscon.empty())
 			continue;
 
-		CConnectionSuper* closedConnection = server.m_queDiscon.front();
-		server.m_queDiscon.pop();
-		server.m_queReady.push(closedConnection);
+		CConnectionSuper* closedConnection = m_queDiscon.front();
+		m_queDiscon.pop();
+		m_queReady.push(closedConnection);
 	}
 }
