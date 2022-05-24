@@ -9,8 +9,11 @@
   <ItemGroup>
     <ClInclude Include="Client.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="ChatClient.h" />
+    <ClInclude Include="_SocketClient.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp" />
+    <ClCompile Include="ChatClient.cpp" />
   </ItemGroup>
 </Project>

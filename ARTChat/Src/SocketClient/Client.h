@@ -19,8 +19,10 @@ public:
 
 	int Connect(ST_SERVER_INFO stServerInfo);
 	int Close();
-	int Send(LPCBYTE pData, size_t tSize);
-	int Recv(LPBYTE pBuffer, size_t tBufferSize);
+	int Send(std::wstring strMessage);
+	int Recv(LPBYTE pBuffer);
+	std::wstring Recv();
+	std::vector<std::wstring> RecvChatData();
 	int Peek(LPBYTE pBuffer, size_t tBufferSize);
 };
 

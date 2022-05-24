@@ -22,27 +22,81 @@ int CClient::Connect(ST_SERVER_INFO stServerInfo)
 	catch (std::exception& e)
 	{
 		printf("[ERROR] : %s\n", e.what());
-		return 1;
+		return 0;
 	}
-	return 0;
+	return 1;
 }
 
 int CClient::Close()
 {
+	::closesocket(m_hClientSocket);
 	return 0;
 }
 
-int CClient::Send(LPCBYTE pData, size_t tSize)
+int CClient::Send(std::wstring strMessage)
 {
+	int nLength = strMessage.length() * sizeof(wchar_t);
+	::send(m_hClientSocket, (const char*)&nLength, sizeof(nLength), 0);
+	::send(m_hClientSocket, (const char*)strMessage.c_str(), nLength, 0);
 	return 0;
 }
 
-int CClient::Recv(LPBYTE pBuffer, size_t tBufferSize)
+int CClient::Recv(LPBYTE pBuffer)
 {
-	return 0;
+	int nRet = 0;
+	try
+	{
+		int nSize = 0;
+		nRet = ::recv(m_hClientSocket, (char*)&nSize, (int)sizeof(nSize), 0);
+		nRet = ::recv(m_hClientSocket, (char*)&pBuffer, nSize, 0);
+	}
+	catch (...)
+	{
+		printf("[Receve Error] : %d", WSAGetLastError());
+	}
+	return nRet;
+}
+
+std::vector<std::wstring> CClient::RecvChatData()
+{
+	std::vector<std::wstring> vecChatData;
+	size_t nVecSize;
+	::recv(m_hClientSocket, (char*)&nVecSize, sizeof(size_t), 0);
+	vecChatData.resize(nVecSize);
+
+	for (size_t i = 0; i < nVecSize; i++)
+	{
+		int nMsgLength;
+		::recv(m_hClientSocket, (char*)&nMsgLength, sizeof(nMsgLength), 0);
+		vecChatData[i].resize(nMsgLength / sizeof(wchar_t));
+		::recv(m_hClientSocket, (char*)vecChatData[i].c_str(), nMsgLength, 0);
+	}
+
+	return vecChatData;
+}
+
+std::wstring CClient::Recv()
+{
+	int nLength = 0;
+	::recv(m_hClientSocket, (char*)&nLength, sizeof(nLength), 0);
+
+	std::wstring strRet;
+	strRet.resize(nLength);
+	::recv(m_hClientSocket, (char*)strRet.c_str(), nLength, 0);
+
+	return strRet;
 }
 
 int CClient::Peek(LPBYTE pBuffer, size_t tBufferSize)
 {
-	return 0;
+	int nRet = 0;
+	try
+	{
+		nRet = ::recv(m_hClientSocket, (char*)&pBuffer, (int)tBufferSize, MSG_PEEK);
+	}
+	catch (...)
+	{
+		printf("[Receve Error] : %d", WSAGetLastError());
+	}
+	return nRet;
 }

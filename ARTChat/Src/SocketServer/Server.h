@@ -24,16 +24,21 @@ private:
 	HANDLE hAcceptThread;
 	HANDLE hDisAcceptThread;
 
-	std::vector<std::string> m_vecChatData;
+	std::vector<std::wstring> m_vecChatData = 
+	{
+		L"--------------------Start Chat--------------------"
+	};
+
 	std::mutex mtx;
 public:
 	DWORD AcceptThread();
 	DWORD DisAcceptThread();
 	int StartUp(ST_SERVER_INIT stInit);
 	void ShutDown();
-	void Broadcast(LPBYTE pConetxt, size_t Size);
-
-	std::vector<std::string> GetChatData();
-	bool PushChatMessage(std::string strMessage);
 	void DisConnect(CConnectionSuper* pConnection);
+	void Broadcast(std::wstring strMessage);
+	void BroadcastChatData();
+	void InsertConnectedSet(CConnectionSuper* newConnection);
+	std::vector<std::wstring> GetChatData();
+	bool UpdateChatData(std::wstring strMessage);
 };

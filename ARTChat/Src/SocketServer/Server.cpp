@@ -56,19 +56,43 @@ void CServer::ShutDown()
 	WaitForSingleObject(hDisAcceptThread, INFINITE);
 }
 
-void CServer::Broadcast(LPBYTE pContext, size_t Size)
+void CServer::Broadcast(std::wstring strMessage)
 {
+	std::set<CConnectionSuper*>::iterator iter;
+	for (iter = m_setConnected.begin(); iter != m_setConnected.end(); iter++)
+	{
+		(*iter)->Send(strMessage);
+	}
 }
 
-std::vector<std::string> CServer::GetChatData()
+void CServer::BroadcastChatData()
+{
+	mtx.lock();
+	std::vector<std::wstring> vecTmp = GetChatData();
+	mtx.unlock();
+
+	std::set<CConnectionSuper*>::iterator iter;
+	for (iter = m_setConnected.begin(); iter != m_setConnected.end(); iter++)
+	{
+		(*iter)->SendChatData(vecTmp);
+	}
+}
+
+void CServer::InsertConnectedSet(CConnectionSuper* newConnection)
+{
+	m_setConnected.insert(newConnection);
+}
+
+std::vector<std::wstring> CServer::GetChatData()
 {
 	return m_vecChatData;
 }
 
-bool CServer::PushChatMessage(std::string strMessage)
+bool CServer::UpdateChatData(std::wstring strMessage)
 {
 	mtx.lock();
 	m_vecChatData.push_back(strMessage);
+	Broadcast(strMessage);
 	mtx.unlock();
 
 	return true;
@@ -96,7 +120,7 @@ DWORD CServer::AcceptThread()
 		CConnectionSuper* newConnection = m_queReady.front();
 		m_queReady.pop();
 		newConnection->Establish(hConnectionSocket, this);
-		m_setConnected.insert(newConnection);
+		//m_setConnected.insert(newConnection); -> 채팅 보낸 이후에 추가하는 것으로 수정
 	}
 }
 

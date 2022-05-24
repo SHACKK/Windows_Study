@@ -16,7 +16,8 @@ protected:
 public:
 	DWORD ConnectionThread();
 	int Establish(SOCKET acceptedSocket, CServer* pServer);
-	int Send(LPCBYTE pBuffer, size_t BufferSize);
-	int Recv(LPBYTE pBuffer, size_t BufferSize);
-	int Peek(LPBYTE pBuffer, size_t BufferSize);
+	int SendChatData(std::vector<std::wstring> vecChatData);
+	int Send(std::wstring strMessage);
+	std::wstring Peek();
+	std::wstring Recv();
 };

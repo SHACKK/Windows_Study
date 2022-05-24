@@ -10,20 +10,14 @@ DWORD WINAPI ConnectionThreadCaller(void* pContext)
 
 DWORD CConnectionSuper::ConnectionThread()
 {
-	std::string strContext;
-	strContext.resize(10);
-
 	onConnect();
-	while (true)
-	{
-		int nRecvSize = Peek((LPBYTE)&strContext, sizeof(strContext));
-		if (nRecvSize == 0)	break;
 
-		onRecv();
-	}
+	onRecv();
+
+	onClose();
 
 	m_pServer->DisConnect(this);
-	onClose();
+
 	return 0;
 }
 
@@ -36,45 +30,49 @@ int CConnectionSuper::Establish(SOCKET acceptedSocket, CServer* pServer)
 	return 0;
 }
 
-int CConnectionSuper::Send(LPCBYTE pBuffer, size_t BufferSize)
+int CConnectionSuper::SendChatData(std::vector<std::wstring> vecChatData)
 {
-	int nRet= 0;
-	try
+	size_t nVecSize = vecChatData.size();
+	::send(m_ConnectionSocket, (const char*)&nVecSize, sizeof(size_t), 0);
+
+	for (size_t i = 0; i < nVecSize; i++)
 	{
-		nRet = ::send(m_ConnectionSocket, (const char*)&pBuffer, (int)BufferSize, 0);
+		int nMsgLength = vecChatData[i].size() * sizeof(wchar_t);
+		::send(m_ConnectionSocket, (const char*)&nMsgLength, sizeof(nMsgLength), 0);
+		::send(m_ConnectionSocket, (const char*)vecChatData[i].c_str(), nMsgLength, 0);
 	}
-	catch (std::exception& e)
-	{
-		printf("[Send Error] : %s", e.what());
-		return 1;
-	}
-	return nRet;
+	return 0;
 }
 
-int CConnectionSuper::Recv(LPBYTE pBuffer, size_t BufferSize)
+int CConnectionSuper::Send(std::wstring strMessage)
 {
-	int nRet= 0;
-	try
-	{
-		nRet = ::recv(m_ConnectionSocket, (char*)&pBuffer, (int)BufferSize, 0);
-	}
-	catch (std::exception& e)
-	{
-		printf("[Receve Error] : %s", e.what());
-	}
-	return nRet;
+	int nLength = strMessage.length();
+	::send(m_ConnectionSocket, (const char*)&nLength, sizeof(nLength), 0);
+	::send(m_ConnectionSocket, (const char*)strMessage.c_str(), nLength, 0);
+
+	return 0;
 }
 
-int CConnectionSuper::Peek(LPBYTE pBuffer, size_t BufferSize)
+std::wstring CConnectionSuper::Recv()
 {
-	int nRet= 0;
-	try
-	{
-		nRet = ::recv(m_ConnectionSocket, (char*)&pBuffer, (int)BufferSize, MSG_PEEK);
-	}
-	catch (std::exception& e)
-	{
-		printf("[Receve Error] : %s", e.what());
-	}
-	return nRet;
+	int nLength = 0;
+	::recv(m_ConnectionSocket, (char*)&nLength, (int)sizeof(nLength), 0);
+
+	std::wstring strMsg;
+	strMsg.resize(nLength / sizeof(wchar_t));
+	::recv(m_ConnectionSocket, (char*)strMsg.c_str(), nLength, 0);
+
+	return strMsg;
+}
+
+std::wstring CConnectionSuper::Peek()
+{
+	int nLength = 0;
+	::recv(m_ConnectionSocket, (char*)&nLength, sizeof(nLength), MSG_PEEK);
+
+	std::wstring strRet;
+	strRet.resize(nLength);
+	::recv(m_ConnectionSocket, (char*)strRet.c_str(), nLength, MSG_PEEK);
+
+	return strRet;
 }
