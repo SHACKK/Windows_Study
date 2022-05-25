@@ -12,7 +12,7 @@
 
 #define CONSTRUCT_DEFAULT 99	// 구조체 default 값
 
-enum E_CONSTRUCT_STATE
+enum class E_CONSTRUCT_STATE
 {
 	BLANK = 0,					// 비어있는 상태
 	ONLY_CHOSEONG,				// 초성만 있는 음절
@@ -32,7 +32,7 @@ enum E_CONSTRUCT_STATE
 class CHangulCharset : public CCharSetSuper
 {
 private:
-	E_CONSTRUCT_STATE state = BLANK;
+	E_CONSTRUCT_STATE state = E_CONSTRUCT_STATE::BLANK;
 	ST_CONSTRUCT stCurrentConstruct = { CONSTRUCT_DEFAULT, CONSTRUCT_DEFAULT, 0 };
 	
 	std::string StrFromVirtualKey(int nVirtualKey, bool bShiftPressed);

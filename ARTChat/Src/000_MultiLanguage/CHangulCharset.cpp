@@ -1,3 +1,4 @@
+#pragma once
 #include "pch.h"
 #include "CHangulCharset.h"
 
@@ -128,63 +129,63 @@ void CHangulCharset::DeleteChar(int nVirtualKey, ST_STRING_CONTEXT& context)
 
 	switch (state)
 	{
-	case BLANK:
+	case E_CONSTRUCT_STATE::BLANK:
 	{
 		strPreContext.pop_back();
 		if (0 < context.nCursorPos)
 			context.nCursorPos--;
 		break;
 	}
-	case ONLY_CHOSEONG:
+	case E_CONSTRUCT_STATE::ONLY_CHOSEONG:
 	{
 		stCurrentConstruct.choseong = CONSTRUCT_DEFAULT;
 		context.strUnderConstruct.clear();
 
 		strPreContext.pop_back();
-		state = BLANK;
+		state = E_CONSTRUCT_STATE::BLANK;
 
 		context.nCursorPos--;
 		break;
 	}
-	case ONLY_JUNGSEONG:
+	case E_CONSTRUCT_STATE::ONLY_JUNGSEONG:
 	{
 		stCurrentConstruct.jungseong = CONSTRUCT_DEFAULT;
 		context.strUnderConstruct.clear();
 
 		strPreContext.pop_back();
-		state = BLANK;
+		state = E_CONSTRUCT_STATE::BLANK;
 
 		context.nCursorPos--;
 		break;
 	}
-	case NO_JONGSEONG_COMB_ABLE_H:
+	case E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_H:
 	{
 		stCurrentConstruct.jungseong = CONSTRUCT_DEFAULT;
 		context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 
 		strPreContext.pop_back();
-		state = ONLY_CHOSEONG;
+		state = E_CONSTRUCT_STATE::ONLY_CHOSEONG;
 		break;
 	}
-	case NO_JONGSEONG_COMB_ABLE_N:
+	case E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_N:
 	{
 		stCurrentConstruct.jungseong = CONSTRUCT_DEFAULT;
 		context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 
 		strPreContext.pop_back();
-		state = ONLY_CHOSEONG;
+		state = E_CONSTRUCT_STATE::ONLY_CHOSEONG;
 		break;
 	}
-	case NO_JONGSEONG_COMB_ABLE_M:
+	case E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_M:
 	{
 		stCurrentConstruct.jungseong = CONSTRUCT_DEFAULT;
 		context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 		strPreContext.pop_back();
 
-		state = ONLY_CHOSEONG;
+		state = E_CONSTRUCT_STATE::ONLY_CHOSEONG;
 		break;
 	}
-	case NO_JONGSEONG_COMB_UNABLE:
+	case E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_UNABLE:
 	{
 		// 중성이 두개가 합쳐있는 경우
 		if (stCurrentConstruct.jungseong == 9 || stCurrentConstruct.jungseong == 10 || stCurrentConstruct.jungseong == 11) // ㅗ
@@ -194,7 +195,7 @@ void CHangulCharset::DeleteChar(int nVirtualKey, ST_STRING_CONTEXT& context)
 			stCurrentConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, strSingleVowel.c_str());
 
 			strPreContext.pop_back();
-			state = NO_JONGSEONG_COMB_ABLE_H;
+			state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_H;
 		}
 		else if (stCurrentConstruct.jungseong == 14 || stCurrentConstruct.jungseong == 15 || stCurrentConstruct.jungseong == 16) // ㅜ
 		{
@@ -203,7 +204,7 @@ void CHangulCharset::DeleteChar(int nVirtualKey, ST_STRING_CONTEXT& context)
 			stCurrentConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, strSingleVowel.c_str());
 
 			strPreContext.pop_back();
-			state = NO_JONGSEONG_COMB_ABLE_N;
+			state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_N;
 		}
 		else if (stCurrentConstruct.jungseong == 19) // ㅡ
 		{
@@ -212,104 +213,104 @@ void CHangulCharset::DeleteChar(int nVirtualKey, ST_STRING_CONTEXT& context)
 			stCurrentConstruct.jungseong = GetIndexNum(charset_jung, NUM_OF_JUNGSEONG, strSingleVowel.c_str());
 
 			strPreContext.pop_back();
-			state = NO_JONGSEONG_COMB_ABLE_M;
+			state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_M;
 		}
 		else // 나머지
 		{
 			stCurrentConstruct.jungseong = CONSTRUCT_DEFAULT;
 
 			strPreContext.pop_back();
-			state = ONLY_CHOSEONG;
+			state = E_CONSTRUCT_STATE::ONLY_CHOSEONG;
 		}
 		context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 		break;
 	}
-	case ONE_JONGSEONG_COMB_ABLE_R:
+	case E_CONSTRUCT_STATE::ONE_JONGSEONG_COMB_ABLE_R:
 	{
 		stCurrentConstruct.jongseong = 0;
 		context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 
 		if (stCurrentConstruct.jungseong == 8) // 중성이 "ㅗ"인 경우
-			state = NO_JONGSEONG_COMB_ABLE_H;
+			state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_H;
 		else if (stCurrentConstruct.jungseong == 13) // 중성이 "ㅜ"인 경우
-			state = NO_JONGSEONG_COMB_ABLE_N;
+			state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_N;
 		else if (stCurrentConstruct.jungseong == 18) // 중성이 "ㅡ"인 경우
-			state = NO_JONGSEONG_COMB_ABLE_M;
+			state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_M;
 		else
-			state = NO_JONGSEONG_COMB_UNABLE;
+			state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_UNABLE;
 
 		strPreContext.pop_back();
 		break;
 	}
-	case ONE_JONGSEONG_COMB_ABLE_S:
+	case E_CONSTRUCT_STATE::ONE_JONGSEONG_COMB_ABLE_S:
 	{
 		stCurrentConstruct.jongseong = 0;
 		context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 
 		if (stCurrentConstruct.jungseong == 8) // 중성이 "ㅗ"인 경우
-			state = NO_JONGSEONG_COMB_ABLE_H;
+			state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_H;
 		else if (stCurrentConstruct.jungseong == 13) // 중성이 "ㅜ"인 경우
-			state = NO_JONGSEONG_COMB_ABLE_N;
+			state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_N;
 		else if (stCurrentConstruct.jungseong == 18) // 중성이 "ㅡ"인 경우
-			state = NO_JONGSEONG_COMB_ABLE_M;
+			state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_M;
 		else
-			state = NO_JONGSEONG_COMB_UNABLE;
+			state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_UNABLE;
 
 		strPreContext.pop_back();
 		break;
 	}
-	case ONE_JONGSEONG_COMB_ABLE_F:
+	case E_CONSTRUCT_STATE::ONE_JONGSEONG_COMB_ABLE_F:
 	{
 		stCurrentConstruct.jongseong = 0;
 		context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 
 		if (stCurrentConstruct.jungseong == 8) // 중성이 "ㅗ"인 경우
-			state = NO_JONGSEONG_COMB_ABLE_H;
+			state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_H;
 		else if (stCurrentConstruct.jungseong == 13) // 중성이 "ㅜ"인 경우
-			state = NO_JONGSEONG_COMB_ABLE_N;
+			state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_N;
 		else if (stCurrentConstruct.jungseong == 18) // 중성이 "ㅡ"인 경우
-			state = NO_JONGSEONG_COMB_ABLE_M;
+			state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_M;
 		else
-			state = NO_JONGSEONG_COMB_UNABLE;
+			state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_UNABLE;
 
 		strPreContext.pop_back();
 		break;
 	}
-	case ONE_JONGSEONG_COMB_ABLE_Q:
+	case E_CONSTRUCT_STATE::ONE_JONGSEONG_COMB_ABLE_Q:
 	{
 		stCurrentConstruct.jongseong = 0;
 		context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 
 		if (stCurrentConstruct.jungseong == 8) // 중성이 "ㅗ"인 경우
-			state = NO_JONGSEONG_COMB_ABLE_H;
+			state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_H;
 		else if (stCurrentConstruct.jungseong == 13) // 중성이 "ㅜ"인 경우
-			state = NO_JONGSEONG_COMB_ABLE_N;
+			state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_N;
 		else if (stCurrentConstruct.jungseong == 18) // 중성이 "ㅡ"인 경우
-			state = NO_JONGSEONG_COMB_ABLE_M;
+			state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_M;
 		else
-			state = NO_JONGSEONG_COMB_UNABLE;
+			state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_UNABLE;
 
 		strPreContext.pop_back();
 		break;
 	}
-	case ONE_JONGSEONG_COMB_UNABLE:
+	case E_CONSTRUCT_STATE::ONE_JONGSEONG_COMB_UNABLE:
 	{
 		stCurrentConstruct.jongseong = 0;
 		context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 
 		if (stCurrentConstruct.jungseong == 8) // 중성이 "ㅗ"인 경우
-			state = NO_JONGSEONG_COMB_ABLE_H;
+			state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_H;
 		else if (stCurrentConstruct.jungseong == 13) // 중성이 "ㅜ"인 경우
-			state = NO_JONGSEONG_COMB_ABLE_N;
+			state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_N;
 		else if (stCurrentConstruct.jungseong == 18) // 중성이 "ㅡ"인 경우
-			state = NO_JONGSEONG_COMB_ABLE_M;
+			state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_M;
 		else
-			state = NO_JONGSEONG_COMB_UNABLE;
+			state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_UNABLE;
 
 		strPreContext.pop_back();
 		break;
 	}
-	case DOUBLE_JONGSEONG:
+	case E_CONSTRUCT_STATE::DOUBLE_JONGSEONG:
 	{
 		std::string strSingleConsonant = charset_jong[stCurrentConstruct.jongseong];
 		strSingleConsonant.pop_back();
@@ -317,15 +318,15 @@ void CHangulCharset::DeleteChar(int nVirtualKey, ST_STRING_CONTEXT& context)
 		context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 
 		if (stCurrentConstruct.jongseong == 1)
-			state = ONE_JONGSEONG_COMB_ABLE_R;
+			state = E_CONSTRUCT_STATE::ONE_JONGSEONG_COMB_ABLE_R;
 		else if (stCurrentConstruct.jongseong == 4)
-			state = ONE_JONGSEONG_COMB_ABLE_S;
+			state = E_CONSTRUCT_STATE::ONE_JONGSEONG_COMB_ABLE_S;
 		else if (stCurrentConstruct.jongseong == 8)
-			state = ONE_JONGSEONG_COMB_ABLE_F;
+			state = E_CONSTRUCT_STATE::ONE_JONGSEONG_COMB_ABLE_F;
 		else if (stCurrentConstruct.jongseong == 17)
-			state = ONE_JONGSEONG_COMB_ABLE_Q;
+			state = E_CONSTRUCT_STATE::ONE_JONGSEONG_COMB_ABLE_Q;
 		else
-			state = ONE_JONGSEONG_COMB_UNABLE;
+			state = E_CONSTRUCT_STATE::ONE_JONGSEONG_COMB_UNABLE;
 
 		strPreContext.pop_back();
 		break;
@@ -354,7 +355,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 	{
 		context.strUnderConstruct.clear();
 		stCurrentConstruct.clear();
-		state = BLANK;
+		state = E_CONSTRUCT_STATE::BLANK;
 		return;
 	}
 
@@ -363,7 +364,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 		int style = CheckStr(c);
 		switch (state)
 		{
-		case BLANK: // ex) ""
+		case E_CONSTRUCT_STATE::BLANK: // ex) ""
 		{
 			if (style == CONSONANT) //자음
 			{
@@ -371,7 +372,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 				context.strUnderConstruct = (AssemUnicode(stCurrentConstruct));
 
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
-				state = ONLY_CHOSEONG;
+				state = E_CONSTRUCT_STATE::ONLY_CHOSEONG;
 				context.nCursorPos++;
 				break;
 			}
@@ -381,12 +382,12 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 				context.strUnderConstruct = (AssemUnicode(stCurrentConstruct));
 
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
-				state = ONLY_JUNGSEONG;
+				state = E_CONSTRUCT_STATE::ONLY_JUNGSEONG;
 				context.nCursorPos++;
 				break;
 			}
 		}
-		case ONLY_CHOSEONG: // ex) "ㄱ"
+		case E_CONSTRUCT_STATE::ONLY_CHOSEONG: // ex) "ㄱ"
 		{
 			if (style == CONSONANT) // 자음
 			{
@@ -397,7 +398,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
-				state = ONLY_CHOSEONG;
+				state = E_CONSTRUCT_STATE::ONLY_CHOSEONG;
 				context.nCursorPos++;
 				break;
 			}
@@ -410,28 +411,28 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 
 				if (c == "h")
 				{
-					state = NO_JONGSEONG_COMB_ABLE_H;
+					state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_H;
 					break;
 				}
 				else if (c == "n")
 				{
-					state = NO_JONGSEONG_COMB_ABLE_N;
+					state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_N;
 					break;
 				}
 				else if (c == "m")
 				{
-					state = NO_JONGSEONG_COMB_ABLE_M;
+					state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_M;
 					break;
 				}
 				else
 				{
-					state = NO_JONGSEONG_COMB_UNABLE;
+					state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_UNABLE;
 					break;
 				}
 				break;
 			}
 		}
-		case ONLY_JUNGSEONG: // ex) "ㅏ"
+		case E_CONSTRUCT_STATE::ONLY_JUNGSEONG: // ex) "ㅏ"
 		{
 			if (style == CONSONANT) // 자음
 			{
@@ -442,7 +443,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-				state = ONLY_CHOSEONG;
+				state = E_CONSTRUCT_STATE::ONLY_CHOSEONG;
 				context.nCursorPos++;
 				break;
 			}
@@ -455,12 +456,12 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-				state = ONLY_JUNGSEONG;
+				state = E_CONSTRUCT_STATE::ONLY_JUNGSEONG;
 				context.nCursorPos++;
 				break;
 			}
 		}
-		case NO_JONGSEONG_COMB_ABLE_H: // ex) "고"
+		case E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_H: // ex) "고"
 		{
 			if (style == CONSONANT) // 자음
 			{
@@ -473,7 +474,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					strPreContext.pop_back();
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = ONE_JONGSEONG_COMB_ABLE_R;
+					state = E_CONSTRUCT_STATE::ONE_JONGSEONG_COMB_ABLE_R;
 					break;
 				}
 				else if (c == "s")
@@ -483,7 +484,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					strPreContext.pop_back();
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = ONE_JONGSEONG_COMB_ABLE_S;
+					state = E_CONSTRUCT_STATE::ONE_JONGSEONG_COMB_ABLE_S;
 					break;
 				}
 				else if (c == "f")
@@ -493,7 +494,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					strPreContext.pop_back();
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = ONE_JONGSEONG_COMB_ABLE_F;
+					state = E_CONSTRUCT_STATE::ONE_JONGSEONG_COMB_ABLE_F;
 					break;
 				}
 				else if (c == "q")
@@ -503,7 +504,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					strPreContext.pop_back();
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = ONE_JONGSEONG_COMB_ABLE_Q;
+					state = E_CONSTRUCT_STATE::ONE_JONGSEONG_COMB_ABLE_Q;
 					break;
 				}
 				else if (c == "Q" || c == "W" || c == "E")
@@ -514,7 +515,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					strPreContext.pop_back();
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = ONLY_CHOSEONG;
+					state = E_CONSTRUCT_STATE::ONLY_CHOSEONG;
 					context.nCursorPos++;
 					break;
 				}
@@ -525,7 +526,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					strPreContext.pop_back();
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = ONE_JONGSEONG_COMB_UNABLE;
+					state = E_CONSTRUCT_STATE::ONE_JONGSEONG_COMB_UNABLE;
 					break;
 				}
 			}
@@ -541,7 +542,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					strPreContext.pop_back();
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = NO_JONGSEONG_COMB_UNABLE;
+					state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_UNABLE;
 					break;
 				}
 				else
@@ -551,14 +552,14 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = ONLY_JUNGSEONG;
+					state = E_CONSTRUCT_STATE::ONLY_JUNGSEONG;
 					context.nCursorPos++;
 					break;
 				}
 
 			}
 		}
-		case NO_JONGSEONG_COMB_ABLE_N: // ex) "구"
+		case E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_N: // ex) "구"
 		{
 			if (style == CONSONANT) // 자음
 			{
@@ -571,7 +572,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					strPreContext.pop_back();
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = ONE_JONGSEONG_COMB_ABLE_R;
+					state = E_CONSTRUCT_STATE::ONE_JONGSEONG_COMB_ABLE_R;
 					break;
 				}
 				else if (c == "s")
@@ -581,7 +582,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					strPreContext.pop_back();
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = ONE_JONGSEONG_COMB_ABLE_S;
+					state = E_CONSTRUCT_STATE::ONE_JONGSEONG_COMB_ABLE_S;
 					break;
 				}
 				else if (c == "f")
@@ -591,7 +592,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					strPreContext.pop_back();
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = ONE_JONGSEONG_COMB_ABLE_F;
+					state = E_CONSTRUCT_STATE::ONE_JONGSEONG_COMB_ABLE_F;
 					break;
 				}
 				else if (c == "q")
@@ -601,7 +602,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					strPreContext.pop_back();
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = ONE_JONGSEONG_COMB_ABLE_Q;
+					state = E_CONSTRUCT_STATE::ONE_JONGSEONG_COMB_ABLE_Q;
 					break;
 				}
 				else if (c == "Q" || c == "W" || c == "E")
@@ -611,7 +612,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = ONLY_CHOSEONG;
+					state = E_CONSTRUCT_STATE::ONLY_CHOSEONG;
 					context.nCursorPos++;
 					break;
 				}
@@ -622,7 +623,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					strPreContext.pop_back();
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = ONE_JONGSEONG_COMB_UNABLE;
+					state = E_CONSTRUCT_STATE::ONE_JONGSEONG_COMB_UNABLE;
 					break;
 				}
 			}
@@ -638,7 +639,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					strPreContext.pop_back();
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = NO_JONGSEONG_COMB_UNABLE;
+					state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_UNABLE;
 					break;
 				}
 				else
@@ -648,13 +649,13 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = ONLY_JUNGSEONG;
+					state = E_CONSTRUCT_STATE::ONLY_JUNGSEONG;
 					context.nCursorPos++;
 					break;
 				}
 			}
 		}
-		case NO_JONGSEONG_COMB_ABLE_M: // ex) "그"
+		case E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_M: // ex) "그"
 		{
 			if (style == CONSONANT) // 자음
 			{
@@ -667,7 +668,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					strPreContext.pop_back();
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = ONE_JONGSEONG_COMB_ABLE_R;
+					state = E_CONSTRUCT_STATE::ONE_JONGSEONG_COMB_ABLE_R;
 					break;
 				}
 				if (c == "s")
@@ -677,7 +678,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					strPreContext.pop_back();
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = ONE_JONGSEONG_COMB_ABLE_S;
+					state = E_CONSTRUCT_STATE::ONE_JONGSEONG_COMB_ABLE_S;
 					break;
 				}
 				if (c == "f")
@@ -687,7 +688,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					strPreContext.pop_back();
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = ONE_JONGSEONG_COMB_ABLE_F;
+					state = E_CONSTRUCT_STATE::ONE_JONGSEONG_COMB_ABLE_F;
 					break;
 				}
 				if (c == "q")
@@ -697,7 +698,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					strPreContext.pop_back();
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = ONE_JONGSEONG_COMB_ABLE_Q;
+					state = E_CONSTRUCT_STATE::ONE_JONGSEONG_COMB_ABLE_Q;
 					break;
 				}
 				if (c == "Q" || c == "W" || c == "E")
@@ -707,7 +708,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = ONLY_CHOSEONG;
+					state = E_CONSTRUCT_STATE::ONLY_CHOSEONG;
 					context.nCursorPos++;
 					break;
 				}
@@ -718,7 +719,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					strPreContext.pop_back();
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = ONE_JONGSEONG_COMB_UNABLE;
+					state = E_CONSTRUCT_STATE::ONE_JONGSEONG_COMB_UNABLE;
 					break;
 				}
 			}
@@ -734,7 +735,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					strPreContext.pop_back();
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = NO_JONGSEONG_COMB_UNABLE;
+					state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_UNABLE;
 					break;
 				}
 				else
@@ -744,13 +745,13 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = ONLY_JUNGSEONG;
+					state = E_CONSTRUCT_STATE::ONLY_JUNGSEONG;
 					context.nCursorPos++;
 					break;
 				}
 			}
 		}
-		case NO_JONGSEONG_COMB_UNABLE: // ex) "규" or "과"
+		case E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_UNABLE: // ex) "규" or "과"
 		{
 			if (style == CONSONANT)
 			{
@@ -763,7 +764,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					strPreContext.pop_back();
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = ONE_JONGSEONG_COMB_ABLE_R;
+					state = E_CONSTRUCT_STATE::ONE_JONGSEONG_COMB_ABLE_R;
 					break;
 				}
 				else if (c == "s")
@@ -773,7 +774,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					strPreContext.pop_back();
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = ONE_JONGSEONG_COMB_ABLE_S;
+					state = E_CONSTRUCT_STATE::ONE_JONGSEONG_COMB_ABLE_S;
 					break;
 				}
 				else if (c == "f")
@@ -783,7 +784,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					strPreContext.pop_back();
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = ONE_JONGSEONG_COMB_ABLE_F;
+					state = E_CONSTRUCT_STATE::ONE_JONGSEONG_COMB_ABLE_F;
 					break;
 				}
 				else if (c == "q")
@@ -793,7 +794,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					strPreContext.pop_back();
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = ONE_JONGSEONG_COMB_ABLE_Q;
+					state = E_CONSTRUCT_STATE::ONE_JONGSEONG_COMB_ABLE_Q;
 					break;
 				}
 				else if (c == "Q" || c == "W" || c == "E")
@@ -803,7 +804,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = ONLY_CHOSEONG;
+					state = E_CONSTRUCT_STATE::ONLY_CHOSEONG;
 					context.nCursorPos++;
 					break;
 				}
@@ -814,7 +815,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					strPreContext.pop_back();
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = ONE_JONGSEONG_COMB_UNABLE;
+					state = E_CONSTRUCT_STATE::ONE_JONGSEONG_COMB_UNABLE;
 					break;
 				}
 			}
@@ -826,12 +827,12 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-				state = ONLY_JUNGSEONG;
+				state = E_CONSTRUCT_STATE::ONLY_JUNGSEONG;
 				context.nCursorPos++;
 				break;
 			}
 		}
-		case ONE_JONGSEONG_COMB_ABLE_R: // ex) "각"
+		case E_CONSTRUCT_STATE::ONE_JONGSEONG_COMB_ABLE_R: // ex) "각"
 		{
 			if (style == CONSONANT) // 자음
 			{
@@ -844,7 +845,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					strPreContext.pop_back();
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = DOUBLE_JONGSEONG;
+					state = E_CONSTRUCT_STATE::DOUBLE_JONGSEONG;
 					break;
 				}
 				else
@@ -854,7 +855,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = ONLY_CHOSEONG;
+					state = E_CONSTRUCT_STATE::ONLY_CHOSEONG;
 					context.nCursorPos++;
 					break;
 				}
@@ -874,19 +875,19 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 
 				if (c == "h")
 				{
-					state = NO_JONGSEONG_COMB_ABLE_H;
+					state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_H;
 				}
 				else if (c == "n")
 				{
-					state = NO_JONGSEONG_COMB_ABLE_N;
+					state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_N;
 				}
 				else if (c == "m")
 				{
-					state = NO_JONGSEONG_COMB_ABLE_M;
+					state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_M;
 				}
 				else
 				{
-					state = NO_JONGSEONG_COMB_UNABLE;
+					state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_UNABLE;
 				}
 
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
@@ -894,7 +895,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 				break;
 			}
 		}
-		case ONE_JONGSEONG_COMB_ABLE_S: // ex) "간"
+		case E_CONSTRUCT_STATE::ONE_JONGSEONG_COMB_ABLE_S: // ex) "간"
 		{
 			if (style == CONSONANT)
 			{
@@ -907,7 +908,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					strPreContext.pop_back();
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = DOUBLE_JONGSEONG;
+					state = E_CONSTRUCT_STATE::DOUBLE_JONGSEONG;
 				}
 				else
 				{
@@ -916,7 +917,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = ONLY_CHOSEONG;
+					state = E_CONSTRUCT_STATE::ONLY_CHOSEONG;
 					context.nCursorPos++;
 				}
 				break;
@@ -937,19 +938,19 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 
 				if (c == "h")
 				{
-					state = NO_JONGSEONG_COMB_ABLE_H;
+					state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_H;
 				}
 				else if (c == "n")
 				{
-					state = NO_JONGSEONG_COMB_ABLE_N;
+					state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_N;
 				}
 				else if (c == "m")
 				{
-					state = NO_JONGSEONG_COMB_ABLE_M;
+					state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_M;
 				}
 				else
 				{
-					state = NO_JONGSEONG_COMB_UNABLE;
+					state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_UNABLE;
 				}
 
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
@@ -957,7 +958,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 				break;
 			}
 		}
-		case ONE_JONGSEONG_COMB_ABLE_F: // ex) "갈"
+		case E_CONSTRUCT_STATE::ONE_JONGSEONG_COMB_ABLE_F: // ex) "갈"
 		{
 			if (style == CONSONANT) //자음
 			{
@@ -970,7 +971,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					strPreContext.pop_back();
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = DOUBLE_JONGSEONG;
+					state = E_CONSTRUCT_STATE::DOUBLE_JONGSEONG;
 				}
 				else
 				{
@@ -979,7 +980,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = ONLY_CHOSEONG;
+					state = E_CONSTRUCT_STATE::ONLY_CHOSEONG;
 					context.nCursorPos++;
 				}
 				break;
@@ -999,19 +1000,19 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 
 				if (c == "h")
 				{
-					state = NO_JONGSEONG_COMB_ABLE_H;
+					state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_H;
 				}
 				else if (c == "n")
 				{
-					state = NO_JONGSEONG_COMB_ABLE_N;
+					state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_N;
 				}
 				else if (c == "m")
 				{
-					state = NO_JONGSEONG_COMB_ABLE_M;
+					state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_M;
 				}
 				else
 				{
-					state = NO_JONGSEONG_COMB_UNABLE;
+					state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_UNABLE;
 				}
 
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
@@ -1019,7 +1020,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 				break;
 			}
 		}
-		case ONE_JONGSEONG_COMB_ABLE_Q: // ex) "갑"
+		case E_CONSTRUCT_STATE::ONE_JONGSEONG_COMB_ABLE_Q: // ex) "갑"
 		{
 			if (style == CONSONANT)
 			{
@@ -1032,7 +1033,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					strPreContext.pop_back();
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = DOUBLE_JONGSEONG;
+					state = E_CONSTRUCT_STATE::DOUBLE_JONGSEONG;
 				}
 				else
 				{
@@ -1041,7 +1042,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 					context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 					context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-					state = ONLY_CHOSEONG;
+					state = E_CONSTRUCT_STATE::ONLY_CHOSEONG;
 					context.nCursorPos++;
 				}
 				break;
@@ -1061,19 +1062,19 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 
 				if (c == "h")
 				{
-					state = NO_JONGSEONG_COMB_ABLE_H;
+					state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_H;
 				}
 				else if (c == "n")
 				{
-					state = NO_JONGSEONG_COMB_ABLE_N;
+					state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_N;
 				}
 				else if (c == "m")
 				{
-					state = NO_JONGSEONG_COMB_ABLE_M;
+					state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_M;
 				}
 				else
 				{
-					state = NO_JONGSEONG_COMB_UNABLE;
+					state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_UNABLE;
 				}
 
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
@@ -1081,7 +1082,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 				break;
 			}
 		}
-		case ONE_JONGSEONG_COMB_UNABLE: // ex) "갚"
+		case E_CONSTRUCT_STATE::ONE_JONGSEONG_COMB_UNABLE: // ex) "갚"
 		{
 			if (style == CONSONANT) // 자음
 			{
@@ -1092,7 +1093,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-				state = ONLY_CHOSEONG;
+				state = E_CONSTRUCT_STATE::ONLY_CHOSEONG;
 				context.nCursorPos++;
 				break;
 			}
@@ -1111,19 +1112,19 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 
 				if (c == "h")
 				{
-					state = NO_JONGSEONG_COMB_ABLE_H;
+					state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_H;
 				}
 				else if (c == "n")
 				{
-					state = NO_JONGSEONG_COMB_ABLE_N;
+					state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_N;
 				}
 				else if (c == "m")
 				{
-					state = NO_JONGSEONG_COMB_ABLE_M;
+					state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_M;
 				}
 				else
 				{
-					state = NO_JONGSEONG_COMB_UNABLE;
+					state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_UNABLE;
 				}
 
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
@@ -1131,7 +1132,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 				break;
 			}
 		}
-		case DOUBLE_JONGSEONG: // ex) "값"
+		case E_CONSTRUCT_STATE::DOUBLE_JONGSEONG: // ex) "값"
 		{
 			if (style == CONSONANT) // 자음
 			{
@@ -1142,7 +1143,7 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 				context.strUnderConstruct = AssemUnicode(stCurrentConstruct);
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
 
-				state = ONLY_CHOSEONG;
+				state = E_CONSTRUCT_STATE::ONLY_CHOSEONG;
 				context.nCursorPos++;
 				break;
 			}
@@ -1164,19 +1165,19 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 
 				if (c == "h")
 				{
-					state = NO_JONGSEONG_COMB_ABLE_H;
+					state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_H;
 				}
 				else if (c == "n")
 				{
-					state = NO_JONGSEONG_COMB_ABLE_N;
+					state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_N;
 				}
 				else if (c == "m")
 				{
-					state = NO_JONGSEONG_COMB_ABLE_M;
+					state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_ABLE_M;
 				}
 				else
 				{
-					state = NO_JONGSEONG_COMB_UNABLE;
+					state = E_CONSTRUCT_STATE::NO_JONGSEONG_COMB_UNABLE;
 				}
 
 				context.strContext = strPreContext + context.strUnderConstruct + strPosContext;
@@ -1190,6 +1191,6 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 
 void CHangulCharset::Clear()
 {
-	state = BLANK;
+	state = E_CONSTRUCT_STATE::BLANK;
 	stCurrentConstruct = { CONSTRUCT_DEFAULT, CONSTRUCT_DEFAULT, 0 };
 }

@@ -90,7 +90,6 @@ DWORD WINAPI KeyInputThread(LPVOID pContext)
 
 	bool bIsShiftEnabled;
 	bool bIsCapsLockEnabled;
-	bool bIsEnterPressed;
 
 	while (true)
 	{
