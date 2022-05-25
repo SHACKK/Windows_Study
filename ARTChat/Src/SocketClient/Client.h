@@ -14,6 +14,8 @@ public:
 	CClient() {};
 	~CClient() 
 	{
+		std::wstring strCloseCommand = L"/CloseByClient";
+		Send(strCloseCommand);
 		this->Close();
 	};
 

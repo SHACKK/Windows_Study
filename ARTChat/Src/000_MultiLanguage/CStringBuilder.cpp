@@ -37,7 +37,9 @@ void CStringBuilder::BuildContext(std::list<ST_KEYSTATE> listKeys, bool bIsShift
 				m_pCurCharset = m_mapCharset[CHARSET_ASCII];
 			break;
 		case VK_RETURN:
-			return;
+			Clear();
+			m_pCurCharset->Clear();
+			break;
 		default:
 			m_pCurCharset->Update(key.nVirtKey, m_Context, bIsShiftEnabled, bIsCapsLockEnabled);
 			break;

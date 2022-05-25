@@ -34,3 +34,7 @@ void CAsciiCharSet::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bSh
 		context.nCursorPos++;
 	}
 }
+
+void CAsciiCharSet::Clear()
+{
+}

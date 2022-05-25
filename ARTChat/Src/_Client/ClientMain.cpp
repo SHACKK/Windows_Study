@@ -1,7 +1,7 @@
 #include "pch.h"
 #pragma comment(lib, "Ws2_32.lib")
 
-#define SERVER_IP "127.0.0.1"
+#define SERVER_IP "172.30.100.217"
 #define SERVER_PORT 55000
 #define USER_NAME L"[ 임창현 ]";
 
@@ -33,15 +33,17 @@ void PrintChatData()
 
 DWORD WINAPI UpdateChatDataThread(LPVOID pContext)
 {
+	std::wstring strCloseCommand = L"CloseByServer";
 	while (true)
 	{
 		CClient& client = *(CClient*)pContext;
 		std::wstring strMessage = client.Recv();
+		
+		if (!wcscmp(strMessage.c_str(), strCloseCommand.c_str()) || strMessage.empty())
+			break;
 
 		vecChatData.push_back(strMessage);
 		PrintChatData();
-		//HANDLE hPrintThread = ::CreateThread(nullptr, 0, InsertChatDataThread, &strMessage, 0, nullptr);
-		//::WaitForSingleObject(hPrintThread, INFINITE);
 	}
 	return 0;
 }
@@ -50,6 +52,7 @@ DWORD WINAPI KeyInputThread(LPVOID pContext)
 {
 	CClient& client = *(CClient*)pContext;
 	CKeyInput input;
+	std::wstring strPreText = L"|";
 
 	// 숫자
 	for (int i = 0x30; i < 0x40; i++)
@@ -87,6 +90,7 @@ DWORD WINAPI KeyInputThread(LPVOID pContext)
 
 	bool bIsShiftEnabled;
 	bool bIsCapsLockEnabled;
+	bool bIsEnterPressed;
 
 	while (true)
 	{
@@ -94,26 +98,31 @@ DWORD WINAPI KeyInputThread(LPVOID pContext)
 
 		std::list<ST_KEYSTATE> listKeys;
 		
-		if (input.Query(listKeys) == 1) 
-		{
-			std::wstring strMessage = stringbuilder.GetContext();
-			client.Send(strMessage);
-			stringbuilder.Clear();
-			strCurrentText.clear();
-			PrintChatData();
-			continue;
-		}
-		// 얘네 위아래 순서 바꿔봐바;;;
+		input.Query(listKeys);
+
 		if (listKeys.empty())
 			continue;
 
 		bIsShiftEnabled = input.IsEnabledShift();
 		bIsCapsLockEnabled = input.IsEnabledCapsLock();
 
+		if (input.IsEnterPressed())
+		{	
+			std::wstring strMessage = stringbuilder.GetContext();
+			if(!strMessage.empty())
+				client.Send(strMessage);
+			strCurrentText.clear();
+			strPreText = L"|";
+		}
+
 		stringbuilder.BuildContext(listKeys, bIsShiftEnabled, bIsCapsLockEnabled);
 
 		strCurrentText = stringbuilder.GetContextWithCursor();
-		PrintChatData();
+		if (wcscmp(strPreText.c_str(), strCurrentText.c_str()))
+		{
+			strPreText = strCurrentText;
+			PrintChatData();
+		}
 	}
 
 	return 0;

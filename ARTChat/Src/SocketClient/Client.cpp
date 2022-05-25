@@ -29,6 +29,8 @@ int CClient::Connect(ST_SERVER_INFO stServerInfo)
 
 int CClient::Close()
 {
+	std::wstring strCloseCommand = L"CloseByClient";
+	Send(strCloseCommand);
 	::closesocket(m_hClientSocket);
 	return 0;
 }

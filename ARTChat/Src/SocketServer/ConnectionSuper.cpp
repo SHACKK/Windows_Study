@@ -16,8 +16,6 @@ DWORD CConnectionSuper::ConnectionThread()
 
 	onClose();
 
-	m_pServer->DisConnect(this);
-
 	return 0;
 }
 
@@ -46,7 +44,7 @@ int CConnectionSuper::SendChatData(std::vector<std::wstring> vecChatData)
 
 int CConnectionSuper::Send(std::wstring strMessage)
 {
-	int nLength = strMessage.length();
+	int nLength = strMessage.length() * (int)sizeof(wchar_t);
 	::send(m_ConnectionSocket, (const char*)&nLength, sizeof(nLength), 0);
 	::send(m_ConnectionSocket, (const char*)strMessage.c_str(), nLength, 0);
 

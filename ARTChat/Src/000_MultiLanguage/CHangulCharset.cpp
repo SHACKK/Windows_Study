@@ -1187,3 +1187,9 @@ void CHangulCharset::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bS
 		}
 	}
 }
+
+void CHangulCharset::Clear()
+{
+	state = BLANK;
+	stCurrentConstruct = { CONSTRUCT_DEFAULT, CONSTRUCT_DEFAULT, 0 };
+}

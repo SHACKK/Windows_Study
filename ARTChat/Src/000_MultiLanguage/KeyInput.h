@@ -16,7 +16,7 @@ public:
 
     void Clear(void);
     void Register(int nVirtKey, int nID);
-    int Query(std::list<ST_KEYSTATE>& outState);
+    void Query(std::list<ST_KEYSTATE>& outState);
 
     bool IsEnabledCapsLock(void);
     bool IsEnabledShift(void);

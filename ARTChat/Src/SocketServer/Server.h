@@ -26,11 +26,18 @@ private:
 
 	std::vector<std::wstring> m_vecChatData = 
 	{
-		L"--------------------Start Chat--------------------"
+		L"-------------------------Start Chat-------------------------"
 	};
 
 	std::mutex mtx;
 public:
+	CServer() {};
+	~CServer()
+	{
+		std::wstring strShutdownCommand = L"/CloseByServer";
+		Broadcast(strShutdownCommand);
+
+	};
 	DWORD AcceptThread();
 	DWORD DisAcceptThread();
 	int StartUp(ST_SERVER_INIT stInit);

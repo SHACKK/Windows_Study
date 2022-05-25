@@ -19,7 +19,7 @@ void CKeyInput::Register(int nVirtKey, int nID)
 		m_mapKeyPressTime[nVirtKey] = 0xFFFFFFFF;
 }
 
-int CKeyInput::Query(std::list<ST_KEYSTATE>& outState)
+void CKeyInput::Query(std::list<ST_KEYSTATE>& outState)
 {
 #ifndef _DEBUG
 	HWND hConsole = ::GetConsoleWindow();
@@ -29,8 +29,7 @@ int CKeyInput::Query(std::list<ST_KEYSTATE>& outState)
 #endif
 	m_bCapsLockEnabled = GetKeyState(VK_CAPITAL) & 0x01;
 	m_bShiftPressed = (GetAsyncKeyState(VK_LSHIFT) & 0x8000) || (GetAsyncKeyState(VK_RSHIFT) & 0x8000);
-	if (m_bEnterPressed = GetAsyncKeyState(VK_RETURN) & 0x8000)
-		return 1;
+	m_bEnterPressed = GetAsyncKeyState(VK_RETURN) & 0x8000;
 
 	std::list<ST_KEYSTATE> tempState;
 	for (auto iter : m_mapRegisteredKey)
@@ -52,7 +51,6 @@ int CKeyInput::Query(std::list<ST_KEYSTATE>& outState)
 	}
 
 	GenerateRepeatKey(tempState, outState);
-	return 0;
 }
 
 void CKeyInput::GenerateRepeatKey(std::list<ST_KEYSTATE>& inState, std::list<ST_KEYSTATE>& outRepeatState)
