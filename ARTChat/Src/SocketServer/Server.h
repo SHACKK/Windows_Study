@@ -1,5 +1,7 @@
 #pragma once
 
+#define MAX_CHATDATA_SIZE 30
+
 class CConnectionSuper;
 
 struct ST_SERVER_INIT
@@ -18,6 +20,7 @@ class CServer
 private:
 	std::vector<CConnectionSuper*> m_vecConnectionInstance;
 	std::queue<CConnectionSuper*> m_queReady;
+	std::queue<SOCKET> m_queSuspended;
 	std::set<CConnectionSuper*> m_setConnected;
 	std::queue<CConnectionSuper*> m_queDiscon;
 	SOCKET m_ListenSocket;
@@ -29,7 +32,12 @@ private:
 		L"-------------------------Start Chat-------------------------"
 	};
 
-	std::mutex mtx;
+	std::mutex mtx_queReady;
+	std::mutex mtx_queSuspended;
+	std::mutex mtx_setConnected;
+	std::mutex mtx_queDiscon;
+	std::mutex mtx_ChatData;
+
 public:
 	CServer() {};
 	~CServer()

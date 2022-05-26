@@ -3,6 +3,9 @@
 
 void CChatConnection::onConnect()
 {
+	std::wstring strConnectedMessage = L"Accept";
+	Send(strConnectedMessage);
+
 	strUserName = Recv();
 
 	m_pServer->UpdateChatData(L"---------------" + strUserName + L" ¥‘¿Ã ¿‘¿Â«œºÃΩ¿¥œ¥Ÿ" + L"---------------");

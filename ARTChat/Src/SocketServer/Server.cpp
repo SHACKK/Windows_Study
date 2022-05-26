@@ -67,9 +67,9 @@ void CServer::Broadcast(std::wstring strMessage)
 
 void CServer::BroadcastChatData()
 {
-	mtx.lock();
+	mtx_ChatData.lock();
 	std::vector<std::wstring> vecTmp = GetChatData();
-	mtx.unlock();
+	mtx_ChatData.unlock();
 
 	std::set<CConnectionSuper*>::iterator iter;
 	for (iter = m_setConnected.begin(); iter != m_setConnected.end(); iter++)
@@ -80,7 +80,9 @@ void CServer::BroadcastChatData()
 
 void CServer::InsertConnectedSet(CConnectionSuper* newConnection)
 {
+	mtx_setConnected.lock();
 	m_setConnected.insert(newConnection);
+	mtx_setConnected.unlock();
 }
 
 std::vector<std::wstring> CServer::GetChatData()
@@ -90,18 +92,28 @@ std::vector<std::wstring> CServer::GetChatData()
 
 bool CServer::UpdateChatData(std::wstring strMessage)
 {
-	mtx.lock();
+	mtx_ChatData.lock();
+	if (MAX_CHATDATA_SIZE < m_vecChatData.size())	
+		m_vecChatData.erase(m_vecChatData.begin());
 	m_vecChatData.push_back(strMessage);
+
 	Broadcast(strMessage);
-	mtx.unlock();
+
+	// Broadcast 과정에서 순서가 뒤바뀔 수도 있으므로 이 행위를 포함하여 mutex처리를 해줬다.
+	mtx_ChatData.unlock();	
 
 	return true;
 }
 
 void CServer::DisConnect(CConnectionSuper* pConnection)
 {
+	mtx_setConnected.lock();
 	m_setConnected.erase(pConnection);
+	mtx_setConnected.unlock();
+
+	mtx_queDiscon.lock();
 	m_queDiscon.push(pConnection);
+	mtx_queDiscon.unlock();
 }
 
 // 클라이언트와 연결
@@ -109,18 +121,31 @@ DWORD CServer::AcceptThread()
 {
 	while (true)
 	{
-		if (m_queReady.empty())
-			continue;
-
 		sockaddr RemoteInfo;
 		int nRemoteInfoSize = (int)sizeof(RemoteInfo);
 
 		SOCKET hConnectionSocket = ::accept(m_ListenSocket, &RemoteInfo, &nRemoteInfoSize);
 
+		if (m_queReady.empty())
+		{
+			mtx_queSuspended.lock();
+			m_queSuspended.push(hConnectionSocket);
+			mtx_queSuspended.unlock();
+
+			std::wstring strWaitMessage = L"Wait";
+			int nLength = (int)strWaitMessage.length() * (int)sizeof(wchar_t);
+			::send(hConnectionSocket, (const char*)&nLength, (int)sizeof(nLength), 0);
+			::send(hConnectionSocket, (const char*)strWaitMessage.c_str(), nLength, 0);
+
+			continue;
+		}
+
+		mtx_queReady.lock();
 		CConnectionSuper* newConnection = m_queReady.front();
 		m_queReady.pop();
+		mtx_queReady.unlock();
+
 		newConnection->Establish(hConnectionSocket, this);
-		//m_setConnected.insert(newConnection); -> 채팅 보낸 이후에 추가하는 것으로 수정
 	}
 }
 
@@ -132,8 +157,27 @@ DWORD CServer::DisAcceptThread()
 		if (m_queDiscon.empty())
 			continue;
 
-		CConnectionSuper* closedConnection = m_queDiscon.front();
-		m_queDiscon.pop();
-		m_queReady.push(closedConnection);
+		if (m_queSuspended.empty()) // 끊어진 연결이 있고, 대기중인 소켓이 없는 경우
+		{
+			mtx_queDiscon.lock();
+			CConnectionSuper* closedConnection = m_queDiscon.front();
+			m_queDiscon.pop();
+			mtx_queDiscon.unlock();
+
+			mtx_queReady.lock();
+			m_queReady.push(closedConnection);
+			mtx_queReady.unlock();
+		}
+		else // 끊어진 연결이 있고, 대기중인 소켓이 있는 경우
+		{
+			mtx_queSuspended.lock();
+			SOCKET suspendedSocket = m_queSuspended.front();
+			m_queSuspended.pop();
+			mtx_queSuspended.unlock();
+
+			CConnectionSuper* closedConnection = m_queDiscon.front();
+			m_queDiscon.pop();
+			closedConnection->Establish(suspendedSocket, this);
+		}
 	}
 }

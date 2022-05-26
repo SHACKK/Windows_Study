@@ -139,18 +139,39 @@ int main()
 	stServerInfo.Port = SERVER_PORT;
 	
 	if (!client.Connect(stServerInfo))
+	{
+		wprintf(L"Failed to Connect\n");
 		return 1;
+	}
 
-	std::wstring strUserName = USER_NAME;
-	client.Send(strUserName);
+	std::wstring strConnectResult = client.Recv();
 
-	vecChatData = client.RecvChatData();
-	PrintChatData();
+	if (!wcscmp(strConnectResult.c_str(), L"Wait"))
+	{
+		wprintf(L"Server is too busy...\n Please Wait...\n");
+		strConnectResult = client.Recv();
+	}
 
-	HANDLE hInputThread = CreateThread(nullptr, 0, KeyInputThread, &client, 0, nullptr);
-	HANDLE hUpdateChatDataThread = CreateThread(nullptr, 0, UpdateChatDataThread, &client, 0, nullptr);
+	if (!wcscmp(strConnectResult.c_str(), L"Accept"))
+	{
+		wprintf(L"Connected!!\n");
 
-	WaitForSingleObject(hInputThread, INFINITE);
-	WaitForSingleObject(hUpdateChatDataThread, INFINITE);
+		std::wstring strUserName = USER_NAME;
+		client.Send(strUserName);
+
+		vecChatData = client.RecvChatData();
+		PrintChatData();
+
+		HANDLE hInputThread = CreateThread(nullptr, 0, KeyInputThread, &client, 0, nullptr);
+		HANDLE hUpdateChatDataThread = CreateThread(nullptr, 0, UpdateChatDataThread, &client, 0, nullptr);
+
+		WaitForSingleObject(hInputThread, INFINITE);
+		WaitForSingleObject(hUpdateChatDataThread, INFINITE);
+	}
+	else
+	{
+		wprintf(L"Plase check the Server\n");
+	}
+
 	return 0;
 }
