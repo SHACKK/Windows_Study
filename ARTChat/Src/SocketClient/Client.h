@@ -1,5 +1,10 @@
 #pragma once
 
+#define SERVER_IP "127.0.0.1"
+#define SERVER_PORT 55000
+#define CONNECTION_CLOSE_BY_CLIENT L"/CloseByClient"
+#define CONNECTION_CLOSE_BY_SERVER L"/CloseByServer"
+
 struct ST_SERVER_INFO
 {
 	const char* IP;

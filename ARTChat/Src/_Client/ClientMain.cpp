@@ -28,19 +28,21 @@ void PrintChatData()
 	{
 		wprintf(L"%s\n", vecChatData[i].c_str());
 	}
-	wprintf(L"%s\n", strCurrentText.c_str());
+	wprintf(L"\n¸Þ¼¼Áö >> %s", strCurrentText.c_str());
 }
 
 DWORD WINAPI UpdateChatDataThread(LPVOID pContext)
 {
-	std::wstring strCloseCommand = L"CloseByServer";
 	while (true)
 	{
 		CClient& client = *(CClient*)pContext;
 		std::wstring strMessage = client.Recv();
 		
-		if (!wcscmp(strMessage.c_str(), strCloseCommand.c_str()) || strMessage.empty())
+		if (!wcscmp(strMessage.c_str(), CONNECTION_CLOSE_BY_SERVER) || strMessage.empty())
+		{
+			client.Close();
 			break;
+		}
 
 		vecChatData.push_back(strMessage);
 		PrintChatData();
@@ -112,6 +114,9 @@ DWORD WINAPI KeyInputThread(LPVOID pContext)
 				client.Send(strMessage);
 			strCurrentText.clear();
 			strPreText = L"|";
+
+			if (!wcscmp(strMessage.c_str(), CONNECTION_CLOSE_BY_CLIENT))	
+				break;
 		}
 
 		stringbuilder.BuildContext(listKeys, bIsShiftEnabled, bIsCapsLockEnabled);
@@ -162,10 +167,13 @@ int main()
 		vecChatData = client.RecvChatData();
 		PrintChatData();
 
-		HANDLE hInputThread = CreateThread(nullptr, 0, KeyInputThread, &client, 0, nullptr);
 		HANDLE hUpdateChatDataThread = CreateThread(nullptr, 0, UpdateChatDataThread, &client, 0, nullptr);
+		HANDLE hInputThread = CreateThread(nullptr, 0, KeyInputThread, &client, 0, nullptr);
 
 		WaitForSingleObject(hInputThread, INFINITE);
+
+		client.Send(CONNECTION_CLOSE_BY_CLIENT);
+
 		WaitForSingleObject(hUpdateChatDataThread, INFINITE);
 	}
 	else

@@ -1,9 +1,6 @@
 #include "pch.h"
 #include "Client.h"
 
-#define SERVER_IP "127.0.0.1"
-#define SERVER_PORT 55000
-
 int CClient::Connect(ST_SERVER_INFO stServerInfo)
 {
 	try
@@ -29,9 +26,8 @@ int CClient::Connect(ST_SERVER_INFO stServerInfo)
 
 int CClient::Close()
 {
-	std::wstring strCloseCommand = L"CloseByClient";
-	Send(strCloseCommand);
 	::closesocket(m_hClientSocket);
+
 	return 0;
 }
 

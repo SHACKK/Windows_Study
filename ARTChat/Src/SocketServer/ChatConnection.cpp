@@ -19,12 +19,10 @@ void CChatConnection::onConnect()
 
 void CChatConnection::onRecv()
 {
-	std::wstring strCloseCommand = L"/CloseByClient";
-
 	while (true)
 	{
 		std::wstring strMessage = Recv();
-		if (!wcscmp(strMessage.c_str(), strCloseCommand.c_str()) || strMessage.empty()) // 임시방편으로 이렇게 막기는 했는데... 왜 메모리가 튀는지???.
+		if (!wcscmp(strMessage.c_str(), CONNECTION_CLOSE_BY_CLIENT) || strMessage.empty()) // 임시방편으로 이렇게 막기는 했는데... 왜 메모리가 튀는지???.
 			break;
 
 		m_pServer->UpdateChatData(strUserName + L" : " + strMessage);
@@ -34,8 +32,7 @@ void CChatConnection::onRecv()
 
 void CChatConnection::onClose()
 {
-	std::wstring strCloseCommand = L"/CloseByServer";
-	Send(strCloseCommand);
+	Send(CONNECTION_CLOSE_BY_SERVER);
 	m_pServer->DisConnect(this);
 	m_pServer->UpdateChatData(L"---------------" + strUserName + L" 님이 퇴장하셨습니다" + L"---------------");
 }

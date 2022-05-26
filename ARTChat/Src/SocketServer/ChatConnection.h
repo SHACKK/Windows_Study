@@ -1,6 +1,9 @@
 #pragma once
 #include "ConnectionSuper.h"
 
+#define CONNECTION_CLOSE_BY_CLIENT L"/CloseByClient"
+#define CONNECTION_CLOSE_BY_SERVER L"/CloseByServer"
+
 class CChatConnection : public CConnectionSuper
 {
 private:

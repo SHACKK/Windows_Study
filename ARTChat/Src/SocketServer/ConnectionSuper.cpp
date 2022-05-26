@@ -11,10 +11,9 @@ DWORD WINAPI ConnectionThreadCaller(void* pContext)
 DWORD CConnectionSuper::ConnectionThread()
 {
 	onConnect();
-
 	onRecv();
-
 	onClose();
+	::closesocket(m_ConnectionSocket);
 
 	return 0;
 }

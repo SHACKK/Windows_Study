@@ -5,7 +5,6 @@ class CConnectionSuper
 {
 private:
 	SOCKET m_ConnectionSocket;
-	sockaddr m_RemoteInfo;
 
 protected:
 	CServer* m_pServer;
