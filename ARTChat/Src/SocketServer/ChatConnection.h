@@ -12,4 +12,8 @@ public:
 	void onConnect();
 	void onRecv();
 	void onClose();
+	std::wstring Recv();
+	void Send(std::wstring strMessage);
+	int SendChatData(std::vector<std::wstring> vecChatData);
+	std::wstring GetCurrentTimeString();
 };

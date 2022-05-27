@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "ConnectionSuper.h"
-#include "ChatConnection.h"
 
 DWORD WINAPI ConnectionThreadCaller(void* pContext)
 {
@@ -13,7 +12,7 @@ DWORD CConnectionSuper::ConnectionThread()
 	onConnect();
 	onRecv();
 	onClose();
-	::closesocket(m_ConnectionSocket);
+	//::closesocket(m_ConnectionSocket);
 
 	return 0;
 }
@@ -27,49 +26,23 @@ int CConnectionSuper::Establish(SOCKET acceptedSocket, CServer* pServer)
 	return 0;
 }
 
-int CConnectionSuper::SendChatData(std::vector<std::wstring> vecChatData)
+int CConnectionSuper::Send(LPCBYTE pData, size_t tSize)
 {
-	size_t nVecSize = vecChatData.size();
-	::send(m_ConnectionSocket, (const char*)&nVecSize, sizeof(size_t), 0);
-
-	for (size_t i = 0; i < nVecSize; i++)
-	{
-		int nMsgLength = (int)vecChatData[i].size() * (int)sizeof(wchar_t);
-		::send(m_ConnectionSocket, (const char*)&nMsgLength, sizeof(nMsgLength), 0);
-		::send(m_ConnectionSocket, (const char*)vecChatData[i].c_str(), nMsgLength, 0);
-	}
-	return 0;
-}
-
-int CConnectionSuper::Send(std::wstring strMessage)
-{
-	int nLength = (int)strMessage.length() * (int)sizeof(wchar_t);
-	::send(m_ConnectionSocket, (const char*)&nLength, sizeof(nLength), 0);
-	::send(m_ConnectionSocket, (const char*)strMessage.c_str(), nLength, 0);
+	int nRet = ::send(m_ConnectionSocket, (const char*)pData, tSize, 0);
 
 	return 0;
 }
 
-std::wstring CConnectionSuper::Recv()
+int CConnectionSuper::Recv(LPBYTE pBuffer, size_t tBufferSize)
 {
-	int nLength = 0;
-	::recv(m_ConnectionSocket, (char*)&nLength, (int)sizeof(nLength), 0);
+	int nRet = ::recv(m_ConnectionSocket, (char*)pBuffer, tBufferSize, 0);
 
-	std::wstring strMsg;
-	strMsg.resize(nLength / sizeof(wchar_t));
-	::recv(m_ConnectionSocket, (char*)strMsg.c_str(), nLength, 0);
-
-	return strMsg;
+	return nRet;
 }
 
-std::wstring CConnectionSuper::Peek()
+int CConnectionSuper::Peek(LPBYTE pBuffer, size_t tBufferSize)
 {
-	int nLength = 0;
-	::recv(m_ConnectionSocket, (char*)&nLength, sizeof(nLength), MSG_PEEK);
+	int nRet = ::recv(m_ConnectionSocket, (char*)&pBuffer, tBufferSize, MSG_PEEK);
 
-	std::wstring strRet;
-	strRet.resize(nLength);
-	::recv(m_ConnectionSocket, (char*)strRet.c_str(), nLength, MSG_PEEK);
-
-	return strRet;
+	return nRet;
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #define MAX_CHATDATA_SIZE 30
+#define MAX_CONNECTION_SIZE 20
 
 class CConnectionSuper;
 
@@ -52,7 +53,6 @@ public:
 	void ShutDown();
 	void DisConnect(CConnectionSuper* pConnection);
 	void Broadcast(std::wstring strMessage);
-	void BroadcastChatData();
 	void InsertConnectedSet(CConnectionSuper* newConnection);
 	std::vector<std::wstring> GetChatData();
 	bool UpdateChatData(std::wstring strMessage);

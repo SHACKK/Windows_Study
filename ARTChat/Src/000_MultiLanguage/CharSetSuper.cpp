@@ -3,7 +3,7 @@
 
 std::map<int, std::wstring> mStrSetLower
 {
-	{ 0X30, L"0" },
+	{ 0x30, L"0" },
 	{ 0x31, L"1" },
 	{ 0x32, L"2" },
 	{ 0x33, L"3" },

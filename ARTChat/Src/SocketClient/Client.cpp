@@ -26,14 +26,14 @@ int CClient::Connect(ST_SERVER_INFO stServerInfo)
 
 int CClient::Close()
 {
-	::closesocket(m_hClientSocket);
+	//::closesocket(m_hClientSocket);
 
 	return 0;
 }
 
 int CClient::Send(std::wstring strMessage)
 {
-	int nLength = strMessage.length() * sizeof(wchar_t);
+	size_t nLength = strMessage.length() * sizeof(wchar_t);
 	::send(m_hClientSocket, (const char*)&nLength, sizeof(nLength), 0);
 	::send(m_hClientSocket, (const char*)strMessage.c_str(), nLength, 0);
 	return 0;
@@ -75,11 +75,11 @@ std::vector<std::wstring> CClient::RecvChatData()
 
 std::wstring CClient::Recv()
 {
-	int nLength = 0;
+	size_t nLength = 0;
 	::recv(m_hClientSocket, (char*)&nLength, sizeof(nLength), 0);
 
 	std::wstring strRet;
-	strRet.resize(nLength);
+	strRet.resize(nLength / sizeof(wchar_t));
 	::recv(m_hClientSocket, (char*)strRet.c_str(), nLength, 0);
 
 	return strRet;

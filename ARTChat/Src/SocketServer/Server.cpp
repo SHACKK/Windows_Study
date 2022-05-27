@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Server.h"
 #include "ConnectionSuper.h"
+#include "ChatConnection.h"
 
 DWORD WINAPI AcceptThreadCaller(void* pContext)
 {
@@ -40,6 +41,7 @@ int CServer::StartUp(ST_SERVER_INIT stInit)
 
 		hAcceptThread = ::CreateThread(nullptr, 0, AcceptThreadCaller, this, 0, nullptr);
 		hDisAcceptThread = ::CreateThread(nullptr, 0, DisAcceptThreadCaller, this, 0, nullptr);
+		
 
 		return 0;
 	}
@@ -58,23 +60,13 @@ void CServer::ShutDown()
 
 void CServer::Broadcast(std::wstring strMessage)
 {
-	std::set<CConnectionSuper*>::iterator iter;
-	for (iter = m_setConnected.begin(); iter != m_setConnected.end(); iter++)
-	{
-		(*iter)->Send(strMessage);
-	}
-}
-
-void CServer::BroadcastChatData()
-{
-	mtx_ChatData.lock();
-	std::vector<std::wstring> vecTmp = GetChatData();
-	mtx_ChatData.unlock();
+	size_t tMessageLength = strMessage.length() * sizeof(wchar_t);
 
 	std::set<CConnectionSuper*>::iterator iter;
 	for (iter = m_setConnected.begin(); iter != m_setConnected.end(); iter++)
 	{
-		(*iter)->SendChatData(vecTmp);
+		(*iter)->Send((LPCBYTE)&tMessageLength, sizeof(tMessageLength));
+		(*iter)->Send((LPCBYTE)(strMessage.c_str()), tMessageLength);
 	}
 }
 
@@ -83,6 +75,8 @@ void CServer::InsertConnectedSet(CConnectionSuper* newConnection)
 	mtx_setConnected.lock();
 	m_setConnected.insert(newConnection);
 	mtx_setConnected.unlock();
+
+	wprintf(L"[INFO] Client connected!! (%d/%d)\n", (int)m_setConnected.size(), MAX_CONNECTION_SIZE);
 }
 
 std::vector<std::wstring> CServer::GetChatData()
@@ -111,9 +105,13 @@ void CServer::DisConnect(CConnectionSuper* pConnection)
 	m_setConnected.erase(pConnection);
 	mtx_setConnected.unlock();
 
+	wprintf(L"[INFO] Client disconnected!! (%d/%d)\n", (int)m_setConnected.size(), MAX_CONNECTION_SIZE);
+
 	mtx_queDiscon.lock();
 	m_queDiscon.push(pConnection);
 	mtx_queDiscon.unlock();
+
+	
 }
 
 // 클라이언트와 연결
@@ -133,7 +131,7 @@ DWORD CServer::AcceptThread()
 			mtx_queSuspended.unlock();
 
 			std::wstring strWaitMessage = L"Wait";
-			int nLength = (int)strWaitMessage.length() * (int)sizeof(wchar_t);
+			size_t nLength = strWaitMessage.length() * sizeof(wchar_t);
 			::send(hConnectionSocket, (const char*)&nLength, (int)sizeof(nLength), 0);
 			::send(hConnectionSocket, (const char*)strWaitMessage.c_str(), nLength, 0);
 

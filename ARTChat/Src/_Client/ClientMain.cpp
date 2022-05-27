@@ -3,7 +3,8 @@
 
 #define SERVER_IP "172.30.100.217"
 #define SERVER_PORT 55000
-#define USER_NAME L"[ 임창현 ]";
+#define USER_NAME L"[ 임창현 ]"
+#define MAX_CHATDATA_SIZE 25
 
 struct ST_WSA_INITIALIZER
 {
@@ -23,6 +24,9 @@ std::wstring strCurrentText;
 
 void PrintChatData()
 {
+	if (MAX_CHATDATA_SIZE < vecChatData.size())
+		vecChatData.erase(vecChatData.begin());
+
 	system("cls");
 	for (int i = 0; i < vecChatData.size(); i++)
 	{
@@ -171,9 +175,6 @@ int main()
 		HANDLE hInputThread = CreateThread(nullptr, 0, KeyInputThread, &client, 0, nullptr);
 
 		WaitForSingleObject(hInputThread, INFINITE);
-
-		client.Send(CONNECTION_CLOSE_BY_CLIENT);
-
 		WaitForSingleObject(hUpdateChatDataThread, INFINITE);
 	}
 	else

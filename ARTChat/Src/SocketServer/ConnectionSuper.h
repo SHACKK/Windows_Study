@@ -4,9 +4,9 @@
 class CConnectionSuper
 {
 private:
-	SOCKET m_ConnectionSocket;
 
 protected:
+	SOCKET m_ConnectionSocket;
 	CServer* m_pServer;
 	virtual void onConnect() = 0;
 	virtual void onRecv() = 0;
@@ -15,8 +15,7 @@ protected:
 public:
 	DWORD ConnectionThread();
 	int Establish(SOCKET acceptedSocket, CServer* pServer);
-	int SendChatData(std::vector<std::wstring> vecChatData);
-	int Send(std::wstring strMessage);
-	std::wstring Peek();
-	std::wstring Recv();
+	int Send(LPCBYTE pData, size_t tSize);
+	int Recv(LPBYTE pBuffer, size_t tBufferSize);
+	int Peek(LPBYTE pBuffer, size_t tBufferSize);
 };
