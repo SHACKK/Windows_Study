@@ -3,10 +3,11 @@
 
 int CChatClient::Send(std::wstring strMessage)
 {
+	int nRet = 0;
 	size_t nLength = strMessage.length() * sizeof(wchar_t);
-	::send(m_hClientSocket, (const char*)&nLength, sizeof(nLength), 0);
-	::send(m_hClientSocket, (const char*)strMessage.c_str(), nLength, 0);
-	return 0;
+	nRet += ::send(m_hClientSocket, (const char*)&nLength, sizeof(nLength), 0);
+	nRet += ::send(m_hClientSocket, (const char*)strMessage.c_str(), nLength, 0);
+	return nRet;
 }
 
 std::wstring CChatClient::Recv()

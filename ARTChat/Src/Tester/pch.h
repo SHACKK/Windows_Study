@@ -7,6 +7,7 @@
 #include <queue>
 #include <string>
 #include <mutex>
+#include <iostream>
 
 #include "../SocketServer/_SocketServer.h"
-#include "../SocketClient/Client.h"
+#include "../SocketClient/_SocketClient.h"
