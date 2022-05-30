@@ -85,7 +85,7 @@ void CCharSetSuper::Update(int nVirtualKey, ST_STRING_CONTEXT& context, bool bIs
 		return;
 	}
 
-	if ( (0x31 <= nVirtualKey && nVirtualKey <= 0x39) ||
+	if ( (0x30 <= nVirtualKey && nVirtualKey <= 0x39) ||
 		(VK_OEM_1 <= nVirtualKey && nVirtualKey <= VK_OEM_7))
 	{
 		std::wstring strPreContext = context.strContext.substr(0, context.nCursorPos);
