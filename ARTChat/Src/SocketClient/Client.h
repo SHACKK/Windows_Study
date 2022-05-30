@@ -11,26 +11,15 @@ struct ST_SERVER_INFO
 
 class CClient
 {
-private:
+protected:
 	SOCKET m_hClientSocket;
-	std::wstring m_strUserName;
 public:
 	CClient() {};
-	~CClient() 
-	{
-		std::wstring strCloseCommand = L"/CloseByClient";
-		Send(strCloseCommand);
-		this->Close();
-	};
+	~CClient() {};
 
 	int Connect(ST_SERVER_INFO stServerInfo);
 	int Close();
-	int Send(std::wstring strMessage);
-	int Recv(LPBYTE pBuffer);
-	std::wstring Recv();
-	std::vector<std::wstring> RecvChatData();
+	int Send(LPBYTE pData, size_t tSize);
+	int Recv(LPBYTE pBuffer, size_t tSize);
 	int Peek(LPBYTE pBuffer, size_t tBufferSize);
-
-	void setUserName(std::wstring strName);
-	std::wstring getUserName();
 };

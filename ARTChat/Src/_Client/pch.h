@@ -7,5 +7,5 @@
 #include <string>
 #include <iostream>
 
-#include "../SocketClient/Client.h"
+#include "../SocketClient/_SocketClient.h"
 #include "../000_MultiLanguage/000_MultiLanguage.h"

@@ -31,83 +31,21 @@ int CClient::Close()
 	return 0;
 }
 
-int CClient::Send(std::wstring strMessage)
+int CClient::Send(LPBYTE pData, size_t tSize)
 {
-	size_t nLength = strMessage.length() * sizeof(wchar_t);
-	::send(m_hClientSocket, (const char*)&nLength, sizeof(nLength), 0);
-	::send(m_hClientSocket, (const char*)strMessage.c_str(), nLength, 0);
-	return 0;
-}
-
-int CClient::Recv(LPBYTE pBuffer)
-{
-	int nRet = 0;
-	try
-	{
-		int nSize = 0;
-		nRet = ::recv(m_hClientSocket, (char*)&nSize, (int)sizeof(nSize), 0);
-		nRet = ::recv(m_hClientSocket, (char*)&pBuffer, nSize, 0);
-	}
-	catch (...)
-	{
-		printf("[Receve Error] : %d", WSAGetLastError());
-	}
+	int nRet = ::send(m_hClientSocket, (const char*)&pData, tSize, 0);
 	return nRet;
 }
 
-std::vector<std::wstring> CClient::RecvChatData()
+
+int CClient::Recv(LPBYTE pBuffer, size_t tSize)
 {
-	std::vector<std::wstring> vecChatData;
-	size_t nVecSize;
-	::recv(m_hClientSocket, (char*)&nVecSize, sizeof(size_t), 0);
-	vecChatData.resize(nVecSize);
-
-	for (size_t i = 0; i < nVecSize; i++)
-	{
-		int nMsgLength;
-		::recv(m_hClientSocket, (char*)&nMsgLength, sizeof(nMsgLength), 0);
-		vecChatData[i].resize(nMsgLength / sizeof(wchar_t));
-		::recv(m_hClientSocket, (char*)vecChatData[i].c_str(), nMsgLength, 0);
-	}
-
-	return vecChatData;
-}
-
-std::wstring CClient::Recv()
-{
-	size_t nLength = 0;
-	::recv(m_hClientSocket, (char*)&nLength, sizeof(nLength), 0);
-
-	std::wstring strRet;
-	strRet.resize(nLength / sizeof(wchar_t));
-	::recv(m_hClientSocket, (char*)strRet.c_str(), nLength, 0);
-
-	return strRet;
+	int nRet = ::recv(m_hClientSocket, (char*)&pBuffer, tSize, 0);
+	return nRet;
 }
 
 int CClient::Peek(LPBYTE pBuffer, size_t tBufferSize)
 {
-	int nRet = 0;
-	try
-	{
-		nRet = ::recv(m_hClientSocket, (char*)&pBuffer, (int)tBufferSize, MSG_PEEK);
-	}
-	catch (...)
-	{
-		printf("[Receve Error] : %d", WSAGetLastError());
-	}
+	int	nRet = ::recv(m_hClientSocket, (char*)&pBuffer, (int)tBufferSize, MSG_PEEK);
 	return nRet;
-}
-
-void CClient::setUserName(std::wstring strName)
-{
-	m_strUserName = strName;
-}
-
-std::wstring CClient::getUserName()
-{
-	if (m_strUserName.empty())
-		return L"NoName";
-	else
-		return m_strUserName;
 }

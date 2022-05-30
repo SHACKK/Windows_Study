@@ -39,7 +39,7 @@ DWORD WINAPI UpdateChatDataThread(LPVOID pContext)
 {
 	while (true)
 	{
-		CClient& client = *(CClient*)pContext;
+		CChatClient& client = *(CChatClient*)pContext;
 		std::wstring strMessage = client.Recv();
 		
 		if (!wcscmp(strMessage.c_str(), CONNECTION_CLOSE_BY_SERVER) || strMessage.empty())
@@ -56,7 +56,7 @@ DWORD WINAPI UpdateChatDataThread(LPVOID pContext)
 
 DWORD WINAPI KeyInputThread(LPVOID pContext)
 {
-	CClient& client = *(CClient*)pContext;
+	CChatClient& client = *(CChatClient*)pContext;
 	CKeyInput input;
 	std::wstring strPreText = L"|";
 
@@ -141,7 +141,7 @@ int main()
 	std::setlocale(LC_ALL, "ko_KR.UTF-8");
 
 	ST_WSA_INITIALIZER stWsaInit;
-	CClient client;
+	CChatClient client;
 
 	ST_SERVER_INFO stServerInfo;
 	stServerInfo.IP = SERVER_IP;
