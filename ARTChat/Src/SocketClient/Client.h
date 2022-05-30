@@ -1,7 +1,5 @@
 #pragma once
 
-#define SERVER_IP "127.0.0.1"
-#define SERVER_PORT 55000
 #define CONNECTION_CLOSE_BY_CLIENT L"/CloseByClient"
 #define CONNECTION_CLOSE_BY_SERVER L"/CloseByServer"
 
@@ -15,6 +13,7 @@ class CClient
 {
 private:
 	SOCKET m_hClientSocket;
+	std::wstring m_strUserName;
 public:
 	CClient() {};
 	~CClient() 
@@ -31,5 +30,7 @@ public:
 	std::wstring Recv();
 	std::vector<std::wstring> RecvChatData();
 	int Peek(LPBYTE pBuffer, size_t tBufferSize);
-};
 
+	void setUserName(std::wstring strName);
+	std::wstring getUserName();
+};

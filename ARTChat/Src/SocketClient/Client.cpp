@@ -98,3 +98,16 @@ int CClient::Peek(LPBYTE pBuffer, size_t tBufferSize)
 	}
 	return nRet;
 }
+
+void CClient::setUserName(std::wstring strName)
+{
+	m_strUserName = strName;
+}
+
+std::wstring CClient::getUserName()
+{
+	if (m_strUserName.empty())
+		return L"NoName";
+	else
+		return m_strUserName;
+}
