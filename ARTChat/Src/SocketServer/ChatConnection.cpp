@@ -47,18 +47,18 @@ void CChatConnection::onClose()
 
 std::wstring CChatConnection::Recv()
 {
-	try 
+	try
 	{
-	size_t nLength = 0;
-	int nRecved = ::recv(m_ConnectionSocket, (char*)&nLength, (int)sizeof(nLength), 0);
+		size_t nLength = 0;
+		int nRecved = ::recv(m_ConnectionSocket, (char*)&nLength, (int)sizeof(nLength), 0);
 
-	std::wstring strMsg;
-	strMsg.resize(nLength / sizeof(wchar_t));
-	::recv(m_ConnectionSocket, (char*)strMsg.c_str(), nLength, 0);
-	
-	return strMsg;
+		std::wstring strMsg;
+		strMsg.resize(nLength / sizeof(wchar_t));
+		::recv(m_ConnectionSocket, (char*)strMsg.c_str(), (int)nLength, 0);
+
+		return strMsg;
 	}
-	catch(...)
+	catch (...)
 	{
 		printf("[Recv Error] : %d\n", WSAGetLastError());
 	}
@@ -68,9 +68,9 @@ void CChatConnection::Send(std::wstring strMessage)
 {
 	try
 	{
-	size_t nLength = strMessage.length() * sizeof(wchar_t);
-	::send(m_ConnectionSocket, (const char*)&nLength, sizeof(nLength), 0);
-	::send(m_ConnectionSocket, (const char*)strMessage.c_str(), nLength, 0);
+		size_t nLength = strMessage.length() * sizeof(wchar_t);
+		::send(m_ConnectionSocket, (const char*)&nLength, sizeof(nLength), 0);
+		::send(m_ConnectionSocket, (const char*)strMessage.c_str(), (int)nLength, 0);
 	}
 	catch (...)
 	{

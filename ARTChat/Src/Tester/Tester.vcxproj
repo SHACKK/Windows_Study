@@ -156,6 +156,9 @@
     <ProjectReference Include="..\SocketClient\SocketClient.vcxproj">
       <Project>{ca4e57f3-4c5b-487f-a726-2c77e568e43f}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\SocketServer\SocketServer.vcxproj">
+      <Project>{0d95fbc3-5fda-40d1-8b8e-e57afa27213e}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

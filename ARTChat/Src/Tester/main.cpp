@@ -33,56 +33,13 @@ int main()
 	}
 	ST_SERVER_INIT stServerInit(PORT, vecConnectionPool);
 	nRet = server.StartUp(stServerInit);
-	if (nRet == 1)
+	if (nRet == 0)
 		printf("[SUCCESS] Server StartUp()\n");
 	else
 	{
 		printf("[FAILED] Server StartUp()\n");
 		printf("[ERROR CODE] %d\n", WSAGetLastError());
 	}
-
-	CChatClient client_1;
-	CChatClient client_2;
-	CChatClient client_3;
-
-	// 2. Client.Connect()
-	ST_SERVER_INFO stServerInfo;
-	stServerInfo.IP = "127.0.0.1";
-	stServerInfo.Port = 56000;
-	nRet = client_1.Connect(stServerInfo);
-	if (nRet == 1)
-		printf("[SUCCESS] Client.Connect()\n");
-	else
-	{
-		printf("[FAILED] Client.Connect()\n");
-		printf("[ERROR CODE] %d\n", WSAGetLastError());
-	}
-
-	// 3. Server.Send() <-> Client.Recv()
-	std::wstring strAccept = client_1.Recv();
-	if (!wcscmp(strAccept.c_str(), L"Accept"))
-	{
-		printf("[SUCCESS] Server Send()\m");
-		printf("[SUCCESS] Client Recv()\m");
-	}
-	else
-	{
-		printf("[FAILED] Server.Send() <-> Client.Recv()\n");
-		printf("[ERROR CODE] %d \n", WSAGetLastError());
-	}
-
-	// 3. Client.Send() <-> Server.Recv()
-	client_1.setUserName(L"TEST");
-	nRet = client_1.Send(client_1.getUserName());
-	if (nRet != 0)
-		printf("[SUCCESS] Client Send()\n");
-	else
-	{
-		printf("[FAILED] Client Send()\n");
-		printf("%d\n", WSAGetLastError());
-	}
-
-	//4. Server.SendChatData() <-> Client.RecvChatData()
 
 	return 0;
 }

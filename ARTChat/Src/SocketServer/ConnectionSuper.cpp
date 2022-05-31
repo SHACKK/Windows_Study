@@ -28,21 +28,21 @@ int CConnectionSuper::Establish(SOCKET acceptedSocket, CServer* pServer)
 
 int CConnectionSuper::Send(LPCBYTE pData, size_t tSize)
 {
-	int nRet = ::send(m_ConnectionSocket, (const char*)pData, tSize, 0);
+	int nRet = ::send(m_ConnectionSocket, (const char*)pData, (int)tSize, 0);
 
 	return 0;
 }
 
 int CConnectionSuper::Recv(LPBYTE pBuffer, size_t tBufferSize)
 {
-	int nRet = ::recv(m_ConnectionSocket, (char*)pBuffer, tBufferSize, 0);
+	int nRet = ::recv(m_ConnectionSocket, (char*)pBuffer, (int)tBufferSize, 0);
 
 	return nRet;
 }
 
 int CConnectionSuper::Peek(LPBYTE pBuffer, size_t tBufferSize)
 {
-	int nRet = ::recv(m_ConnectionSocket, (char*)&pBuffer, tBufferSize, MSG_PEEK);
+	int nRet = ::recv(m_ConnectionSocket, (char*)&pBuffer, (int)tBufferSize, MSG_PEEK);
 
 	return nRet;
 }

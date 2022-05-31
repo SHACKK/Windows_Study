@@ -25,7 +25,7 @@
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\000_MultiLanguage\000_MultiLanguage.vcxproj">
+    <ProjectReference Include="..\MultiLanguage\MultiLanguage.vcxproj">
       <Project>{825b17e8-3fd9-4430-9ebf-1f3d0fe1865e}</Project>
     </ProjectReference>
     <ProjectReference Include="..\SocketClient\SocketClient.vcxproj">

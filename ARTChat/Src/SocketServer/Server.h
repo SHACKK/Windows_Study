@@ -24,9 +24,9 @@ private:
 	std::queue<SOCKET> m_queSuspended;
 	std::set<CConnectionSuper*> m_setConnected;
 	std::queue<CConnectionSuper*> m_queDiscon;
-	SOCKET m_ListenSocket;
-	HANDLE hAcceptThread;
-	HANDLE hDisAcceptThread;
+	SOCKET m_ListenSocket = 0;
+	HANDLE hAcceptThread = 0;
+	HANDLE hDisAcceptThread = 0;
 
 	std::vector<std::wstring> m_vecChatData = 
 	{

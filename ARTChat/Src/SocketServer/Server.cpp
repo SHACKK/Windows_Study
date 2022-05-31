@@ -54,6 +54,7 @@ int CServer::StartUp(ST_SERVER_INIT stInit)
 
 void CServer::ShutDown()
 {
+	Broadcast(CONNECTION_CLOSE_BY_SERVER);
 	WaitForSingleObject(hAcceptThread, INFINITE);
 	WaitForSingleObject(hDisAcceptThread, INFINITE);
 }
@@ -133,7 +134,7 @@ DWORD CServer::AcceptThread()
 			std::wstring strWaitMessage = L"Wait";
 			size_t nLength = strWaitMessage.length() * sizeof(wchar_t);
 			::send(hConnectionSocket, (const char*)&nLength, (int)sizeof(nLength), 0);
-			::send(hConnectionSocket, (const char*)strWaitMessage.c_str(), nLength, 0);
+			::send(hConnectionSocket, (const char*)strWaitMessage.c_str(), (int)nLength, 0);
 
 			continue;
 		}

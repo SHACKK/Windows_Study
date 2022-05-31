@@ -11,3 +11,4 @@
 
 #include "../SocketServer/_SocketServer.h"
 #include "../SocketClient/_SocketClient.h"
+#include "../Packet/_Packet.h"

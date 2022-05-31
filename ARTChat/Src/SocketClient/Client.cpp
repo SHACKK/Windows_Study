@@ -33,14 +33,14 @@ int CClient::Close()
 
 int CClient::Send(LPBYTE pData, size_t tSize)
 {
-	int nRet = ::send(m_hClientSocket, (const char*)&pData, tSize, 0);
+	int nRet = ::send(m_hClientSocket, (const char*)&pData, (int)tSize, 0);
 	return nRet;
 }
 
 
 int CClient::Recv(LPBYTE pBuffer, size_t tSize)
 {
-	int nRet = ::recv(m_hClientSocket, (char*)&pBuffer, tSize, 0);
+	int nRet = ::recv(m_hClientSocket, (char*)&pBuffer, (int)tSize, 0);
 	return nRet;
 }
 
