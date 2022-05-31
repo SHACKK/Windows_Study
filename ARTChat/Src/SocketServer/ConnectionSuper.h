@@ -18,4 +18,7 @@ public:
 	int Send(LPCBYTE pData, size_t tSize);
 	int Recv(LPBYTE pBuffer, size_t tBufferSize);
 	int Peek(LPBYTE pBuffer, size_t tBufferSize);
+
+	//Test¿ë
+	void SetSocket(SOCKET socket, CServer* server);
 };

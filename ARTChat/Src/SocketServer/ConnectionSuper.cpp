@@ -46,3 +46,9 @@ int CConnectionSuper::Peek(LPBYTE pBuffer, size_t tBufferSize)
 
 	return nRet;
 }
+
+void CConnectionSuper::SetSocket(SOCKET socket, CServer* server)
+{
+	m_ConnectionSocket = socket;
+	m_pServer = server;
+}

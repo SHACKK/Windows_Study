@@ -5,9 +5,6 @@ int CClient::Connect(ST_SERVER_INFO stServerInfo)
 {
 	try
 	{
-		m_hClientSocket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-		if (INVALID_SOCKET == m_hClientSocket) throw std::exception("Failed to Create SOCKET");
-
 		sockaddr_in service;
 		service.sin_family = AF_INET;
 		service.sin_addr.s_addr = inet_addr(stServerInfo.IP);
@@ -27,7 +24,6 @@ int CClient::Connect(ST_SERVER_INFO stServerInfo)
 int CClient::Close()
 {
 	//::closesocket(m_hClientSocket);
-
 	return 0;
 }
 

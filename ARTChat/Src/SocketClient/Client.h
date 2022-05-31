@@ -14,7 +14,12 @@ class CClient
 protected:
 	SOCKET m_hClientSocket;
 public:
-	CClient() {};
+	CClient() 
+	{
+		m_hClientSocket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+		if (INVALID_SOCKET == m_hClientSocket)
+			printf("[ERROR] Can't Create Socket %d\n", WSAGetLastError());
+	};
 	~CClient() {};
 
 	int Connect(ST_SERVER_INFO stServerInfo);

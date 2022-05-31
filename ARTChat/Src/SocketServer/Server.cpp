@@ -18,9 +18,6 @@ DWORD WINAPI DisAcceptThreadCaller(void* pContext)
 int CServer::StartUp(ST_SERVER_INIT stInit)
 {
 	try {
-		m_ListenSocket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-		if (INVALID_SOCKET == m_ListenSocket) throw WSAGetLastError();
-
 		sockaddr_in service;
 		service.sin_family = AF_INET;
 		service.sin_addr.s_addr = INADDR_ANY;
@@ -98,6 +95,11 @@ bool CServer::UpdateChatData(std::wstring strMessage)
 	mtx_ChatData.unlock();	
 
 	return true;
+}
+
+SOCKET CServer::GetListenSocket()
+{
+	return m_ListenSocket;
 }
 
 void CServer::DisConnect(CConnectionSuper* pConnection)

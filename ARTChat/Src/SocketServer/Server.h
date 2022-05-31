@@ -40,7 +40,12 @@ private:
 	std::mutex mtx_ChatData;
 
 public:
-	CServer() {};
+	CServer() 
+	{
+		m_ListenSocket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+		if (INVALID_SOCKET == m_ListenSocket)
+			printf("[ERROR] Cant' Create Socket : %d\n", WSAGetLastError());
+	};
 	~CServer()
 	{
 		std::wstring strShutdownCommand = L"/CloseByServer";
@@ -56,4 +61,7 @@ public:
 	void InsertConnectedSet(CConnectionSuper* newConnection);
 	std::vector<std::wstring> GetChatData();
 	bool UpdateChatData(std::wstring strMessage);
+	
+	//Test¿ë
+	SOCKET GetListenSocket();
 };
