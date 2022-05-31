@@ -5,7 +5,7 @@
 #include "../SocketClient/_SocketClient.h"
 #include "../SocketServer/_SocketServer.h"
 
-bool SendTest()
+bool SendRecvTest()
 {
 	try
 	{
@@ -15,8 +15,18 @@ bool SendTest()
 		MakeConnection(&server, &connection, &client);
 
 		std::wstring strSendMessage = L"TEST";
-		client.Send(strSendMessage);
+		int nRet = client.Send(strSendMessage);
+		if (0 < nRet)	return false;
+
 		std::wstring strRecvMessage = connection.Recv();
+		if (strRecvMessage.empty() || wcscmp(strRecvMessage.c_str(), strSendMessage.c_str()))	return false;
+
+		nRet = connection.Send(strSendMessage);
+		if (0 < nRet)	return false;
+
+		strRecvMessage = client.Recv();
+		if (strRecvMessage.empty() || wcscmp(strRecvMessage.c_str(), strSendMessage.c_str()))	return false;
+
 		return true;
 	}
 	catch (...)

@@ -13,4 +13,4 @@ struct ST_ACCEPTTHREAD_PARAM
 
 DWORD WINAPI AcceptThread(LPVOID pContext);
 DWORD WINAPI ConnectThread(LPVOID pContext);
-void MakeConnection(CServer* server, CChatConnection* connection, CChatClient* client);
+bool MakeConnection(CServer* server, CChatConnection* connection, CChatClient* client);

@@ -17,7 +17,7 @@ int main()
 	ST_WSA_INITIALIZER stWsaInit;
 	bool bRes;
 
-	bRes = SendTest();
+	bRes = SendRecvTest();
 	CheckResult(bRes, "SendTest");
 
 	return 0;

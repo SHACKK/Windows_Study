@@ -37,7 +37,7 @@ DWORD WINAPI ConnectThread(LPVOID pContext)
 	return 0;
 }
 
-void MakeConnection(CServer* server, CChatConnection* connection, CChatClient* client)
+bool MakeConnection(CServer* server, CChatConnection* connection, CChatClient* client)
 {
 	try
 	{
@@ -49,9 +49,12 @@ void MakeConnection(CServer* server, CChatConnection* connection, CChatClient* c
 
 		::WaitForSingleObject(hAcceptThread, INFINITE);
 		::WaitForSingleObject(hConnectThread, INFINITE);
+
+		return true;
 	}
 	catch (...)
 	{
 		printf("[ERROR] Connection Failed [ERROR-CODE] %d", WSAGetLastError());
+		return false;
 	}
 }
