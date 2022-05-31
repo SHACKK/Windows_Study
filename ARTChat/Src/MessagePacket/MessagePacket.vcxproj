@@ -156,34 +156,28 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="BroadcastChatData.h" />
-    <ClInclude Include="BroadcastDisconnection.h" />
-    <ClInclude Include="ReqDisconnection.h" />
-    <ClInclude Include="ReqMessageInput.h" />
-    <ClInclude Include="ResAccept.h" />
-    <ClInclude Include="ReqConnection.h" />
-    <ClInclude Include="Packetizer.h" />
-    <ClInclude Include="PacketHandler.h" />
-    <ClInclude Include="PacketHandlerSuper.h" />
+    <ClInclude Include="BROADCAST_DISCONNECT.h" />
+    <ClInclude Include="BROADCAST_MESSAGE.h" />
+    <ClInclude Include="REQ_DISCONNECT.h" />
+    <ClInclude Include="REQ_MESSAGEINPUT.h" />
+    <ClInclude Include="RES_ACCEPT.h" />
+    <ClInclude Include="REQ_CONNECT.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="ResChatData.h" />
-    <ClInclude Include="ResWait.h" />
+    <ClInclude Include="RES_CHATDATA.h" />
+    <ClInclude Include="RES_WAIT.h" />
     <ClInclude Include="_Packet.h" />
-    <ClInclude Include="PCK_HEADER.h" />
+    <ClInclude Include="PACKET_HEADER.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BroadcastChatData.cpp" />
-    <ClCompile Include="BroadcastDisconnection.cpp" />
-    <ClCompile Include="ReqDisconnection.cpp" />
-    <ClCompile Include="ReqMessageInput.cpp" />
-    <ClCompile Include="ResAccept.cpp" />
-    <ClCompile Include="ReqConnection.cpp" />
-    <ClCompile Include="Packetizer.cpp" />
-    <ClCompile Include="PacketHandler.cpp" />
-    <ClCompile Include="PacketHandlerSuper.cpp" />
-    <ClCompile Include="PCK_HEADER.cpp" />
-    <ClCompile Include="ResChatData.cpp" />
-    <ClCompile Include="ResWait.cpp" />
+    <ClCompile Include="BROADCAST_DISCONNECT.cpp" />
+    <ClCompile Include="BROADCAST_MESSAGE.cpp" />
+    <ClCompile Include="REQ_DISCONNECT.cpp" />
+    <ClCompile Include="REQ_MESSAGEINPUT.cpp" />
+    <ClCompile Include="RES_ACCEPT.cpp" />
+    <ClCompile Include="REQ_CONNECT.cpp" />
+    <ClCompile Include="PACKET_HEADER.cpp" />
+    <ClCompile Include="RES_CHATDATA.cpp" />
+    <ClCompile Include="RES_WAIT.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
