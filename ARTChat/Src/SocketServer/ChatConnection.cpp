@@ -64,17 +64,21 @@ std::wstring CChatConnection::Recv()
 	}
 }
 
-void CChatConnection::Send(std::wstring strMessage)
+int CChatConnection::Send(std::wstring strMessage)
 {
+	int nRet = 0;
 	try
 	{
 		size_t nLength = strMessage.length() * sizeof(wchar_t);
-		::send(m_ConnectionSocket, (const char*)&nLength, sizeof(nLength), 0);
-		::send(m_ConnectionSocket, (const char*)strMessage.c_str(), (int)nLength, 0);
+		nRet += ::send(m_ConnectionSocket, (const char*)&nLength, sizeof(nLength), 0);
+		nRet += ::send(m_ConnectionSocket, (const char*)strMessage.c_str(), (int)nLength, 0);
+
+		return nRet;
 	}
 	catch (...)
 	{
 		printf("[Send Error] : %d\n", WSAGetLastError());
+		return 0;
 	}
 }
 
