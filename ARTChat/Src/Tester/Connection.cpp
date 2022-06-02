@@ -6,46 +6,50 @@
 
 DWORD WINAPI AcceptThread(LPVOID pContext)
 {
-	ST_ACCEPTTHREAD_PARAM& stParam = *(ST_ACCEPTTHREAD_PARAM*)pContext;
-	sockaddr_in service;
-	service.sin_family = AF_INET;
-	service.sin_addr.s_addr = INADDR_ANY;
-	service.sin_port = htons(PORT);
-	int nExcep = ::bind(stParam.server->GetListenSocket(), (sockaddr*)&service, sizeof(service));
-	if (SOCKET_ERROR == nExcep) throw std::exception("Failed to Bind");
+	try
+	{
+		ST_TEST_PARAM& stTestParam = *(ST_TEST_PARAM*)pContext;
+		sockaddr_in service;
+		service.sin_family = AF_INET;
+		service.sin_addr.s_addr = INADDR_ANY;
+		service.sin_port = htons(PORT);
+		int nExcep = ::bind(stTestParam.server->GetListenSocket(), (sockaddr*)&service, sizeof(service));
+		if (SOCKET_ERROR == nExcep) throw std::exception("Failed to Bind");
 
-	nExcep = listen(stParam.server->GetListenSocket(), 200);
-	if (SOCKET_ERROR == nExcep) throw std::exception("Failed to Listen");
+		nExcep = listen(stTestParam.server->GetListenSocket(), 200);
+		if (SOCKET_ERROR == nExcep) throw std::exception("Failed to Listen");
 
-	sockaddr RemoteInfo;
-	int nRemoteInfoSize = (int)sizeof(RemoteInfo);
-	SOCKET hConnectionSocket = ::accept(stParam.server->GetListenSocket(), &RemoteInfo, &nRemoteInfoSize);
+		sockaddr RemoteInfo;
+		int nRemoteInfoSize = (int)sizeof(RemoteInfo);
+		SOCKET hConnectionSocket = ::accept(stTestParam.server->GetListenSocket(), &RemoteInfo, &nRemoteInfoSize);
 
-	stParam.connection->SetSocket(hConnectionSocket, stParam.server);
+		stTestParam.connection->SetSocket(hConnectionSocket, stTestParam.server);
+	}
+	catch (std::exception& e)
+	{
+		printf("%s\n", e.what());
+	}
 
 	return 0;
 }
 
 DWORD WINAPI ConnectThread(LPVOID pContext)
 {
-	CChatClient& client = *(CChatClient*)pContext;
+	ST_TEST_PARAM& stTestParam = *(ST_TEST_PARAM*)pContext;
 	ST_SERVER_INFO stServerInfo;
 	stServerInfo.IP = "127.0.0.1";
 	stServerInfo.Port = 56000;
-	client.Connect(stServerInfo);
+	stTestParam.client->CClient::Connect(stServerInfo);
 
 	return 0;
 }
 
-bool MakeConnection(CServer* server, CChatConnection* connection, CChatClient* client)
+bool MakeConnection(ST_TEST_PARAM stTestParam)
 {
 	try
 	{
-		ST_ACCEPTTHREAD_PARAM stArg;
-		stArg.server = server;
-		stArg.connection = connection;
-		HANDLE hAcceptThread = ::CreateThread(nullptr, 0, AcceptThread, &stArg, 0, nullptr);
-		HANDLE hConnectThread = ::CreateThread(nullptr, 0, ConnectThread, client, 0, nullptr);
+		HANDLE hAcceptThread = ::CreateThread(nullptr, 0, AcceptThread, &stTestParam, 0, nullptr);
+		HANDLE hConnectThread = ::CreateThread(nullptr, 0, ConnectThread, &stTestParam, 0, nullptr);
 
 		::WaitForSingleObject(hAcceptThread, INFINITE);
 		::WaitForSingleObject(hConnectThread, INFINITE);
@@ -54,7 +58,7 @@ bool MakeConnection(CServer* server, CChatConnection* connection, CChatClient* c
 	}
 	catch (...)
 	{
-		printf("[ERROR] Connection Failed [ERROR-CODE] %d", WSAGetLastError());
+		printf("[ERROR CODE] %d\n", WSAGetLastError());
 		return false;
 	}
 }

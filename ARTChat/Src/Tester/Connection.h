@@ -3,14 +3,14 @@
 #include "../SocketClient/_SocketClient.h"
 
 #define PORT 56000
-#define MAX_CONNECTION 1
 
-struct ST_ACCEPTTHREAD_PARAM
+struct ST_TEST_PARAM
 {
 	CServer* server;
 	CChatConnection* connection;
+	CChatClient* client;
 };
 
 DWORD WINAPI AcceptThread(LPVOID pContext);
 DWORD WINAPI ConnectThread(LPVOID pContext);
-bool MakeConnection(CServer* server, CChatConnection* connection, CChatClient* client);
+bool MakeConnection(ST_TEST_PARAM stTestParam);
