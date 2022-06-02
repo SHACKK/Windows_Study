@@ -50,34 +50,5 @@ int main()
 	CheckResult(Client_RecvChatDataTest(stTestParam), "Client RecvChatData() Test");
 	CheckResult(Client_setUserNameTest(stTestParam), "Client SetUserName() Test");
 
-	std::vector<CConnectionSuper*> vecConnectionPool;
-
-	for (int i = 0; i < MAX_CONNECTION; i++)
-	{
-		CChatConnection* connection = new CChatConnection;
-		vecConnectionPool.push_back(connection);
-	}
-	server.MakeConnectionPool(vecConnectionPool);
-
-	::CreateThread(nullptr, 0, ServerAccpetThreadCaller, &server, 0, nullptr);
-	::CreateThread(nullptr, 0, ServerDisAcceptThreadCaller, &server, 0, nullptr);
-
-	std::vector<CChatClient*> vecClient;
-	ST_SERVER_INFO stServerInfo;
-	stServerInfo.IP = "127.0.0.1";
-	stServerInfo.Port = 56000;
-	
-	for (int i = 0; i < MAX_CLIENT; i++)
-	{
-		CChatClient* client = new CChatClient;
-		vecClient.push_back(client);
-	}
-
-	for (auto iter : vecClient)
-	{
-		(iter)->Connect(stServerInfo, L"TEST");
-	}
-
-
 	return 0;
 }

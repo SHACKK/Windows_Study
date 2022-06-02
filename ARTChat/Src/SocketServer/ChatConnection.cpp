@@ -16,7 +16,6 @@ void CChatConnection::onConnect()
 
 	m_pServer->UpdateChatData(L"---------------" + strUserName + L" 님이 입장하셨습니다" + L"---------------");
 	m_pServer->InsertConnectedSet(this);
-	//wprintf(L"%s", strUserName.c_str());
 
 	// 최초 채팅데이터 전송
 	std::vector<std::wstring> vecChatData = m_pServer->GetChatData();
@@ -28,7 +27,7 @@ void CChatConnection::onRecv()
 	while (true)
 	{
 		std::wstring strMessage = Recv();
-		if (!wcscmp(strMessage.c_str(), CONNECTION_CLOSE_BY_CLIENT) || strMessage.empty()) // 임시방편으로 이렇게 막기는 했는데... 왜 메모리가 튀는지???.
+		if (!wcscmp(strMessage.c_str(), CONNECTION_CLOSE_BY_CLIENT) || strMessage.empty()) 
 			break;
 
 		m_pServer->UpdateChatData(GetCurrentTimeString() + strUserName + L" : " + strMessage);
@@ -42,7 +41,6 @@ void CChatConnection::onClose()
 
 	if (!strUserName.empty())
 		m_pServer->UpdateChatData(L"---------------" + strUserName + L" 님이 퇴장하셨습니다" + L"---------------");
-
 }
 
 std::wstring CChatConnection::Recv()

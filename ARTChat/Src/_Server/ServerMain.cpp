@@ -2,7 +2,7 @@
 #pragma comment(lib, "Ws2_32.lib")
 
 #define PORT 55000
-#define MAX_CONNECTION 20
+#define MAX_CONNECTION 3
 
 int main()
 {

@@ -147,6 +147,7 @@ int main()
 	stServerInfo.IP = SERVER_IP;
 	stServerInfo.Port = SERVER_PORT;
 
+	
 	if (!client.Connect(stServerInfo, USER_NAME))
 	{
 		printf("Connection Failed\n");
