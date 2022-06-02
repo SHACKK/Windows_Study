@@ -1,6 +1,27 @@
 #include "pch.h"
 #include "ChatClient.h"
 
+bool CChatClient::Connect(ST_SERVER_INFO stServerInfo, std::wstring strUserName)
+{
+	__super::Connect(stServerInfo);
+
+	std::wstring strConnectResult = Recv();
+	if (!wcscmp(strConnectResult.c_str(), L"Wait"))
+	{
+		wprintf(L"Server is too busy...\nPlease Wait");
+		strConnectResult = Recv();
+	}
+	if (!wcscmp(strConnectResult.c_str(), L"Accept"))
+	{
+		wprintf(L"Connected!\n");
+		m_strUserName = strUserName;
+		Send(m_strUserName);
+		return true;
+	}
+
+	return false;
+}
+
 int CChatClient::Send(std::wstring strMessage)
 {
 	int nRet = 0;

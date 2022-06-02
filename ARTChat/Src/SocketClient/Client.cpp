@@ -23,7 +23,8 @@ int CClient::Connect(ST_SERVER_INFO stServerInfo)
 
 int CClient::Close()
 {
-	//::closesocket(m_hClientSocket);
+	
+	::closesocket(m_hClientSocket);
 	return 0;
 }
 
@@ -32,7 +33,6 @@ int CClient::Send(LPBYTE pData, size_t tSize)
 	int nRet = ::send(m_hClientSocket, (const char*)&pData, (int)tSize, 0);
 	return nRet;
 }
-
 
 int CClient::Recv(LPBYTE pBuffer, size_t tSize)
 {
