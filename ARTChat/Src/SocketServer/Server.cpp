@@ -182,3 +182,89 @@ DWORD CServer::DisAcceptThread()
 		}
 	}
 }
+
+void CServer::MakeConnectionPool(std::vector<CConnectionSuper*> vecConnectionPool)
+{
+	// Fill the m_queReady
+	for (auto iter : vecConnectionPool)
+		m_queReady.push(iter);
+	if (m_queReady.empty()) throw std::exception("Connection Pool doesn't exist");
+}
+
+DWORD CServer::TestAcceptThread()
+{
+	while (true)
+	{
+		sockaddr RemoteInfo;
+		int nRemoteInfoSize = (int)sizeof(RemoteInfo);
+
+		SOCKET hConnectionSocket = ::accept(m_ListenSocket, &RemoteInfo, &nRemoteInfoSize);
+
+		if (m_queReady.empty())
+		{
+			mtx_queSuspended.lock();
+			m_queSuspended.push(hConnectionSocket);
+			mtx_queSuspended.unlock();
+
+			std::wstring strWaitMessage = L"Wait";
+			size_t nLength = strWaitMessage.length() * sizeof(wchar_t);
+			::send(hConnectionSocket, (const char*)&nLength, (int)sizeof(nLength), 0);
+			::send(hConnectionSocket, (const char*)strWaitMessage.c_str(), (int)nLength, 0);
+
+			continue;
+		}
+
+		mtx_queReady.lock();
+		CConnectionSuper* newConnection = m_queReady.front();
+		m_queReady.pop();
+		mtx_queReady.unlock();
+
+		//Accept 보내기
+		std::wstring strAccept = L"Accept";
+		size_t nLength_ = strAccept.length() * sizeof(wchar_t);
+		newConnection->Send((LPCBYTE)&nLength_, sizeof(nLength_));
+		newConnection->Send((LPCBYTE)strAccept.c_str(), nLength_);
+
+		//strUserName 받기
+		size_t nLength = 0;
+		newConnection->Recv((LPBYTE)&nLength, sizeof(nLength));
+
+		std::wstring strUserName;
+		strUserName.resize(nLength / sizeof(wchar_t));
+		newConnection->Recv((LPBYTE)strUserName.c_str(), (int)nLength);
+
+		InsertConnectedSet(newConnection);
+	}
+}
+
+DWORD CServer::TestDisAcceptThread()
+{
+	while (true)
+	{
+		if (m_queDiscon.empty())
+			continue;
+
+		if (m_queSuspended.empty()) // 끊어진 연결이 있고, 대기중인 소켓이 없는 경우
+		{
+			mtx_queDiscon.lock();
+			CConnectionSuper* closedConnection = m_queDiscon.front();
+			m_queDiscon.pop();
+			mtx_queDiscon.unlock();
+
+			mtx_queReady.lock();
+			m_queReady.push(closedConnection);
+			mtx_queReady.unlock();
+		}
+		else // 끊어진 연결이 있고, 대기중인 소켓이 있는 경우
+		{
+			mtx_queSuspended.lock();
+			SOCKET suspendedSocket = m_queSuspended.front();
+			m_queSuspended.pop();
+			mtx_queSuspended.unlock();
+
+			CConnectionSuper* closedConnection = m_queDiscon.front();
+			m_queDiscon.pop();
+			InsertConnectedSet(closedConnection);
+		}
+	}
+}

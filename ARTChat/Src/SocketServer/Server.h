@@ -64,4 +64,7 @@ public:
 	
 	//Test¿ë
 	SOCKET GetListenSocket();
+	void MakeConnectionPool(std::vector<CConnectionSuper*> vecConnectionPool);
+	DWORD TestAcceptThread();
+	DWORD TestDisAcceptThread();
 };
