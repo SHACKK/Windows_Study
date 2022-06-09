@@ -59,6 +59,7 @@ CSockMFCDlg::CSockMFCDlg(CWnd* pParent /*=nullptr*/)
 void CSockMFCDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_EDIT_FileName, m_edFileName);
 }
 
 BEGIN_MESSAGE_MAP(CSockMFCDlg, CDialogEx)
@@ -154,13 +155,19 @@ HCURSOR CSockMFCDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
-
+//TODO : ID, PW 받고 인증 완료되면 다른 다이얼로그가 나오도록 처리
 void CSockMFCDlg::OnBnClickedButton1()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	CString strFileName;
-	GetDlgItemTextW(IDC_BUTTON1, strFileName);
+	GetDlgItemText(IDC_EDIT_FileName, strFileName);
 
+	if (strFileName.IsEmpty())
+	{
+		MessageBox(TEXT("파일 이름을 입력하십시오"),TEXT("알림"), MB_ICONWARNING);
+		return;
+	}
+		
 	SOCKET hSocket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	sockaddr_in service;
 	service.sin_family = AF_INET;

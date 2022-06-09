@@ -8,7 +8,6 @@
 #define IDD_FTPSERVER_DIALOG            102
 #define IDP_SOCKETS_INIT_FAILED         103
 #define IDR_MAINFRAME                   128
-#define IDD_DIALOG1                     132
 #define IDC_LIST1                       1000
 #define IDC_edProtNumer                 1001
 #define IDC_edMaxConn                   1002

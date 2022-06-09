@@ -104,7 +104,8 @@ BOOL CFTPServerDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
 
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
-	
+	GetWindowRect(&m_rtWindow);
+	SetWindowPos(nullptr, 0, 0, m_rtWindow.Width(), 140, SWP_NOMOVE | SWP_NOZORDER);
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -158,51 +159,83 @@ HCURSOR CFTPServerDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+UINT CFTPServerDlg::AccpetThread(LPVOID pContext)
+{
+	CFTPServerDlg& dlg = *(CFTPServerDlg*)pContext;
+	sockaddr RemoteInfo;
+	int nRemoteInfoSize = (int)sizeof(RemoteInfo);
+	dlg.hConnectionSocket = ::accept(dlg.hListenSocket, &RemoteInfo, &nRemoteInfoSize);
+	return 0;
+}
+
 void CFTPServerDlg::OnBnClickedbnstartup()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+
+	CString strPortNumber, strMaxConn;
+	GetDlgItemText(IDC_edProtNumer, strPortNumber);
+	GetDlgItemText(IDC_edMaxConn, strMaxConn);
+
+	if (strPortNumber.IsEmpty())
+	{
+		MessageBox(TEXT("포트 번호를 입력하세요"), TEXT("알림"), MB_OK);
+		return;
+	}
+
+	if (strMaxConn.IsEmpty())
+	{
+		MessageBox(TEXT("최대 연결수를 입력하세요"), TEXT("알림"), MB_OK);
+		return;
+	}
+
 	if (bServerRunning)
 	{
 		MessageBox(TEXT("Server is already running"), TEXT("Warnning"), MB_ICONWARNING);
 		return;
 	}
-
-	bServerRunning = true;
-	m_ltlogMessage.AddString(TEXT("[INFO] SERVER STARTUP"));
-
-	////////////////////////////////// socket ////////////////////////////////// 
-	hListenSocket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-	if (hListenSocket != INVALID_SOCKET)	m_ltlogMessage.AddString(TEXT("[SUCCESS] SOCKET CREATE"));
-	else	m_ltlogMessage.AddString(TEXT("[ERROR] SOCKET CREATE"));
-
-	/////////////////////////////////// bind /////////////////////////////////// 
-	sockaddr_in service;
-	service.sin_family = AF_INET;
-	inet_pton(AF_INET, "127.0.0.1", &(service.sin_addr.s_addr));
-	service.sin_port = htons(56000);
-	int nRet = ::bind(hListenSocket, (sockaddr*)&service, (int)sizeof(service));
-	if (nRet == SOCKET_ERROR)
+	else
 	{
-		m_ltlogMessage.AddString(TEXT("[ERROR] SOCKET BIND\n[ERROR CODE] %d", WSAGetLastError()));
-		return;
-	}
-	m_ltlogMessage.AddString(TEXT("[SUCCESS] SOCKET BIND"));
+		SetWindowPos(nullptr, 0, 0, m_rtWindow.Width(), m_rtWindow.Height(), SWP_NOZORDER | SWP_NOMOVE);
 
-	/////////////////////////////////// listen /////////////////////////////////// 
-	nRet = ::listen(hListenSocket, 200);
-	if(nRet == SOCKET_ERROR)
-	{
-		m_ltlogMessage.AddString(TEXT("[ERROR] SOCKET LISTEN\n[ERROR CODE] %d", WSAGetLastError()));
-		return;
-	}
-	m_ltlogMessage.AddString(TEXT("[SUCCESS] SOCKET LISTEN"));
+		bServerRunning = true;
+		m_ltlogMessage.AddString(TEXT("[INFO] SERVER STARTUP"));
 
+		////////////////////////////////// socket ////////////////////////////////// 
+		hListenSocket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+		if (hListenSocket != INVALID_SOCKET)	m_ltlogMessage.AddString(TEXT("[SUCCESS] SOCKET CREATE"));
+		else	m_ltlogMessage.AddString(TEXT("[ERROR] SOCKET CREATE"));
+
+		/////////////////////////////////// bind /////////////////////////////////// 
+		sockaddr_in service;
+		service.sin_family = AF_INET;
+		inet_pton(AF_INET, "127.0.0.1", &(service.sin_addr.s_addr));
+		service.sin_port = htons(56000);
+		int nRet = ::bind(hListenSocket, (sockaddr*)&service, (int)sizeof(service));
+		if (nRet == SOCKET_ERROR)
+		{
+			m_ltlogMessage.AddString(TEXT("[ERROR] SOCKET BIND\n[ERROR CODE] %d", WSAGetLastError()));
+			return;
+		}
+		m_ltlogMessage.AddString(TEXT("[SUCCESS] SOCKET BIND"));
+
+		/////////////////////////////////// listen /////////////////////////////////// 
+		nRet = ::listen(hListenSocket, 200);
+		if (nRet == SOCKET_ERROR)
+		{
+			m_ltlogMessage.AddString(TEXT("[ERROR] SOCKET LISTEN\n[ERROR CODE] %d", WSAGetLastError()));
+			return;
+		}
+		m_ltlogMessage.AddString(TEXT("[SUCCESS] SOCKET LISTEN"));
+
+		AfxBeginThread(AccpetThread, this);
+	}
 	
 }
 
 void CFTPServerDlg::OnBnClickedbnshutdown()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	SetWindowPos(nullptr, 0, 0, m_rtWindow.Width(), 140, SWP_NOMOVE | SWP_NOZORDER);
 	::closesocket(hListenSocket);
 	bServerRunning = false;
 	m_ltlogMessage.AddString(TEXT("[INFO] SERVER SHUTDOWN"));
@@ -218,7 +251,6 @@ void CFTPServerDlg::OnEnChangeedmaxconn()
 
 	// TODO:  여기에 컨트롤 알림 처리기 코드를 추가합니다.
 }
-
 
 void CFTPServerDlg::OnEnChangeedprotnumer()
 {

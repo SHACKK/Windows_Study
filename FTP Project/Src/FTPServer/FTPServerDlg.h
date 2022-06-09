@@ -24,6 +24,7 @@ public:
 // 구현입니다.
 protected:
 	HICON m_hIcon;
+	CRect m_rtWindow;
 
 	// 생성된 메시지 맵 함수
 	virtual BOOL OnInitDialog();
@@ -33,9 +34,11 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	SOCKET hListenSocket;
+	SOCKET hConnectionSocket;
 	BOOL bServerRunning = false;
 	CListBox m_ltConnectionInfo;
 	CListBox m_ltlogMessage;
+	static UINT AccpetThread(LPVOID pContext);
 	afx_msg void OnBnClickedbnstartup();
 	afx_msg void OnBnClickedbnshutdown();
 	afx_msg void OnEnChangeedmaxconn();
