@@ -17,7 +17,7 @@ enum class E_PACKET_TYPE
 struct PACKET_HEADER
 {
 	const char m_szMagic[4];
-	const E_PACKET_TYPE m_eType;
+	static const E_PACKET_TYPE m_eType;
 	const int m_nSize;
 
 	PACKET_HEADER(void);
@@ -27,9 +27,11 @@ struct PACKET_HEADER
 		, m_nSize(nPacketSize)
 	{}
 };
+//외부에서 선언되어야 한다?
 
 struct REQ_CONNECT : public PACKET_HEADER
 {
+	static const E_PACKET_TYPE m_eType = E_PACKET_TYPE::REQ_CONNECT;
 	char szUserID[8];
 	REQ_CONNECT(void)
 		:PACKET_HEADER(E_PACKET_TYPE::REQ_CONNECT, sizeof(*this) - sizeof(PACKET_HEADER))

@@ -13,13 +13,12 @@ class CPacketHandler : public CPacketHandlerSuper
 template<typename T>
 inline E_PACKET_TYPE CPacketHandler<T>::GetType()
 {
-	return T::m_eType;
+	return T;
 }
 
 template<typename T>
 inline void CPacketHandler<T>::OnRecv(void* pData, size_t tDataSize)
 {
 	T* packet = (T*)pData;
-
-	packet.OnRecv(packet);
+	this->OnRecv(packet);
 }
