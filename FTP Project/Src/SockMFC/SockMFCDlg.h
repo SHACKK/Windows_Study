@@ -3,7 +3,7 @@
 //
 
 #pragma once
-
+#include "LoginDlg.h"
 
 // CSockMFCDlg 대화 상자
 class CSockMFCDlg : public CDialogEx
@@ -25,6 +25,8 @@ public:
 protected:
 	HICON m_hIcon;
 	CRect m_rtWindow;
+	SOCKET hSocket;
+	CLoginDlg dlgLogin;
 
 	// 생성된 메시지 맵 함수
 	virtual BOOL OnInitDialog();

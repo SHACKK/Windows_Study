@@ -165,6 +165,21 @@ UINT CFTPServerDlg::AccpetThread(LPVOID pContext)
 	sockaddr RemoteInfo;
 	int nRemoteInfoSize = (int)sizeof(RemoteInfo);
 	dlg.hConnectionSocket = ::accept(dlg.hListenSocket, &RemoteInfo, &nRemoteInfoSize);
+
+	return 0;
+}
+
+DWORD WINAPI AcceptThreadCaller(LPVOID pContext)
+{
+	CFTPServerDlg* dlg = (CFTPServerDlg*)pContext;
+	return dlg->Accept(dlg);
+}
+
+DWORD CFTPServerDlg::Accept(CFTPServerDlg dlg)
+{
+	sockaddr RemoteInfo;
+	int nRemoteInfoSize = (int)sizeof(RemoteInfo);
+	dlg.hConnectionSocket = ::accept(dlg.hListenSocket, &RemoteInfo, &nRemoteInfoSize);
 	return 0;
 }
 
@@ -208,8 +223,8 @@ void CFTPServerDlg::OnBnClickedbnstartup()
 		/////////////////////////////////// bind /////////////////////////////////// 
 		sockaddr_in service;
 		service.sin_family = AF_INET;
-		inet_pton(AF_INET, "127.0.0.1", &(service.sin_addr.s_addr));
-		service.sin_port = htons(56000);
+		service.sin_addr.s_addr = INADDR_ANY;
+		service.sin_port = htons(_ttoi(strPortNumber));
 		int nRet = ::bind(hListenSocket, (sockaddr*)&service, (int)sizeof(service));
 		if (nRet == SOCKET_ERROR)
 		{
@@ -227,7 +242,9 @@ void CFTPServerDlg::OnBnClickedbnstartup()
 		}
 		m_ltlogMessage.AddString(TEXT("[SUCCESS] SOCKET LISTEN"));
 
+		//둘중 선택
 		AfxBeginThread(AccpetThread, this);
+		::CreateThread(nullptr, 0, AcceptThreadCaller, this, 0, nullptr);
 	}
 	
 }
@@ -237,27 +254,10 @@ void CFTPServerDlg::OnBnClickedbnshutdown()
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	SetWindowPos(nullptr, 0, 0, m_rtWindow.Width(), 140, SWP_NOMOVE | SWP_NOZORDER);
 	::closesocket(hListenSocket);
+	::closesocket(hConnectionSocket);
 	bServerRunning = false;
 	m_ltlogMessage.AddString(TEXT("[INFO] SERVER SHUTDOWN"));
-}
 
-
-void CFTPServerDlg::OnEnChangeedmaxconn()
-{
-	// TODO:  RICHEDIT 컨트롤인 경우, 이 컨트롤은
-	// CDialogEx::OnInitDialog() 함수를 재지정 
-	//하고 마스크에 OR 연산하여 설정된 ENM_CHANGE 플래그를 지정하여 CRichEditCtrl().SetEventMask()를 호출하지 않으면
-	// 이 알림 메시지를 보내지 않습니다.
-
-	// TODO:  여기에 컨트롤 알림 처리기 코드를 추가합니다.
-}
-
-void CFTPServerDlg::OnEnChangeedprotnumer()
-{
-	// TODO:  RICHEDIT 컨트롤인 경우, 이 컨트롤은
-	// CDialogEx::OnInitDialog() 함수를 재지정 
-	//하고 마스크에 OR 연산하여 설정된 ENM_CHANGE 플래그를 지정하여 CRichEditCtrl().SetEventMask()를 호출하지 않으면
-	// 이 알림 메시지를 보내지 않습니다.
-
-	// TODO:  여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	CString strMessage;
+	strMessage.
 }

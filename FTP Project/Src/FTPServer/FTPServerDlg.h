@@ -39,8 +39,7 @@ public:
 	CListBox m_ltConnectionInfo;
 	CListBox m_ltlogMessage;
 	static UINT AccpetThread(LPVOID pContext);
+	DWORD Accept(CFTPServerDlg dlg);
 	afx_msg void OnBnClickedbnstartup();
 	afx_msg void OnBnClickedbnshutdown();
-	afx_msg void OnEnChangeedmaxconn();
-	afx_msg void OnEnChangeedprotnumer();
 };

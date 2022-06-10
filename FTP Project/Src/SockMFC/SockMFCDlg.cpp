@@ -7,11 +7,13 @@
 #include "SockMFC.h"
 #include "SockMFCDlg.h"
 #include "afxdialogex.h"
+#include "LoginDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
+typedef std::basic_string<TCHAR> tstring;
 
 // 응용 프로그램 정보에 사용되는 CAboutDlg 대화 상자입니다.
 
@@ -102,6 +104,13 @@ BOOL CSockMFCDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
 
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
+	hSocket = (SOCKET)(dlgLogin.DoModal());
+	if (hSocket == INVALID_SOCKET)
+	{
+		CDialogEx::OnCancel();
+		return false;
+	}
+	
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -167,13 +176,4 @@ void CSockMFCDlg::OnBnClickedButton1()
 		MessageBox(TEXT("파일 이름을 입력하십시오"),TEXT("알림"), MB_ICONWARNING);
 		return;
 	}
-		
-	SOCKET hSocket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-	sockaddr_in service;
-	service.sin_family = AF_INET;
-	inet_pton(AF_INET, "127.0.0.1", &(service.sin_addr.s_addr));
-	service.sin_port = htons(56000);
-	int nRet = ::connect(hSocket, (sockaddr*)&service, (int)sizeof(service));
-
-
 }
