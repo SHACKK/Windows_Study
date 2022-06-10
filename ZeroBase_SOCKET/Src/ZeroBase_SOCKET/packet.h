@@ -21,9 +21,8 @@ struct PACKET_HEADER
 	const int m_nSize;
 
 	PACKET_HEADER(void);
-	PACKET_HEADER(E_PACKET_TYPE ePacketType, int nPacketSize)
+	PACKET_HEADER(int nPacketSize)
 		: m_szMagic{ 'S', 'H', 'A', 'K' }
-		, m_eType(ePacketType)
 		, m_nSize(nPacketSize)
 	{}
 };
@@ -33,9 +32,10 @@ struct REQ_CONNECT : public PACKET_HEADER
 {
 	static const E_PACKET_TYPE m_eType = E_PACKET_TYPE::REQ_CONNECT;
 	char szUserID[8];
-	REQ_CONNECT(void)
-		:PACKET_HEADER(E_PACKET_TYPE::REQ_CONNECT, sizeof(*this) - sizeof(PACKET_HEADER))
+	REQ_CONNECT(E_PACKET_TYPE ePacketType)
+		:PACKET_HEADER(sizeof(*this) - sizeof(PACKET_HEADER))
 		, szUserID{ 0, }
+		, PACKET_HEADER::m_eType = ePacketType
 	{}
 };
 
