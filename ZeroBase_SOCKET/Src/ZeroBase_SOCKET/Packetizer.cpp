@@ -40,10 +40,9 @@ void CPacketizer::ProcessPacket(void* pData, size_t tDataSize)
 	for (iter = m_vecHandler.begin(); iter != m_vecHandler.end(); iter++)
 	{
 		if (header.m_eType == (*iter)->GetType())
+		{
 			(*iter)->OnRecv(pData, tDataSize);
+			break;
+		}
 	}
 }
-
-// 1. m_vecHandler 액세스가 모호합니다?
-// 2. PacketHandler<>에서 GetType()함수 구현 오류
-// 3. packetizer 안에서 recv를 하려는 순간 소켓이 필요함. -> 밖에서 받아서 들어오자니 받을 사이즈가 패킷마다 다름.

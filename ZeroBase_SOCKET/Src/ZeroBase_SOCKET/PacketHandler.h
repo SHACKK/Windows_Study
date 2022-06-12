@@ -1,5 +1,4 @@
 #pragma once
-#include "packet.h"
 #include "PacketHandlerSuper.h"
 
 template <typename T>
@@ -13,13 +12,13 @@ class CPacketHandler : public CPacketHandlerSuper
 template<typename T>
 inline E_PACKET_TYPE CPacketHandler<T>::GetType()
 {
-	return T::m_eType;
+	T packet;
+	return packet.m_eType;
 }
 
 template<typename T>
 inline void CPacketHandler<T>::OnRecv(void* pData, size_t tDataSize)
 {
 	T* packet = (T*)pData;
-
-	packet.OnRecv(packet);
+	OnRecv(packet);
 }

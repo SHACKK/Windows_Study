@@ -1,7 +1,5 @@
 #include <Windows.h>
 #include <stdio.h>
-#include "packet.h"
-#include "PacketHandler.h"
 #include "Packetizer.h"
 #pragma comment(lib, "Ws2_32.lib")
 

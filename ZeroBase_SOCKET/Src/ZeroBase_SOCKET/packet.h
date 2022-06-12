@@ -16,16 +16,17 @@ enum class E_PACKET_TYPE
 
 struct PACKET_HEADER
 {
-	const char m_szMagic[4];
-	const E_PACKET_TYPE m_eType;
-	const int m_nSize;
+	char m_szMagic[4];
+	E_PACKET_TYPE m_eType;
+	int m_nSize;
 
-	PACKET_HEADER(void);
+	PACKET_HEADER() {}
 	PACKET_HEADER(E_PACKET_TYPE ePacketType, int nPacketSize)
 		: m_szMagic{ 'S', 'H', 'A', 'K' }
 		, m_eType(ePacketType)
 		, m_nSize(nPacketSize)
 	{}
+	~PACKET_HEADER() {}
 };
 
 struct REQ_CONNECT : public PACKET_HEADER
