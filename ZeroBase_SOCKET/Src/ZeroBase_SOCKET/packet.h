@@ -31,10 +31,11 @@ struct PACKET_HEADER
 
 struct REQ_CONNECT : public PACKET_HEADER
 {
-	char szUserID[8];
+public:
+	char szUserID[10];
 	REQ_CONNECT(void)
 		:PACKET_HEADER(E_PACKET_TYPE::REQ_CONNECT, sizeof(*this) - sizeof(PACKET_HEADER))
-		, szUserID{ 0, }
+		, szUserID{0, }
 	{}
 };
 
@@ -50,6 +51,7 @@ public:
 
 struct REQ_MESSAGE_INPUT : public PACKET_HEADER
 {
+public:
 	char szMessage[20];
 
 	REQ_MESSAGE_INPUT(void)
@@ -60,6 +62,7 @@ struct REQ_MESSAGE_INPUT : public PACKET_HEADER
 
 struct RES_MESSAGE : public PACKET_HEADER
 {
+public:
 	char szMessage[20];
 	RES_MESSAGE(void)
 		:PACKET_HEADER(E_PACKET_TYPE::RES_MESSAGE, sizeof(*this) - sizeof(PACKET_HEADER))
@@ -69,6 +72,7 @@ struct RES_MESSAGE : public PACKET_HEADER
 
 struct REQ_DISCONNECT : public PACKET_HEADER
 {
+public:
 	char szDiscon[8];
 	REQ_DISCONNECT(void)
 		:PACKET_HEADER(E_PACKET_TYPE::REQ_DISCONNECT, sizeof(*this) - sizeof(PACKET_HEADER))

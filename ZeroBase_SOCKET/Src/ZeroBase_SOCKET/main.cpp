@@ -28,12 +28,9 @@ DWORD WINAPI ServerThread(LPVOID pContext)
 	}
 
 	PACKET_HEADER packet;
-	while (packet.m_eType != E_PACKET_TYPE::REQ_DISCONNECT)
-	{
-		::recv(*(stParam.hConnectionSocket), (char*)&packet, sizeof(PACKET_HEADER), MSG_PEEK);
-		CPacketizer packetizer;
-		packetizer.ProcessPacket(&packet, sizeof(PACKET_HEADER)); // 멤버를 사용하려면 this도 가지고 들어가야 하는거 아닌가?
-	}
+	::recv(*(stParam.hConnectionSocket), (char*)&packet, sizeof(PACKET_HEADER), MSG_PEEK);
+	CPacketizer packetizer;
+	packetizer.ProcessPacket(&packet, sizeof(PACKET_HEADER)); // 멤버를 사용하려면 this도 가지고 들어가야 하는거 아닌가?
 
 	return 0;
 }
@@ -51,14 +48,10 @@ DWORD WINAPI ClientThread(LPVOID pContext)
 		return 0;
 	}
 
-	PACKET_HEADER packet;
-	int nRecvSize = 0;
-	while (nRecvSize != 0)
-	{
-		::recv(hClientSocket, (char*)&packet, sizeof(PACKET_HEADER), MSG_PEEK);
-		CPacketizer packetizer;
-		packetizer.ProcessPacket(&packet, sizeof(PACKET_HEADER));
-	}
+	std::string strUserId = "jfhg456";
+	REQ_CONNECT pckConnect;
+	strcpy_s(pckConnect.szUserID, strUserId.c_str());
+	send(hClientSocket, (const char*)&pckConnect, (int)sizeof(REQ_CONNECT), 0);
 
 	return 0;
 }
@@ -79,10 +72,6 @@ int main()
 
 	WaitForSingleObject(hServerHandle, INFINITE);
 	WaitForSingleObject(hClientHandle, INFINITE);
-
-	REQ_CONNECT pckConnect;
-	
-
 
 	WSACleanup();
 	return 0;
