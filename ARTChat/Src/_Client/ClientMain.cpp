@@ -1,7 +1,7 @@
 #include "pch.h"
 #pragma comment(lib, "Ws2_32.lib")
 
-#define SERVER_IP "172.30.100.217"
+#define SERVER_IP "127.0.0.1"
 #define SERVER_PORT 55000
 #define USER_NAME L"[ ÀÓÃ¢Çö ]"
 #define MAX_CHATDATA_SIZE 25
