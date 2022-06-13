@@ -259,5 +259,5 @@ void CFTPServerDlg::OnBnClickedbnshutdown()
 	m_ltlogMessage.AddString(TEXT("[INFO] SERVER SHUTDOWN"));
 
 	CString strMessage;
-	strMessage.
+	//strMessage.
 }
