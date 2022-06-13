@@ -30,7 +30,7 @@ DWORD WINAPI ServerThread(LPVOID pContext)
 	PACKET_HEADER packet;
 	::recv(*(stParam.hConnectionSocket), (char*)&packet, sizeof(PACKET_HEADER), MSG_PEEK);
 	CPacketizer packetizer;
-	packetizer.ProcessPacket(&packet, sizeof(PACKET_HEADER)); // 멤버를 사용하려면 this도 가지고 들어가야 하는거 아닌가?
+	packetizer.ProcessPacket(&packet, sizeof(PACKET_HEADER));
 
 	return 0;
 }
